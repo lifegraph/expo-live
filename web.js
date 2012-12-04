@@ -250,6 +250,10 @@ var dbmongo, cols = {};
 function setupMongo (next) {
   mongo.connect(MONGO_URI, {}, function (error, _dbmongo) {
     dbmongo = _dbmongo;
+    if (error) {
+      console.error('Error connecting to mongo:', error);
+      process.exit(1);
+    }
     console.log("Connected to Mongo:", MONGO_URI);
 
     dbmongo.on("error", function (error) {
