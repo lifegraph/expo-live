@@ -5,6 +5,7 @@ var express = require('express');
 
 var app = express();
 app.use(express.logger());
+app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
 
 app.get('/', function (req, res) {
@@ -12,7 +13,7 @@ app.get('/', function (req, res) {
 });
 
 app.post('/hardware', function (req, res) {
-  res.send(JSON.stringify(req.params));
+  res.send(JSON.stringify(req.body));
 });
 
 var port = process.env.PORT || 5000;
