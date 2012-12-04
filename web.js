@@ -90,9 +90,13 @@ app.get('/binds/:id', function (req, res) {
   cols.binds.findOne({
     _id: new ObjectID(req.params.id)
   }, function (err, bind) {
-    bindJSON(bind, function (err, json) {
-      res.json(json);
-    });
+    if (bind) {
+      bindJSON(bind, function (err, json) {
+        res.json(json);
+      });
+    } else {
+      res.json({message: 'No such bind.'}, 404);
+    }
   });
 });
 
@@ -118,9 +122,13 @@ app.get('/ants/:id', function (req, res) {
   cols.ants.findOne({
     ant: req.params.id
   }, function (err, ant) {
-    antJSON(ant, function (err, json) {
-      res.json(json);
-    });
+    if (ant) {
+      antJSON(ant, function (err, json) {
+        res.json(json);
+      });
+    } else {
+      res.json({message: 'No such ant.'}, 404);
+    }
   });
 });
 
