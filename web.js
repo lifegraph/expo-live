@@ -149,7 +149,12 @@ app.put('/ants/:id', function (req, res) {
 
 function userJSON (user, next) {
   // TODO strip fields
-  next(null, user);
+  next(null, {
+    id: user.id,
+    name: user.name,
+    facebookid: user.facebookid,
+    email: user.email
+  });
 }
 
 app.get('/users', function (req, res) {
