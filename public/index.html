@@ -15,9 +15,9 @@
 
       <h2>Client API</h2>
 
-      <h3><span class="muted">GET</span> /users/</h3>
+      <h3><a href="/users/"><span class="muted">GET</span> /users/</a></h3>
 
-      <h3><span class="muted">GET</span> /users/&lt;user id&gt;</h3>
+      <h3><a href="/users/1"><span class="muted">GET</span> /users/&lt;user id&gt;</a></h3>
 
       <p>Unique users in our system, who may or may not have a Facebook ID attached to them.</p>
 
@@ -39,9 +39,9 @@
   "facebookid": 1237230063
 }</pre>
 
-      <h3><span class="muted">GET</span> /presentations/</h3>
+      <h3><a href="/presentations/"><span class="muted">GET</span> /presentations/</a></h3>
 
-      <h3><span class="muted">GET</span> /presentations/&lt;presentation id&gt;</h3>
+      <h3><a href="/presentations/1"><span class="muted">GET</span> /presentations/&lt;presentation id&gt;</a></h3>
 
       <p>Presentations that happen at Expo. Once integrated with a schedule, these presentations will incorporate a time and a location.</p>
 
@@ -66,13 +66,13 @@
 
       <hr>
 
-      <h3><span class="muted">GET</span> /binds/</h3>
+      <h3><a href="/binds/"><span class="muted">GET</span> /binds/</a></h3>
 
-      <h3><span class="muted">GET</span> /binds/&lt;bind id&gt;</h3>
+      <h3><a href="/binds/50bdbd97a931e00000000001"><span class="muted">GET</span> /binds/&lt;bind id&gt;</a></h3>
 
       <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Queen IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
 
-      <h3><span class="muted">GET, PUT</span> /ants/&lt;ant id&gt;</h3>
+      <h3><a href="/ants/abba"><span class="muted">GET, PUT</span> /ants/&lt;ant id&gt;</a></h3>
 
       <p>Retrieve or update <code>ant &hArr; user</code> binding for a given Ant. These should be set when an Ant is deployed in the field.</p>
 
@@ -89,7 +89,7 @@
 
       <hr>
 
-      <h3><span class="muted">Websocket</span> /</h3>
+      <h3><a href="/debug/"><span class="muted">Websocket</span> /</a></h3>
       <p>Emits the following events:</p>
       <ul>
         <li><code>bind:create</code></li>
