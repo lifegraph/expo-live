@@ -1,0 +1,4 @@
+cd ~
+sudo apt-get install python-setuptools
+sudo easy_install serial
+echo "print 'Queen setup complete.'" | python
