@@ -101,6 +101,11 @@ io.sockets.on('connection', function (socket) {
   console.log('New connection:', socket.id);
 });
 
+io.configure(function () { 
+  io.set("transports", ["xhr-polling"]); 
+  io.set("polling duration", 10); 
+});
+
 
 /**
  * Initialize
