@@ -19,18 +19,59 @@
 
       <h3><span class="muted">GET</span> /users/&lt;user id&gt;</h3>
 
-      <h3><span class="muted">GET</span> /locations/</h3>
+      <pre>{
+  "id": 1,
+  "name": "Tim Cameron Ryan",
+  "created_at": "2012-12-03T11:15:03.096Z",
+  "updated_at": "2012-12-03T23:36:37.298Z",
+  "email": "id@timryan.org",
+  "encrypted_password": "",
+  "reset_password_token": null,
+  "reset_password_sent_at": null,
+  "remember_created_at": null,
+  "sign_in_count": 5,
+  "current_sign_in_at": "2012-12-03T23:36:37.295Z",
+  "last_sign_in_at": "2012-12-03T19:32:17.050Z",
+  "current_sign_in_ip": "208.91.53.168",
+  "last_sign_in_ip": "208.91.53.168",
+  "facebookid": 1237230063
+}</pre>
 
-      <h3><span class="muted">GET</span> /locations/&lt;user id&gt;</h3>
+      <h3><span class="muted">GET</span> /presentations/</h3>
+
+      <h3><span class="muted">GET</span> /presentations/&lt;presentation id&gt;</h3>
+
+      <pre>{
+  "id": 1,
+  "contact_name": "Margaret-Ann Seger",
+  "contact_email": "margaret-ann.seger@students.olin.edu",
+  "presentation_title": "Lifegraph",
+  "all_students_presenting": "Tim Ryan, Jialiya Huang, Jon McKay, Paul Booth, Shane Moon, Margaret-Ann Seger",
+  "project_description": "We are introducing a platform for developers to persist, record, and share physical interactions on Facebook's Open Graph. \r\n\r\nFacebook’s Open Graph is an extension of its vast social graph- the Open Graph allows users’ activity on third-party websites and pages throughout the web to be naturally integrated into their Facebook experience. \r\n\r\nLifegraph Labs was born from the idea that much of the lives we live, and the activities we wish to remember and share with our friends, are not done online. Oftentimes there is a fundamental disconnect between how people express themselves online and how they express themselves in everyday interactions. \r\n\r\nToday, the accepted standard device for persisting physical interactions online is the mobile phone. Smartphones, and the sizable app-network that has grown up around them, are adept at recording and consuming information. However, smartphones are disruptive of the natural flow of physical world interactions: they require users’ direct attention, funneling it, however temporarily, from whomever or whatever is happening around them in the real world into a small screen internet portal. \r\n\r\nThe next generation of personal computing will not rely on fumbling around with a smartphone to record, share, and remember. Lifegraph Labs is building the platform that will enable these next-gen interactions by making it easy for developers to design, build, and connect any type of device to Facebook’s Open Graph infrastructure.\r\n",
+  "special_needs": "none",
+  "class_affiliation": "SCOPE",
+  "created_at": "2012-12-03T11:15:22.296Z",
+  "updated_at": "2012-12-03T19:01:51.104Z"
+  }</pre>
+
+      <hr>
 
       <h3><span class="muted">GET</span> /binds/</h3>
 
-      <h3><span class="muted">GET</span> /binds/&lt;user id&gt;</h3>
+      <h3><span class="muted">GET</span> /binds/&lt;bind id&gt;</h3>
+
+      <h3><span class="muted">GET</span> /ants/&lt;ant id&gt;</h3>
+
+      <h3><span class="muted">GET</span> /queens/&lt;queen id&gt;</h3>
+
+      <hr>
 
       <h3><span class="muted">Websocket</span> /</h3>
       <p>Emits the following events:</p>
       <ul>
         <li><code>bind:create</code></li>
+        <li><code>ant:update</code></li>
+        <li><code>queen:update</code></li>
       </ul>
 
       <hr>

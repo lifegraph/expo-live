@@ -6,7 +6,8 @@
   "dependencies": {
     "express": "~3.0.3",
     "mongodb": "~1.2.2",
-    "socket.io": "~0.9.11"
+    "socket.io": "~0.9.11",
+    "pg": "~0.8.7"
   },
   "engines": {
     "node": "0.8.x",

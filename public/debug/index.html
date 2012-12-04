@@ -12,5 +12,11 @@ socket.on('connect', function () {
 socket.on('bind:create', function (data) {
   logs.appendChild(document.createTextNode('bind:create - ' + JSON.stringify(data) + '\n'));
 });
+socket.on('ant:update', function (data) {
+  logs.appendChild(document.createTextNode('ant:update - ' + JSON.stringify(data) + '\n'));
+});
+socket.on('queen:update', function (data) {
+  logs.appendChild(document.createTextNode('queen:update - ' + JSON.stringify(data) + '\n'));
+});
 
 </script>
