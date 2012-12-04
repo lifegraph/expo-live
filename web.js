@@ -11,7 +11,7 @@ app.get('/', function (req, res) {
   res.send('Hello World!');
 });
 
-app.get('/hardware', function (req, res) {
+app.post('/hardware', function (req, res) {
   res.send(JSON.stringify(req.params));
 });
 
