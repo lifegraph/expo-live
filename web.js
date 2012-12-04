@@ -95,8 +95,8 @@ mongo.connect(MONGO_URI, {}, function (error, _db) {
 
   db.collection('locations', function (err, locations) {
     cols.locations = locations;
-    db.collection('students', function (err, students) {
-      cols.students = students;
+    db.collection('users', function (err, users) {
+      cols.users = users;
       db.collection('binds', function (err, binds) {
         cols.binds = binds;
 

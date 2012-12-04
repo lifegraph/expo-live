@@ -2,9 +2,41 @@
 
 <html>
   <head>
+    <title>Olin Expo API</title>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
   </head>
   <body>
-    <h1>Olin Expo API</h1>
-    <p>Todo</p>
+    <div class="container-fluid">
+      <h1>Olin Expo API</h1>
+
+      <hr>
+
+      <h2>Client API</h2>
+
+      <h3><span class="muted">GET</span> /users/</h3>
+
+      <h3><span class="muted">GET</span> /users/&lt;user id&gt;</h3>
+
+      <h3><span class="muted">GET</span> /locations/</h3>
+
+      <h3><span class="muted">GET</span> /locations/&lt;user id&gt;</h3>
+
+      <h3><span class="muted">GET</span> /binds/</h3>
+
+      <h3><span class="muted">GET</span> /binds/&lt;user id&gt;</h3>
+
+      <hr>
+
+      <h2>Hardware API</h2>
+
+      <h3><span class="muted">POST</span> /hardware</h3>
+      <p>Hardware endpoint. Associates Ants with Queens.</p>
+      <p><b>Form values:</b></p>
+      <ul>
+        <li>ant=<em>&lt;antid&gt;</em></li>
+        <li>queen=<em>&lt;queen id&gt;</em></li>
+      </ul>
+
+    </div>
   </body>
 </html>
