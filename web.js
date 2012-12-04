@@ -2,6 +2,7 @@ var fs = require('fs');
 var path = require('path');
 var http = require('http');
 
+var async = require('async');
 var express = require('express');
 var mongo = require('mongodb'), ObjectID = mongo.ObjectID;
 var socketio = require('socket.io');
@@ -34,6 +35,11 @@ var server = http.createServer(app);
  * Hardware API
  */
 
+// body: ant=<ant id>&queen=<queen id>
+// This creates a new bind. Associations between ants <=> users
+// and queens <=> locations exist server-side and augmented to
+// this information.
+
 app.post('/hardware', function (req, res) {
   if (!req.body.ant || !req.body.queen) {
     return res.json({message: 'Need ant and queen parameter.'}, 500);
@@ -54,9 +60,29 @@ app.post('/hardware', function (req, res) {
  * Mongo API (binds, ants, queens)
  */
 
+// Binds
+
+function bindJSON (bind, next) {
+  bind.id = bind._id;
+  delete bind._id;
+  cols.ants.findOne({
+    ant: bind.ant
+  }, function (err, ant) {
+    ant && (bind.user = ant.user);
+    cols.queens.findOne({
+      queen: bind.queen
+    }, function (err, queen) {
+      queen && (bind.location = queen.location);
+      next(err, bind);
+    });
+  });
+}
+
 app.get('/binds', function (req, res) {
   cols.binds.find().toArray(function (err, results) {
-    res.json(results);
+    async.map(results, bindJSON, function (err, json) {
+      res.json(json);
+    });
   });
 });
 
@@ -64,33 +90,37 @@ app.get('/binds/:id', function (req, res) {
   cols.binds.findOne({
     _id: new ObjectID(req.params.id)
   }, function (err, bind) {
-    cols.ants.findOne({
-      ant: bind.ant
-    }, function (err, ant) {
-      ant && (bind.user = ant.user);
-      cols.queens.findOne({
-        queen: bind.queen
-      }, function (err, queen) {
-        queen && (bind.location = queen.location);
-        res.json(bind);
-      });
+    bindJSON(ant, function (err, json) {
+      res.json(json);
     });
   });
 });
 
 // Ants
 
+function antJSON (ant, next) {
+  next(null, {
+    ant: ant.ant,
+    user: ant.user
+  });
+}
+
+// [private]
 app.get('/ants', function (req, res) {
   cols.ants.find().toArray(function (err, results) {
-    res.json(results);
+    async.map(results, antJSON, function (err, json) {
+      res.json(json);
+    });
   });
 });
 
 app.get('/ants/:id', function (req, res) {
   cols.ants.findOne({
     ant: req.params.id
-  }, function (err, results) {
-    res.json(results);
+  }, function (err, ant) {
+    antJSON(ant, function (err, json) {
+      res.json(json);
+    });
   });
 });
 
@@ -105,27 +135,32 @@ app.put('/ants/:id', function (req, res) {
   };
   cols.ants.insert(ant, function (err, docs) {
     res.json({message: 'Succeeded in adding ant.'});
+
+    // Notify streaming clients.
     io.sockets.emit('ant:update', ant);
   });
 });
 
 /**
- * Postgres API (users, locations)
+ * Postgres API (users, presentations, locations.)
  */
+
+// Users.
+
+function userJSON (user, next) {
+  // TODO strip fields
+  next(null, user);
+}
 
 app.get('/users', function (req, res) {
   dbpg.query('SELECT * FROM users', [], function (err, result) {
     if (err) {
       console.error(err);
+      res.json({message: err}, 500);
     } else {
-      res.json(result.rows.map(function (row) {
-        return row;
-        // TODO!
-        return {
-          id: row.id,
-          name: row.name
-        }
-      }));
+      async.map(result.rows, userJSON, function (err, json) {
+        res.json(json);
+      });
     }
   });
 });
@@ -135,27 +170,34 @@ app.get('/users/:id', function (req, res) {
     req.params.id
   ], function (err, users) {
     if (err) {
-      console.error(users);
+      console.error(err);
+      res.json({message: err}, 500);
+    } else if (users.rows.length) {
+      userJSON(users.rows[0], function (err, json) {
+        res.json(json);
+      })
     } else {
-      res.json(users.rows[0]);
+      res.json({message: 'No such user.'}, 404);
     }
   });
 });
 
+// Presentations.
+
+function presentationJSON (presentation, next) {
+  // TODO strip fields
+  next(null, presentation);
+}
 
 app.get('/presentations', function (req, res) {
   dbpg.query('SELECT * FROM projects', [], function (err, result) {
     if (err) {
       console.error(err);
+      res.json({message: err}, 500);
     } else {
-      res.json(result.rows.map(function (row) {
-        return row;
-        // TODO!
-        return {
-          id: row.id,
-          name: row.name
-        }
-      }));
+      async.map(result.rows, presentationJSON, function (err, json) {
+        res.json(json);
+      });
     }
   });
 });
@@ -165,9 +207,14 @@ app.get('/presentations/:id', function (req, res) {
     req.params.id
   ], function (err, presentations) {
     if (err) {
-      console.error(err, presentations);
+      console.error(err);
+      res.json({message: err}, 500);
+    } else if (presentations.rows.length) {
+      presentationJSON(presentations.rows[0], function (err, json) {
+        res.json(json);
+      })
     } else {
-      res.json(presentations.rows[0]);
+      res.json({message: 'No such user.'}, 404);
     }
   });
 });

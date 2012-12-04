@@ -19,6 +19,8 @@
 
       <h3><span class="muted">GET</span> /users/&lt;user id&gt;</h3>
 
+      <p>Unique users in our system, who may or may not have a Facebook ID attached to them.</p>
+
       <pre>{
   "id": 1,
   "name": "Tim Cameron Ryan",
@@ -41,18 +43,26 @@
 
       <h3><span class="muted">GET</span> /presentations/&lt;presentation id&gt;</h3>
 
+      <p>Presentations that happen at Expo. Once integrated with a schedule, these presentations will incorporate a time and a location.</p>
+
       <pre>{
   "id": 1,
   "contact_name": "Margaret-Ann Seger",
   "contact_email": "margaret-ann.seger@students.olin.edu",
   "presentation_title": "Lifegraph",
   "all_students_presenting": "Tim Ryan, Jialiya Huang, Jon McKay, Paul Booth, Shane Moon, Margaret-Ann Seger",
-  "project_description": "We are introducing a platform for developers to persist, record, and share physical interactions on Facebook's Open Graph. \r\n\r\nFacebook’s Open Graph is an extension of its vast social graph- the Open Graph allows users’ activity on third-party websites and pages throughout the web to be naturally integrated into their Facebook experience. \r\n\r\nLifegraph Labs was born from the idea that much of the lives we live, and the activities we wish to remember and share with our friends, are not done online. Oftentimes there is a fundamental disconnect between how people express themselves online and how they express themselves in everyday interactions. \r\n\r\nToday, the accepted standard device for persisting physical interactions online is the mobile phone. Smartphones, and the sizable app-network that has grown up around them, are adept at recording and consuming information. However, smartphones are disruptive of the natural flow of physical world interactions: they require users’ direct attention, funneling it, however temporarily, from whomever or whatever is happening around them in the real world into a small screen internet portal. \r\n\r\nThe next generation of personal computing will not rely on fumbling around with a smartphone to record, share, and remember. Lifegraph Labs is building the platform that will enable these next-gen interactions by making it easy for developers to design, build, and connect any type of device to Facebook’s Open Graph infrastructure.\r\n",
+  "project_description": "We are introducing a platform for developers to persist, record, and share physical interactions on Facebook's Open Graph. \r\n\r\nFacebook’s Open Graph is an extension of its vast social graph- the Open Graph allows users’ activity on third-party websites and pages throughout the web to be naturally integrated into their Facebook experience...",
   "special_needs": "none",
   "class_affiliation": "SCOPE",
   "created_at": "2012-12-03T11:15:22.296Z",
   "updated_at": "2012-12-03T19:01:51.104Z"
   }</pre>
+
+      <h3><span class="muted">GET</span> /locations/</h3>
+
+      <h3><span class="muted">GET</span> /locations/&lt;location id&gt;</h3>
+
+      <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
 
       <hr>
 
@@ -60,9 +70,22 @@
 
       <h3><span class="muted">GET</span> /binds/&lt;bind id&gt;</h3>
 
-      <h3><span class="muted">GET</span> /ants/&lt;ant id&gt;</h3>
+      <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Queen IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
 
-      <h3><span class="muted">GET</span> /queens/&lt;queen id&gt;</h3>
+      <h3><span class="muted">GET, PUT</span> /ants/&lt;ant id&gt;</h3>
+
+      <p>Retrieve or update <code>ant &hArr; user</code> binding for a given Ant. These should be set when an Ant is deployed in the field.</p>
+
+      <pre>{
+  "ant": "abba",
+  "user": 1
+}</pre>
+
+      <h3><span class="muted">GET, PUT</span> /queens/&lt;queen id&gt;</h3>
+
+      <p>Retrieve or update <code>queen &hArr; location</code> binding for a given Queen. These should be set when a Queen is deployed in the field.</p>
+
+      <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
 
       <hr>
 
@@ -77,6 +100,8 @@
       <hr>
 
       <h2>Hardware API</h2>
+
+      <p>This should only be used by the Queens to locate where Ants were seen.</p>
 
       <h3><span class="muted">POST</span> /hardware</h3>
       <p>Hardware endpoint. Associates Ants with Queens.</p>
