@@ -90,7 +90,7 @@ app.get('/binds/:id', function (req, res) {
   cols.binds.findOne({
     _id: new ObjectID(req.params.id)
   }, function (err, bind) {
-    bindJSON(ant, function (err, json) {
+    bindJSON(bind, function (err, json) {
       res.json(json);
     });
   });
