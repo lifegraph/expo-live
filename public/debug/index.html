@@ -1,0 +1,16 @@
+<h3>Streaming logs:</h3>
+<pre style="background: #ddd; padding: 15px;" id="logs"></pre>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+var logs = document.getElementById('logs');
+var socket = io.connect('http://' + window.location.host);
+socket.on('connect', function () {
+  logs.appendChild(document.createTextNode('(Connected to server.)\n'));
+});
+socket.on('bind:create', function (data) {
+  logs.appendChild(document.createTextNode('bind:create - ' + JSON.stringify(data) + '\n'));
+});
+
+</script>

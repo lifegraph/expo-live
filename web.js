@@ -1,8 +1,11 @@
 var fs = require('fs');
 var path = require('path');
+var http = require('http');
 
 var express = require('express');
 var mongo = require('mongodb'), ObjectID = mongo.ObjectID;
+var socketio = require('socket.io');
+
 
 /**
  * Config
@@ -21,16 +24,25 @@ app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
 
+var server = http.createServer(app);
+
+
+/**
+ * Routes
+ */
+
 app.post('/hardware', function (req, res) {
   if (!req.body.ant || !req.body.queen) {
     return res.json({message: 'Need ant and queen parameter.'}, 500);
   }
 
-  cols.binds.insert({
+  var bind = {
     ant: req.body.ant,
     queen: req.body.queen
-  }, function (err, docs) {
+  };
+  cols.binds.insert(bind, function (err, docs) {
     res.json({message: 'Succeeded in adding bind.'});
+    io.sockets.emit('bind:create', bind);
   });
 });
 
@@ -79,12 +91,23 @@ app.get('/locations/:id', function (req, res) {
   });
 });
 
+/**
+ * Sockets
+ */
+
+var io = socketio.listen(server);
+
+io.sockets.on('connection', function (socket) {
+  console.log('New connection:', socket.id);
+});
+
 
 /**
  * Initialize
  */
 
-var db, cols = {};
+var db, cols = {}, server;
+
 mongo.connect(MONGO_URI, {}, function (error, _db) {
   db = _db;
   console.log("Connected to Mongo:", MONGO_URI);
@@ -101,7 +124,7 @@ mongo.connect(MONGO_URI, {}, function (error, _db) {
         cols.binds = binds;
 
         // Launch server.
-        app.listen(port, function() {
+        server.listen(port, function() {
           console.log("Listening on http://localhost:" + port);
         });
       });
