@@ -7,7 +7,7 @@ import subprocess
 arduino = serial.Serial('/dev/tty.usbmodem1411', 57600) # serial port# and baud rate
 
 def post_to_server(queen_id, ant_id):
-  subprocess.call(["curl", "-X", "POST", "localhost:3000/hardware/" + queen_id + "/" + ant_id])
+  subprocess.call(["curl", "-X", "POST", "-d", "queen=" + queen_id, "-d", "ant=" + ant_id, "api.olinexpo.com/hardware"])
 
 prefix = 'Got payload: '
 while 1:
