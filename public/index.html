@@ -68,7 +68,7 @@
 
       <h3><a href="/binds/50bdbd97a931e00000000001"><span class="muted">GET</span> /binds/&lt;bind id&gt;</a></h3>
 
-      <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Queen IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
+      <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Hill IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
 
       <h3><a href="/ants/abba"><span class="muted">GET, PUT</span> /ants/&lt;ant id&gt;</a></h3>
 
@@ -81,7 +81,7 @@
 
       <h3><span class="muted">GET, PUT</span> /hills/&lt;hill id&gt;</h3>
 
-      <p>Retrieve or update <code>hill &hArr; location</code> binding for a given Queen. These should be set when a Queen is deployed in the field.</p>
+      <p>Retrieve or update <code>hill &hArr; location</code> binding for a given Hill. These should be set when a Hill is deployed in the field.</p>
 
       <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
 
@@ -99,10 +99,10 @@
 
       <h2>Hardware API</h2>
 
-      <p>This should only be used by the Queens to locate where Ants were seen.</p>
+      <p>This should only be used by the Hills to locate where Ants were seen.</p>
 
       <h3><span class="muted">POST</span> /hardware</h3>
-      <p>Hardware endpoint. Associates Ants with Queens.</p>
+      <p>Hardware endpoint. Associates Ants with Hills.</p>
       <p><b>Form values:</b></p>
       <ul>
         <li><code>ant=<em>&lt;antid&gt;</em></code></li>
