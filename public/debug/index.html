@@ -15,8 +15,8 @@ socket.on('bind:create', function (data) {
 socket.on('ant:update', function (data) {
   logs.appendChild(document.createTextNode('ant:update - ' + JSON.stringify(data) + '\n'));
 });
-socket.on('queen:update', function (data) {
-  logs.appendChild(document.createTextNode('queen:update - ' + JSON.stringify(data) + '\n'));
+socket.on('colony:update', function (data) {
+  logs.appendChild(document.createTextNode('colony:update - ' + JSON.stringify(data) + '\n'));
 });
 
 </script>

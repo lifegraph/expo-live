@@ -16,8 +16,8 @@
       <ul>
         <li><b>The user</b> is an attendee of Expo. They are wearing <b>an ant</b>. They attend the conference.</li>
         <li><b>A presentation</b> is, for example, <i>2:00&ndash;3:00 Why Bois Ties Help Reduce Infertility in Men, in AC203</i>.</li>
-        <li><b>A location</b> (i.e. <i>AC203</i>) has different <b>presentations</b> occuring over the course of the day. They are uniquely marked by a <b>hill</b>.</li>
-        <li>A <b>bind</b> is a time at which a <i>user</i> (their <i>ant</i>) is seen at a <i>location</i> (a <i>hill</i>).</li>
+        <li><b>A location</b> (i.e. <i>AC203</i>) has different <b>presentations</b> occuring over the course of the day. They are uniquely marked by a <b>colony</b>.</li>
+        <li>A <b>bind</b> is a time at which a <i>user</i> (their <i>ant</i>) is seen at a <i>location</i> (a <i>colony</i>).</li>
       </ul>
 
       <hr>
@@ -68,7 +68,7 @@
 
       <h3><a href="/binds/50bdbd97a931e00000000001"><span class="muted">GET</span> /binds/&lt;bind id&gt;</a></h3>
 
-      <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Hill IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
+      <p>Binds are the sighting of a <code>user</code> at a given <code>presentation</code> with an implicit <code>location</code>, as determined by the Ant and Colony IDs submitted to the Hardware API. Looking up the binds for a user will list, starting with the most recent, where they were last seen and what presentation they were in attendance with at the time.</p>
 
       <h3><a href="/ants/abba"><span class="muted">GET, PUT</span> /ants/&lt;ant id&gt;</a></h3>
 
@@ -79,9 +79,9 @@
   "user": 1
 }</pre>
 
-      <h3><span class="muted">GET, PUT</span> /hills/&lt;hill id&gt;</h3>
+      <h3><span class="muted">GET, PUT</span> /colonies/&lt;colony id&gt;</h3>
 
-      <p>Retrieve or update <code>hill &hArr; location</code> binding for a given Hill. These should be set when a Hill is deployed in the field.</p>
+      <p>Retrieve or update <code>colony &hArr; location</code> binding for a given Colony. These should be set when a Colony is deployed in the field.</p>
 
       <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
 
@@ -92,21 +92,21 @@
       <ul>
         <li><code>bind:create</code></li>
         <li><code>ant:update</code></li>
-        <li><code>hill:update</code></li>
+        <li><code>colony:update</code></li>
       </ul>
 
       <hr>
 
       <h2>Hardware API</h2>
 
-      <p>This should only be used by the Hills to locate where Ants were seen.</p>
+      <p>This should only be used by the Colonies to locate where Ants were seen.</p>
 
       <h3><span class="muted">POST</span> /hardware</h3>
-      <p>Hardware endpoint. Associates Ants with Hills.</p>
+      <p>Hardware endpoint. Associates Ants with Colonies.</p>
       <p><b>Form values:</b></p>
       <ul>
         <li><code>ant=<em>&lt;antid&gt;</em></code></li>
-        <li><code>hill=<em>&lt;hill id&gt;</em></code></li>
+        <li><code>colony=<em>&lt;colony id&gt;</em></code></li>
       </ul>
 
       <hr>
