@@ -35,19 +35,19 @@ var server = http.createServer(app);
  * Hardware API
  */
 
-// body: ant=<ant id>&queen=<queen id>
+// body: ant=<ant id>&hill=<hill id>
 // This creates a new bind. Associations between ants <=> users
-// and queens <=> locations exist server-side and augmented to
+// and hills <=> locations exist server-side and augmented to
 // this information.
 
 app.post('/hardware', function (req, res) {
-  if (!req.body.ant || !req.body.queen) {
-    return res.json({message: 'Need ant and queen parameter.'}, 500);
+  if (!req.body.ant || !req.body.hill) {
+    return res.json({message: 'Need ant and hill parameter.'}, 500);
   }
 
   var bind = {
     ant: req.body.ant,
-    queen: req.body.queen,
+    hill: req.body.hill,
     time: Date.now()
   };
   cols.binds.insert(bind, function (err, docs) {
@@ -57,7 +57,7 @@ app.post('/hardware', function (req, res) {
 });
 
 /**
- * Mongo API (binds, ants, queens)
+ * Mongo API (binds, ants, hills)
  */
 
 // Binds
@@ -69,10 +69,10 @@ function bindJSON (bind, next) {
     ant: bind.ant
   }, function (err, ant) {
     ant && (bind.user = ant.user);
-    cols.queens.findOne({
-      queen: bind.queen
-    }, function (err, queen) {
-      queen && (bind.location = queen.location);
+    cols.hills.findOne({
+      hill: bind.hill
+    }, function (err, hill) {
+      hill && (bind.location = hill.location);
       next(err, bind);
     });
   });
@@ -270,7 +270,7 @@ function setupMongo (next) {
 
     cols.binds = new mongo.Collection(dbmongo, 'binds');
     cols.ants = new mongo.Collection(dbmongo, 'ants');
-    cols.queens = new mongo.Collection(dbmongo, 'queens');
+    cols.hills = new mongo.Collection(dbmongo, 'hills');
 
     next();
   });
