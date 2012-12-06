@@ -5,23 +5,6 @@ pre { overflow: auto; background: #ddd; padding: 15px; }
 hr, br { clear: both; }
 </style>
 
-<h2>Postgres</h2>
-
-<div>
-  <h3>Users</h3>
-  <pre id="log-users"></pre>
-</div>
-<div>
-  <h3>Locations</h3>
-  <pre id="log-locations"></pre>
-</div>
-<br>
-<div>
-  <h3>Presentations</h3>
-  <pre id="log-presentations"></pre>
-</div>
-<hr>
-
 <h2>Mongo</h1>
 
 <div>
@@ -56,6 +39,23 @@ hr, br { clear: both; }
   <h3>Stream</h3>
   <pre id="log-stream"></pre>
 </div>
+
+<h2>Postgres</h2>
+
+<div>
+  <h3>Users</h3>
+  <pre id="log-users"></pre>
+</div>
+<div>
+  <h3>Locations</h3>
+  <pre id="log-locations"></pre>
+</div>
+<br>
+<div>
+  <h3>Presentations</h3>
+  <pre id="log-presentations"></pre>
+</div>
+<hr>
 
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
@@ -97,7 +97,7 @@ olinexpo({
     $('#log-colonies').text(this.state.colonies.map(function (colony) {
       return JSON.stringify(colony);
     }).join('\n'));
-    
+
     $('#bind-control-colony').html('').append(this.state.colonies.map(function (colony) {
       return $('<option>').val(colony.colony).text(colony.colony);
     }));

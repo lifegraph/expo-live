@@ -81,10 +81,7 @@ function bindJSON (bind, next) {
 }
 
 app.get('/binds', function (req, res) {
-  cols.binds.find()toArray(function (err, results) {
-    results = results.sort(function (a, b) {
-      return a.time < b.time ? 1 : -1; 
-    });
+  cols.binds.find().toArray(function (err, results) {
     async.map(results, bindJSON, function (err, json) {
       res.json(json);
     });
