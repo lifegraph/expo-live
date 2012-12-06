@@ -19,7 +19,7 @@ function refresh () {
         return location.id == bind.location;
       })[0];
     }
-    $('div').append($('<p>').text(user.name + ' - (' + (bind ? bind.ant + '=>' + bind.colony : '') + ') ' + (location ? location.floor + location.index : '')));
+    $('div').append($('<p>').text(user.name + ' - (' + (bind ? String(new Date(bind.time)).split(' ')[4] + ' ' + bind.ant + '=>' + bind.colony : '') + ') ' + (location ? location.floor + location.index : '')));
   });
 }
 
