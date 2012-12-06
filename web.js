@@ -109,7 +109,6 @@ function antJSON (ant, next) {
   });
 }
 
-// [private]
 app.get('/ants', function (req, res) {
   cols.ants.find().toArray(function (err, results) {
     async.map(results, antJSON, function (err, json) {
@@ -142,10 +141,58 @@ app.put('/ants/:id', function (req, res) {
     user: parseInt(req.body.user)
   };
   cols.ants.insert(ant, function (err, docs) {
-    res.json({message: 'Succeeded in adding ant.'});
+    res.json({message: 'Succeeded in assigning ant.'});
 
     // Notify streaming clients.
     io.sockets.emit('ant:update', ant);
+  });
+});
+
+// Colonies
+
+function colonyJSON (colony, next) {
+  next(null, {
+    colony: colony.colony,
+    location: colony.location
+  });
+}
+
+app.get('/colonies', function (req, res) {
+  cols.colonies.find().toArray(function (err, results) {
+    async.map(results, colonyJSON, function (err, json) {
+      res.json(json);
+    });
+  });
+});
+
+app.get('/colonies/:id', function (req, res) {
+  cols.colonies.findOne({
+    colony: req.params.id
+  }, function (err, colony) {
+    if (ant) {
+      colonyJSON(colony, function (err, json) {
+        res.json(json);
+      });
+    } else {
+      res.json({message: 'No such colony.'}, 404);
+    }
+  });
+});
+
+app.put('/colonies/:id', function (req, res) {
+  if (!req.body.location) {
+    return res.json({message: 'Need location parameter.'}, 500);
+  }
+
+  var colony = {
+    colony: req.params.id,
+    location: parseInt(req.body.location)
+  };
+  cols.colonies.insert(colony, function (err, docs) {
+    res.json({message: 'Succeeded in assigning colony.'});
+
+    // Notify streaming clients.
+    io.sockets.emit('colony:update', colony);
   });
 });
 
@@ -156,7 +203,6 @@ app.put('/ants/:id', function (req, res) {
 // Users.
 
 function userJSON (user, next) {
-  // TODO strip fields
   next(null, {
     id: user.id,
     name: user.name,
@@ -191,6 +237,47 @@ app.get('/users/:id', function (req, res) {
       })
     } else {
       res.json({message: 'No such user.'}, 404);
+    }
+  });
+});
+
+// Location.
+
+function locationJSON (loc, next) {
+  next(null, {
+    "id": loc.id,
+    "floor": loc.floor,
+    "type": loc.type,
+    "index": loc.index
+  });
+}
+
+app.get('/locations', function (req, res) {
+  dbpg.query('SELECT * FROM locations', [], function (err, result) {
+    if (err) {
+      console.error(err);
+      res.json({message: err}, 500);
+    } else {
+      async.map(result.rows, locationJSON, function (err, json) {
+        res.json(json);
+      });
+    }
+  });
+});
+
+app.get('/locations/:id', function (req, res) {
+  dbpg.query('SELECT * FROM locations WHERE id = $1 LIMIT 1', [
+    req.params.id
+  ], function (err, locations) {
+    if (err) {
+      console.error(err);
+      res.json({message: err}, 500);
+    } else if (locations.rows.length) {
+      locationJSON(locations.rows[0], function (err, json) {
+        res.json(json);
+      })
+    } else {
+      res.json({message: 'No such location.'}, 404);
     }
   });
 });
@@ -247,6 +334,8 @@ io.configure(function () {
   io.set("transports", ["xhr-polling"]); 
   io.set("polling duration", 10); 
 });
+
+io.set('log level', 1);
 
 
 /**

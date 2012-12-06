@@ -22,7 +22,7 @@
 
       <hr>
 
-      <h2>Client API</h2>
+      <h2>Public API</h2>
 
       <h3><a href="/users/"><span class="muted">GET</span> /users/</a></h3>
 
@@ -54,15 +54,34 @@
   "class_affiliation": "SCOPE",
   "created_at": "2012-12-03T11:15:22.296Z",
   "updated_at": "2012-12-03T19:01:51.104Z"
-  }</pre>
+}</pre>
 
-      <h3><span class="muted">GET</span> /locations/</h3>
+      <h3><a href="/locations/"><span class="muted">GET</span> /locations/</a></h3>
 
-      <h3><span class="muted">GET</span> /locations/&lt;location id&gt;</h3>
+      <h3><a href="/locations/1"><span class="muted">GET</span> /locations/&lt;location id&gt;</a></h3>
 
-      <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
+      <p>Locations are individual places at which a presentation takes place.</p>
+
+      <pre>{
+  "id": 1,
+  "floor": "AC3",
+  "type": "room",
+  "index": 18
+}</pre>
+
+      <h3><a href="/debug/"><span class="muted">Websocket</span> /</a></h3>
+      <p>Emits the following events:</p>
+      <ul>
+        <li><code>bind:create</code></li>
+        <li><code>ant:update</code></li>
+        <li><code>colony:update</code></li>
+      </ul>
+
+      <p>This should only be used by the Colonies to locate where Ants were seen.</p>
 
       <hr>
+
+      <h2>Private APIs</h2>
 
       <h3><a href="/binds/"><span class="muted">GET</span> /binds/</a></h3>
 
@@ -84,22 +103,6 @@
       <p>Retrieve or update <code>colony &hArr; location</code> binding for a given Colony. These should be set when a Colony is deployed in the field.</p>
 
       <p style="background: red; padding: 15px; font-size: 20px">TODO TODO TODO</p>
-
-      <hr>
-
-      <h3><a href="/debug/"><span class="muted">Websocket</span> /</a></h3>
-      <p>Emits the following events:</p>
-      <ul>
-        <li><code>bind:create</code></li>
-        <li><code>ant:update</code></li>
-        <li><code>colony:update</code></li>
-      </ul>
-
-      <hr>
-
-      <h2>Hardware API</h2>
-
-      <p>This should only be used by the Colonies to locate where Ants were seen.</p>
 
       <h3><span class="muted">POST</span> /hardware</h3>
       <p>Hardware endpoint. Associates Ants with Colonies.</p>
