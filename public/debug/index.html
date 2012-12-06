@@ -1,22 +1,165 @@
-<h3>Streaming logs:</h3>
-<pre style="background: #ddd; padding: 15px;" id="logs"></pre>
+<style>
+h3 { margin: 0; }
+div { width: 47%; margin-right: 1%; float: left; padding: 15px; border: 1px solid #ccc; box-sizing: border-box; margin: 15px 1%;}
+pre { overflow: auto; background: #ddd; padding: 15px; }
+hr, br { clear: both; }
+</style>
 
+<h2>Postgres</h2>
+
+<div>
+  <h3>Users</h3>
+  <pre id="log-users"></pre>
+</div>
+<div>
+  <h3>Locations</h3>
+  <pre id="log-locations"></pre>
+</div>
+<br>
+<div>
+  <h3>Presentations</h3>
+  <pre id="log-presentations"></pre>
+</div>
+<hr>
+
+<h2>Mongo</h1>
+
+<div>
+  <h3>Binds</h3>
+  <pre id="log-binds"></pre>
+  <form id="bind-control">
+    ant: <select id="bind-control-ant"></select>
+    colony: <select id="bind-control-colony"></select>
+    <button>Submit</button>
+  </form>
+</div>
+<div>
+  <h3>Ants</h3>
+  <pre id="log-ants"></pre>
+  <form id="ant-control">
+    id: <input id="ant-control-name"><br>
+    user: <select id="ant-control-user"></select>
+    <button>Submit</button>
+  </form>
+</div>
+<br>
+<div>
+  <h3>Colonies</h3>
+  <pre id="log-colonies"></pre>
+  <form id="colony-control">
+    id: <input id="colony-control-name"><br>
+    location: <select id="colony-control-location"></select>
+    <button>Submit</button>
+  </form>
+</div>
+<div>
+  <h3>Stream</h3>
+  <pre id="log-stream"></pre>
+</div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="/olinexpo.js"></script>
 <script>
 
-var logs = document.getElementById('logs');
-var socket = io.connect('http://' + window.location.host);
-socket.on('connect', function () {
-  logs.appendChild(document.createTextNode('(Connected to server.)\n'));
-});
-socket.on('bind:create', function (data) {
-  logs.appendChild(document.createTextNode('bind:create - ' + JSON.stringify(data) + '\n'));
-});
-socket.on('ant:update', function (data) {
-  logs.appendChild(document.createTextNode('ant:update - ' + JSON.stringify(data) + '\n'));
-});
-socket.on('colony:update', function (data) {
-  logs.appendChild(document.createTextNode('colony:update - ' + JSON.stringify(data) + '\n'));
+olinexpo({
+  onconnect: function () {
+    $('#log-stream').append('(Connected to websocket.)\n');
+  },
+
+  onbindcreate: function (bind) {
+    if (this.loaded) {
+      $('#log-stream').append('bind:create - ' + JSON.stringify(bind) + '\n');
+    }
+    $('#log-binds').text(this.state.binds.map(function (bind) {
+      return JSON.stringify(bind);
+    }).join('\n'));
+  },
+
+  onantupdate: function (ant) {
+    if (this.loaded) {
+      $('#log-stream').append('ant:update - ' + JSON.stringify(ant) + '\n');
+    }
+    $('#log-ants').text(this.state.ants.map(function (ant) {
+      return JSON.stringify(ant);
+    }).join('\n'));
+
+    // Ant selection for new bind.
+    $('#bind-control-ant').html('').append(this.state.ants.map(function (ant) {
+      return $('<option>').val(ant.ant).text(ant.ant);
+    }));
+  },
+
+  oncolonyupdate: function (colony) {
+    if (this.loaded) {
+      $('#log-stream').append('colony:update - ' + JSON.stringify(colony) + '\n');
+    }
+    $('#log-colonies').text(this.state.colonies.map(function (colony) {
+      return JSON.stringify(colony);
+    }).join('\n'));
+    
+    $('#bind-control-colony').html('').append(this.state.colonies.map(function (colony) {
+      return $('<option>').val(colony.colony).text(colony.colony);
+    }));
+  },
+
+  onload: function () {
+    // Log users.
+    $('#log-users').text(this.state.users.map(function (user) {
+      return JSON.stringify(user);
+    }).join('\n'));
+
+    $('#ant-control-user').html('').append(this.state.users.map(function (user) {
+      return $('<option>').val(user.id).text(user.name);
+    }));
+
+    // Log locations.
+    $('#log-locations').text(this.state.locations.map(function (location) {
+      return JSON.stringify(location);
+    }).join('\n'));
+
+    $('#colony-control-location').html('').append(this.state.locations.map(function (location) {
+      return $('<option>').val(location.id).text(location.floor + location.index);
+    }));
+
+    // Log presentations.
+    $('#log-presentations').text(this.state.presentations.map(function (presentation) {
+      return JSON.stringify(presentation);
+    }).join('\n'));
+
+    // Events.
+
+    $('#bind-control').on('submit', function () {
+      var ant = $('#bind-control-ant').val();
+      var colony = $('#bind-control-colony').val();
+      $.post('/hardware', {ant: ant, colony: colony}, console.log);
+      return false;
+    });
+
+    $('#ant-control').on('submit', function () {
+      var name = $('#ant-control-name').val();
+      var user = $('#ant-control-user').val();
+      $.ajax({
+        type: 'put',
+        url: '/ants/' + name,
+        data: {user: user},
+        success: console.log
+      });
+      return false;
+    });
+
+    $('#colony-control').on('submit', function () {
+      var name = $('#colony-control-name').val();
+      var location = $('#colony-control-location').val();
+      $.ajax({
+        type: 'put',
+        url: '/colonies/' + name,
+        data: {location: location},
+        success: console.log
+      });
+      return false;
+    });
+  }
 });
 
 </script>

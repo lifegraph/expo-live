@@ -37,7 +37,7 @@ var server = http.createServer(app);
 
 // body: ant=<ant id>&colony=<colony id>
 // This creates a new bind. Associations between ants <=> users
-// and colonys <=> locations exist server-side and augmented to
+// and colonies <=> locations exist server-side and augmented to
 // this information.
 
 app.post('/hardware', function (req, res) {
@@ -52,12 +52,14 @@ app.post('/hardware', function (req, res) {
   };
   cols.binds.insert(bind, function (err, docs) {
     res.json({message: 'Succeeded in adding bind.'});
-    io.sockets.emit('bind:create', bind);
+    bindJSON(bind, function (err, json) {
+      io.sockets.emit('bind:create', json);
+    });
   });
 });
 
 /**
- * Mongo API (binds, ants, colonys)
+ * Mongo API (binds, ants, colonies)
  */
 
 // Binds
@@ -66,11 +68,11 @@ function bindJSON (bind, next) {
   bind.id = bind._id;
   delete bind._id;
   cols.ants.findOne({
-    ant: bind.ant
+    _id: bind.ant
   }, function (err, ant) {
     ant && (bind.user = ant.user);
-    cols.colonys.findOne({
-      colony: bind.colony
+    cols.colonies.findOne({
+      _id: bind.colony
     }, function (err, colony) {
       colony && (bind.location = colony.location);
       next(err, bind);
@@ -79,7 +81,10 @@ function bindJSON (bind, next) {
 }
 
 app.get('/binds', function (req, res) {
-  cols.binds.find().toArray(function (err, results) {
+  cols.binds.find()toArray(function (err, results) {
+    results = results.sort(function (a, b) {
+      return a.time < b.time ? 1 : -1; 
+    });
     async.map(results, bindJSON, function (err, json) {
       res.json(json);
     });
@@ -104,7 +109,7 @@ app.get('/binds/:id', function (req, res) {
 
 function antJSON (ant, next) {
   next(null, {
-    ant: ant.ant,
+    ant: ant._id,
     user: ant.user
   });
 }
@@ -119,7 +124,7 @@ app.get('/ants', function (req, res) {
 
 app.get('/ants/:id', function (req, res) {
   cols.ants.findOne({
-    ant: req.params.id
+    _id: String(req.params.id)
   }, function (err, ant) {
     if (ant) {
       antJSON(ant, function (err, json) {
@@ -137,14 +142,20 @@ app.put('/ants/:id', function (req, res) {
   }
 
   var ant = {
-    ant: req.params.id,
+    _id: String(req.params.id),
     user: parseInt(req.body.user)
   };
-  cols.ants.insert(ant, function (err, docs) {
+  cols.ants.update({
+    _id: String(req.params.id)
+  }, ant, {
+    upsert: true
+  }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});
 
     // Notify streaming clients.
-    io.sockets.emit('ant:update', ant);
+    antJSON(ant, function (err, json) {
+      io.sockets.emit('ant:update', json);
+    });
   });
 });
 
@@ -152,7 +163,7 @@ app.put('/ants/:id', function (req, res) {
 
 function colonyJSON (colony, next) {
   next(null, {
-    colony: colony.colony,
+    colony: colony._id,
     location: colony.location
   });
 }
@@ -167,7 +178,7 @@ app.get('/colonies', function (req, res) {
 
 app.get('/colonies/:id', function (req, res) {
   cols.colonies.findOne({
-    colony: req.params.id
+    _id: String(req.params.id)
   }, function (err, colony) {
     if (ant) {
       colonyJSON(colony, function (err, json) {
@@ -185,14 +196,20 @@ app.put('/colonies/:id', function (req, res) {
   }
 
   var colony = {
-    colony: req.params.id,
+    _id: String(req.params.id),
     location: parseInt(req.body.location)
   };
-  cols.colonies.insert(colony, function (err, docs) {
+  cols.colonies.update({
+    _id: String(req.params.id)
+  }, colony, {
+    upsert: true
+  }, function (err, docs) {
     res.json({message: 'Succeeded in assigning colony.'});
 
     // Notify streaming clients.
-    io.sockets.emit('colony:update', colony);
+    colonyJSON(colony, function (err, json) {
+      io.sockets.emit('colony:update', json);
+    })
   });
 });
 
@@ -359,7 +376,7 @@ function setupMongo (next) {
 
     cols.binds = new mongo.Collection(dbmongo, 'binds');
     cols.ants = new mongo.Collection(dbmongo, 'ants');
-    cols.colonys = new mongo.Collection(dbmongo, 'colonys');
+    cols.colonies = new mongo.Collection(dbmongo, 'colonies');
 
     next();
   });
