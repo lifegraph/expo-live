@@ -42,8 +42,8 @@ function refresh () {
         '<b>Start:</b>' + strstart +
         '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small></h3>' +
       '<blockquote>' +
-      '<i>time running:</i> ' + running_seconds + ' seconds, ' + (running_seconds/60) + ' minutes<br>' +
-      (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago, ' + (latest_seconds/60) + ' minutes ago' + (latest_seconds > 10 ? '</span>' : '') +
+      '<i>time running:</i> ' + running_seconds + ' seconds, ' + Math.round(running_seconds/60) + ' minutes<br>' +
+      (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago, ' + Math.round(latest_seconds/60) + ' minutes ago' + (latest_seconds > 10 ? '</span>' : '') +
       '</blockquote>');
   }
 }
