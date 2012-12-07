@@ -19,7 +19,7 @@ var api = olinexpo({
       ants[bind.ant] = {first: bind, last: null}
     }
     ants[bind.ant].last = bind;
-    console.log(bind);
+    console.log('bind received');
   },
   onantupdate: function (ant) {
   },
@@ -38,7 +38,7 @@ function refresh () {
       '<blockquote>' +
       '<b>Start:</b>' + String(new Date(ant.first.time)) + '<br>' +
       '<b>Latest:</b>' + (String(new Date(ant.last.time))) + '<br>' + 
-      '<i>time runing:</i> ' + Math.round((ant.last.time - ant.start.time)/1000) + ' seconds ago<br>' +
+      '<i>time runing:</i> ' + Math.round((ant.last.time - ant.first.time)/1000) + ' seconds ago<br>' +
       '<i>time since latest:</i> ' + Math.round((Date.now() - ant.last.time)/1000) + ' seconds ago<br>' +
       '</blockquote>');
   }
