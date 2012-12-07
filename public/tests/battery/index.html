@@ -31,9 +31,10 @@ var api = olinexpo({
 
 function refresh () {
   try {
+    $('div').html('');
     for (var antid in ants) {
       var ant = ants[antid];
-      $('div').html(
+      $('div').append(
         '<h3>Ant: ' + antid + '</h3>' +
         '<blockquote>' +
         '<b>Start:</b>' + String(new Date(ant.first.time)) + '<br>' +
