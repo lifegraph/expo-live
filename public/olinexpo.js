@@ -9,10 +9,10 @@ var olinexpo = (function () {
     this.state = {};
     this.loaded = false;
     this.controller = controller;
-    this.connectSocket(function () {
-      this.controller.onconnect.call(this);
-      this.loadResources(function () {
-        this.controller.onload.call(this);
+    this.loadResources(function () {
+      this.controller.onload.call(this);
+      this.connectSocket(function () {
+        this.controller.onconnect.call(this);
         this.loaded = true;
       }.bind(this));
     }.bind(this))
