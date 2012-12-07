@@ -1,6 +1,6 @@
 # listen to an arduino over serial port
 
-import serial
+import serial, json
 import os
 import subprocess
 
@@ -15,12 +15,12 @@ while 1:
   pos = data.find(prefix)
   if pos != -1:
     message = data[pos + len(prefix):]
-    print "message:", message
+    print "message:", json.dumps(message)
     # 8 bytes, each 2 characters big, so make minimum 16 to left pad with appropriate leading 0's
     # these might be reversed
     colony_id = message[0:8]
     ant_id = message[8:]
-    print "colony:", colony_id, "ant:", ant_id
+    print "colony:", json.dumps(colony_id), "ant:", json.dumps(ant_id)
     post_to_server(colony_id, ant_id);
     # subprocess.check_output(["echo", "Hello World!"])
 
