@@ -2,21 +2,22 @@
 <div>
 </div>
 
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/olinexpo.js"></script>
 <script>
 
-var first = null, last = null;
+var ants = {};
 
 var api = olinexpo({
   onconnect: function () {
   },
   onbindcreate: function (bind) {
-    if (!first) {
-      first = bind;
+    if (!ants[bind.ant]) {
+      ants[bind.ant] = {first: bind, last: null}
     }
-    last = bind;
+    ants[bind.ant].last = bind;
     console.log(bind);
   },
   onantupdate: function (ant) {
@@ -29,7 +30,16 @@ var api = olinexpo({
 
 function refresh () {
   try {
-    $('div').text(String(new Date(first.time)) + ' running to ' + (String(new Date(last.time))) + Math.round((last.time - Date.now())/1000) + ' seconds ago');
+    for (var antid in ants) {
+      var ant = ants[antid];
+      $('div').html(
+        '<h3>Ant: ' + antid + '</h3>' +
+        '<blockquote>' +
+        '<b>Start:</b>' + String(new Date(ant.first.time)) + '<br>' +
+        '<b>Latest:</b>' + (String(new Date(ant.last.time))) + '<br>' + 
+        '<b>time since latest:<b>' + Math.round((ant.last.time - Date.now())/1000) + ' seconds ago' +
+        '</blockquote>');
+    }
   } catch (e) {
     console.log(e);
   }
