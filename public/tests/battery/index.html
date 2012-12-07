@@ -29,10 +29,11 @@ var api = olinexpo({
 
 function refresh () {
   try {
-    $('div').text(String(new Date(first.time)) + ' ' + Math.round((last.time - Date.now())/1000) + ' seconds ago');
+    $('div').text(String(new Date(first.time)) + ' running to ' + (String(new Date(last.time))) + Math.round((last.time - Date.now())/1000) + ' seconds ago');
   } catch (e) {
     console.log(e);
   }
 }
+setInterval(refresh, 100);
 
 </script>
