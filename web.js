@@ -210,6 +210,15 @@ app.put('/colonies/:id', function (req, res) {
   });
 });
 
+// Reset api
+
+app.get('/destroyallbinddataiamserious', function (req, res) {
+  cols.colonies.remove();
+  cols.ants.remove();
+  cols.binds.remove();
+  res.json('You did it. Murderer.');
+});
+
 /**
  * Postgres API (users, presentations, locations.)
  */
