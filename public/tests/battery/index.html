@@ -33,13 +33,17 @@ function refresh () {
   $('div').html('');
   for (var antid in ants) {
     var ant = ants[antid];
+    var start = ant.first.time;
+    var end = ant.last.time;
+    var running_seconds = Math.round((end - start)/1000);
+    var latest_seconds = Math.round((Date.now() - end)/1000);
     $('div').append(
       '<h3>Ant: ' + antid + '</h3>' +
       '<blockquote>' +
-      '<b>Start:</b>' + String(new Date(ant.first.time)) + '<br>' +
-      '<b>Latest:</b>' + (String(new Date(ant.last.time))) + '<br>' + 
-      '<i>time runing:</i> ' + Math.round((ant.last.time - ant.first.time)/1000) + ' seconds ago<br>' +
-      '<i>time since latest:</i> ' + Math.round((Date.now() - ant.last.time)/1000) + ' seconds ago<br>' +
+      '<b>Start:</b>' + String(new Date(start)) + '<br>' +
+      '<b>Latest:</b>' + (String(new Date(end))) + '<br>' + 
+      '<i>time running:</i> ' + running_seconds + ' seconds ago<br>' +
+      (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago' + (latest_seconds > 10 ? '</span>' : '') +
       '</blockquote>');
   }
 }
