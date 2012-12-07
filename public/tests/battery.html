@@ -1,0 +1,38 @@
+<h2>Battery test</h2>
+<div>
+</div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/olinexpo.js"></script>
+<script>
+
+var first = null, last = null;
+
+var api = olinexpo({
+  onconnect: function () {
+  },
+  onbindcreate: function (bind) {
+    if (!first) {
+      first = bind;
+    }
+    last = bind;
+    console.log(bind);
+  },
+  onantupdate: function (ant) {
+  },
+  oncolonyupdate: function (colony) {
+  },
+  onload: function () {
+  }
+});
+
+function refresh () {
+  try {
+    $('div').text(String(new Date(first.time)) + ' ' + Math.round((last.time - Date.now())/1000) + ' seconds ago');
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+</script>
