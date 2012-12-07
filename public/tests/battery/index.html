@@ -39,7 +39,8 @@ function refresh () {
         '<blockquote>' +
         '<b>Start:</b>' + String(new Date(ant.first.time)) + '<br>' +
         '<b>Latest:</b>' + (String(new Date(ant.last.time))) + '<br>' + 
-        '<b>time since latest:<b>' + Math.round((Date.now() - ant.last.time)/1000) + ' seconds ago' +
+        '<i>time runing:</i> ' + Math.round((ant.last.time - ant.start.time)/1000) + ' seconds ago<br>' +
+        '<i>time since latest:</i> ' + Math.round((Date.now() - ant.last.time)/1000) + ' seconds ago<br>' +
         '</blockquote>');
     }
   } catch (e) {
