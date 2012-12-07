@@ -81,7 +81,7 @@ function bindJSON (bind, next) {
 }
 
 app.get('/binds', function (req, res) {
-  cols.binds.find().toArray(function (err, results) {
+  cols.binds.find().sort('time').toArray(function (err, results) {
     async.map(results, bindJSON, function (err, json) {
       res.json(json);
     });
