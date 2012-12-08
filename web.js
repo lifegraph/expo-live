@@ -67,6 +67,9 @@ app.post('/hardware', function (req, res) {
 function bindJSON (bind, next) {
   bind.id = bind._id;
   delete bind._id;
+  next(null, bind);
+  return;
+
   cols.ants.findOne({
     _id: bind.ant
   }, function (err, ant) {
@@ -92,6 +95,30 @@ app.get('/binds', function (req, res) {
         return bind;
       }));
     });
+  });
+});
+
+app.get('/segments', function (req, res) {
+  var last = null, segments = [{first: null, last: null}];
+  cols.binds.find().sort('time').each(function (err, bind) {
+    if (!bind) {
+      res.json(segments);
+      return;
+    }
+
+    if (last) {
+      if (bind.time - last.time > 10*10000) {
+        segments.push({first: null, last: null});
+      }
+    }
+
+    var seg = segments[segments.length - 1]
+    if (!seg.first) {
+      seg.first = bind;
+    }
+    seg.last = bind;
+    seg.length = seg.last.time - seg.first.time;
+    last = bind;
   });
 });
 
