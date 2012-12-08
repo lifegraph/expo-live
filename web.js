@@ -99,25 +99,32 @@ app.get('/binds', function (req, res) {
 });
 
 app.get('/segments', function (req, res) {
-  var last = null, segments = [{first: null, last: null}];
+  var segments = {};
   cols.binds.find().sort('time').each(function (err, bind) {
+    if (err) {
+      return console.error(err);
+    }
     if (!bind) {
       res.json(segments);
       return;
     }
 
-    if (last) {
-      if (bind.time - last.time > 10*10000) {
-        segments.push({first: null, last: null});
+    if (!segments[bind.ant]) {
+      segments[bind.ant] = [{first: null, last: null}];
+    }
+
+    var seg = segments[bind.ant][segments[bind.ant].length - 1];
+    if (seg.last) {
+      if (bind.time - seg.last.time > 10*10000) {
+        segments[bind.ant].push(seg = {first: null, last: null});
       }
     }
 
-    var seg = segments[segments.length - 1]
     if (!seg.first) {
       seg.first = bind;
     }
     seg.last = bind;
-    seg.length = seg.last.time - seg.first.time;
+    seg.duration = seg.last.time - seg.first.time;
     last = bind;
   });
 });
