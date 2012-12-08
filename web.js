@@ -99,7 +99,7 @@ app.get('/binds', function (req, res) {
 });
 
 app.get('/segments', function (req, res) {
-  var segments = {};
+  var segments = {}, drop = Number(req.query.drop || 10);
   cols.binds.find().sort('time').each(function (err, bind) {
     if (err) {
       return console.error(err);
@@ -115,7 +115,7 @@ app.get('/segments', function (req, res) {
 
     var seg = segments[bind.ant][segments[bind.ant].length - 1];
     if (seg.last) {
-      if (bind.time - seg.last.time > 10*10000) {
+      if (bind.time - seg.last.time > drop*1000) {
         segments[bind.ant].push(seg = {first: null, last: null});
       }
     }
