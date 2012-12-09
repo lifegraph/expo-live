@@ -52,8 +52,8 @@ function bindJSON (bind) {
 
 app.del('/binds', function (req, res) {
   var ant = req.query.ant, colony = req.query.colony;
-  if (!ant && !colony) {
-    res.json({'message': 'Please specify an ant or colony id in the paramters.'}, 400);
+  if (!ant && !colony && !req.query.force) {
+    res.json({'message': 'Pleace specify force=1 to delete all binds.'}, 400);
     return;
   }
   var crit = {};
