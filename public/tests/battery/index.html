@@ -13,12 +13,9 @@ var ants = {};
 
 var api = olinexpo({
   onconnect: function () {
+    setInterval(refresh, 1000);
   },
   onbindcreate: function (bind) {
-    if (!ants[bind.ant]) {
-      ants[bind.ant] = {first: bind, last: null}
-    }
-    ants[bind.ant].last = bind;
     console.log('bind received');
   },
   onantupdate: function (ant) {
@@ -31,8 +28,9 @@ var api = olinexpo({
 
 function refresh () {
   $('div').html('');
-  Object.keys(ants).forEach(function (antid) {
-    var ant = ants[antid];
+  Object.keys(api.state.segments).forEach(function (antid) {
+    var ant = api.state.segments[antid][api.state.segments[antid].length - 1];
+    if (!ant) return;
     var start = ant.first.time, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
     var end = ant.last.time, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
     var running_seconds = Math.round((end - start)/1000);
@@ -58,6 +56,5 @@ function refresh () {
       }));
   });
 }
-setInterval(refresh, 1000);
 
 </script>

@@ -29,6 +29,12 @@ var olinexpo = (function () {
         this.state.segments[bind.ant] = [{first: null, last: null}];
       }
       var seg = this.state.segments[bind.ant][this.state.segments[bind.ant].length - 1];
+      // Split segments.
+      if (seg.last) {
+        if ((bind.time - seg.last.time) > 30*1000) {
+          this.state.segments[bind.ant].push(seg = {first: null, last: null});
+        }
+      }
       if (!seg.first) {
         seg.first = bind;
       }
