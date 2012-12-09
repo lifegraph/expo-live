@@ -52,7 +52,7 @@ function Visual (width, height) {
   setInterval(function () {
     Object.keys(this.markers).forEach(function (locid) {
       this.mark(locid, this.markers[locid] - 0.1);
-    })
+    }.bind(this))
   }.bind(this), 50);
 }
 
