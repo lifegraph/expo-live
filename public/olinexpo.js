@@ -31,7 +31,7 @@ var olinexpo = (function () {
       var seg = this.state.segments[bind.ant][this.state.segments[bind.ant].length - 1];
       // Split segments.
       if (seg.last) {
-        if ((bind.time - seg.last.time) > 30*1000) {
+        if ((bind.time - seg.last.time) > 180*1000) {
           this.state.segments[bind.ant].push(seg = {first: null, last: null});
         }
       }
@@ -60,7 +60,7 @@ var olinexpo = (function () {
     var api = this;
     $.getJSON('/users/', function (users) {
       $.getJSON('/locations/', function (locations) {
-        $.getJSON('/segments/?drop=30', function (segments) {
+        $.getJSON('/segments/?drop=180', function (segments) {
           $.getJSON('/presentations/', function (presentations) {
             $.getJSON('/ants/', function (ants) {
               $.getJSON('/colonies/', function (colonies) {

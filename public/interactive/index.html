@@ -84,6 +84,7 @@ olinexpo({
       var user = this.getUserById(seg.last.user);
       var location = this.getLocationById(seg.last.location);
       var locid = location.floor + location.index;
+      visual.ctx.fillStyle = seg.last.user == 2 ? 'green' : 'blue';
       visual.mark(locid, segincreaser = 10);
     }
   },
