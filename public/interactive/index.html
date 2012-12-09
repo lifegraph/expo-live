@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <style>
+    canvas { border: 1px solid red; }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas" width="1000" height="400">Lol</canvas>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/olinexpo.js"></script>
+    <script>
+
+// Static mapping locations to positions
+
+var locations = {
+  "AC118": {x: -100, y: -25}
+};
+
+/**
+ * Visual code
+ */
+
+function drawCanvasImage (ctx, src, x, y, w, h, next) {
+  var img = new Image();
+  img.onload = function () {
+    ctx.drawImage(img, x, y, w, h);
+    next();
+  };
+  img.src = src;
+}
+
+function Visual (width, height) {
+  this.width = width;
+  this.height = height;
+
+  var canvas = document.getElementById('canvas');
+  this.ctx = canvas.getContext('2d');
+  this.ctx.translate(width/2, height/2);
+
+  $(canvas).on('click', function (e) {
+    this.ctx.fillStyle = 'blue';
+    e.offsetX -= cwidth / 2;
+    e.offsetY -= cheight / 2;
+    drawMarker(this.ctx, e.offsetX, e.offsetY);
+  }.bind(this));
+
+  this.markers = {};
+}
+
+Visual.prototype.mark = function (id, radius) {
+  this.markers[id] = radius;
+}
+
+Visual.prototype.render = function () {
+  drawCanvasImage(this.ctx, "ac1.png", -this.width/2, -this.height/2, this.width, this.height, function () {
+    Object.keys(this.markers).forEach(function (room) {
+      var x = locations[room].x, y = locations[room].y, radius = this.markers[room];
+      this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }.bind(this));
+  }.bind(this));
+};
+
+/**
+ * Introduction code
+ */
+
+var visual = new Visual(1000, 400);
+
+var segincreaser = 10;
+
+olinexpo({
+  onsegmentupdate: function (seg) {
+    if (seg.last && seg.last.location && seg.last.user) {
+      console.log('Segment with user+location:', seg.last.location, seg.last.user);
+      var user = this.getUserById(seg.last.user);
+      var location = this.getLocationById(seg.last.location);
+      var locid = location.floor + location.index;
+      visual.mark(locid, segincreaser++);
+    }
+  },
+  onload: function () {
+    setInterval(visual.render.bind(visual), 100);
+  },
+  onconnect: function () {
+    console.log('Websocket connected.');
+  }
+});
+
+    </script>
+  </body>
+</html>

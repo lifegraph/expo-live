@@ -89,8 +89,14 @@ var olinexpo = (function () {
   }
 
   API.prototype.getUserById = function (id) {
-    return this.state.users.filter(function (user) {
-      return user.id == id;
+    return this.state.users.filter(function (item) {
+      return item.id == id;
+    })[0];
+  }
+
+  API.prototype.getLocationById = function (id) {
+    return this.state.locations.filter(function (item) {
+      return item.id == id;
     })[0];
   }
 
