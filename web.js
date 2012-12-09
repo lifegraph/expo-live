@@ -83,6 +83,29 @@ function bindJSON (bind, next) {
   });
 }
 
+// DELETE /binds/? ant=<ant id> || colony=<colony id>
+
+app.del('/binds', function (req, res) {
+  var ant = req.query.ant, colony = req.query.colony;
+  if (!ant && !colony) {
+    res.json({'message': 'Please specify an ant or colony id in the paramters.'}, 400);
+    return;
+  }
+  var crit = {};
+  if (ant) {
+    crit.ant = ant;
+  }
+  if (colony) {
+    crit.colony = colony;
+  }
+  cols.binds.remove(crit, function (err) {
+    console.log(arguments);
+    res.json({message: 'Successfully removed binds.'});
+  })
+});
+
+// GET /binds
+
 app.get('/binds', function (req, res) {
   var first = null;
   res.write('[');
@@ -97,6 +120,8 @@ app.get('/binds', function (req, res) {
     res.write(JSON.stringify(bind));
   });
 });
+
+// GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
   var segments = {}, drop = Number(req.query.drop || 10);
@@ -128,6 +153,8 @@ app.get('/segments', function (req, res) {
     last = bind;
   });
 });
+
+// GET /binds/<bind id>
 
 app.get('/binds/:id', function (req, res) {
   cols.binds.findOne({
