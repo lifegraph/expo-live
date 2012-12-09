@@ -48,6 +48,12 @@ function Visual (width, height) {
   }.bind(this));
 
   this.markers = {};
+
+  setInterval(function () {
+    Object.key(this.markers).forEach(function (locid) {
+      this.mark(locid, this.markers[locid] - 0.1);
+    })
+  }.bind(this), 50);
 }
 
 Visual.prototype.mark = function (id, radius) {
@@ -69,7 +75,7 @@ Visual.prototype.render = function () {
 
 var visual = new Visual(1000, 400);
 
-var segincreaser = 10;
+var segincreaser = 10, theloc = null;
 
 olinexpo({
   onsegmentupdate: function (seg) {
@@ -78,11 +84,11 @@ olinexpo({
       var user = this.getUserById(seg.last.user);
       var location = this.getLocationById(seg.last.location);
       var locid = location.floor + location.index;
-      visual.mark(locid, segincreaser++);
+      visual.mark(locid, segincreaser = 10);
     }
   },
   onload: function () {
-    setInterval(visual.render.bind(visual), 100);
+    setInterval(visual.render.bind(visual), 50);
   },
   onconnect: function () {
     console.log('Websocket connected.');
