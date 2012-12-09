@@ -32,55 +32,20 @@ var server = http.createServer(app);
 
 
 /**
- * Hardware API
- */
-
-// body: ant=<ant id>&colony=<colony id>
-// This creates a new bind. Associations between ants <=> users
-// and colonies <=> locations exist server-side and augmented to
-// this information.
-
-app.post('/hardware', function (req, res) {
-  if (!req.body.ant || !req.body.colony) {
-    return res.json({message: 'Need ant and colony parameter.'}, 500);
-  }
-
-  var bind = {
-    ant: req.body.ant,
-    colony: req.body.colony,
-    time: Date.now()
-  };
-  cols.binds.insert(bind, function (err, docs) {
-    res.json({message: 'Succeeded in adding bind.'});
-    bindJSON(bind, function (err, json) {
-      io.sockets.emit('bind:create', json);
-    });
-  });
-});
-
-/**
  * Mongo API (binds, ants, colonies)
  */
 
 // Binds
 
-function bindJSON (bind, next) {
-  bind.id = bind._id;
-  delete bind._id;
-  next(null, bind);
-  return;
-
-  cols.ants.findOne({
-    _id: bind.ant
-  }, function (err, ant) {
-    ant && (bind.user = ant.user);
-    cols.colonies.findOne({
-      _id: bind.colony
-    }, function (err, colony) {
-      colony && (bind.location = colony.location);
-      next(err, bind);
-    });
-  });
+function bindJSON (bind) {
+  return {
+    id: bind.id,
+    ant: bind.ant,
+    colony: bind.colony,
+    time: bind.time,
+    user: bind.user,
+    location: bind.location
+  };
 }
 
 // DELETE /binds/? ant=<ant id> || colony=<colony id>
@@ -121,36 +86,38 @@ app.get('/binds', function (req, res) {
   });
 });
 
-// GET /segments? drop=<time between delimited segments>
+// POST /hardware? ant=<ant id> && colony=<colony id>
+// This creates a new bind. Associations between ants <=> users
+// and colonies <=> locations exist server-side and augmented to
+// this information.
 
-app.get('/segments', function (req, res) {
-  var segments = {}, drop = Number(req.query.drop || 10);
-  cols.binds.find().sort('time').each(function (err, bind) {
-    if (err) {
-      return console.error(err);
-    }
-    if (!bind) {
-      res.json(segments);
-      return;
-    }
+app.post('/hardware', function (req, res) {
+  if (!req.body.ant || !req.body.colony) {
+    return res.json({message: 'Need ant and colony parameter.'}, 500);
+  }
 
-    if (!segments[bind.ant]) {
-      segments[bind.ant] = [{first: null, last: null}];
-    }
+  var bind = {
+    ant: req.body.ant,
+    colony: req.body.colony,
+    time: Date.now()
+  };
 
-    var seg = segments[bind.ant][segments[bind.ant].length - 1];
-    if (seg.last) {
-      if (bind.time - seg.last.time > drop*1000) {
-        segments[bind.ant].push(seg = {first: null, last: null});
-      }
-    }
-
-    if (!seg.first) {
-      seg.first = bind;
-    }
-    seg.last = bind;
-    seg.duration = seg.last.time - seg.first.time;
-    last = bind;
+  // Find corresponding user and location.
+  cols.ants.findOne({
+    _id: bind.ant
+  }, function (err, ant) {
+    ant && (bind.user = ant.user);
+    cols.colonies.findOne({
+      _id: bind.colony
+    }, function (err, colony) {
+      colony && (bind.location = colony.location);
+  
+      // Insert bind.
+      cols.binds.insert(bind, function (err) {
+        res.json({message: 'Succeeded in adding bind.'});
+        io.sockets.emit('bind:create', bindJSON(bind));
+      });
+    });
   });
 });
 
@@ -161,29 +128,64 @@ app.get('/binds/:id', function (req, res) {
     _id: new ObjectID(req.params.id)
   }, function (err, bind) {
     if (bind) {
-      bindJSON(bind, function (err, json) {
-        res.json(json);
-      });
+      res.json(bindJSON(bind));
     } else {
       res.json({message: 'No such bind.'}, 404);
     }
   });
 });
 
-// Ants
+// GET /segments? drop=<time between delimited segments>
+
+app.get('/segments', function (req, res) {
+  var segments = {}, drop = Number(req.query.drop || 10);
+  cols.binds.find().sort('time').each(function (err, bind) {
+    if (err) {
+      return console.error(err);
+    }
+
+    // End loop.
+    if (!bind) {
+      res.json(segments);
+      return;
+    }
+
+    // Put in new bucket.
+    if (!segments[bind.ant]) {
+      segments[bind.ant] = [{first: null, last: null}];
+    }
+
+    // Get ant bucket for this segment.
+    var seg = segments[bind.ant][segments[bind.ant].length - 1];
+    if (seg.last) {
+      if (bind.time - seg.last.time > drop*1000) {
+        segments[bind.ant].push(seg = {first: null, last: null});
+      }
+    }
+
+    // Update segment duration.
+    if (!seg.first) {
+      seg.first = bind;
+    }
+    seg.last = bind;
+    last = bind;
+  });
+});
+
+/*
+ * Ants
+ */
 
 function antJSON (ant, next) {
-  next(null, {
+  return {
     ant: ant._id,
     user: ant.user
-  });
+  };
 }
 
 app.get('/ants', function (req, res) {
   cols.ants.find().toArray(function (err, results) {
-    async.map(results, antJSON, function (err, json) {
-      res.json(json);
-    });
+    res.json(results.map(antJSON));
   });
 });
 
@@ -192,9 +194,7 @@ app.get('/ants/:id', function (req, res) {
     _id: String(req.params.id)
   }, function (err, ant) {
     if (ant) {
-      antJSON(ant, function (err, json) {
-        res.json(json);
-      });
+      res.json(antJSON(ant));
     } else {
       res.json({message: 'No such ant.'}, 404);
     }
@@ -218,26 +218,24 @@ app.put('/ants/:id', function (req, res) {
     res.json({message: 'Succeeded in assigning ant.'});
 
     // Notify streaming clients.
-    antJSON(ant, function (err, json) {
-      io.sockets.emit('ant:update', json);
-    });
+    io.sockets.emit('ant:update', antJSON(ant));
   });
 });
 
-// Colonies
+/*
+ * Colonies
+ */
 
-function colonyJSON (colony, next) {
-  next(null, {
+function colonyJSON (colony) {
+  return {
     colony: colony._id,
     location: colony.location
-  });
+  };
 }
 
 app.get('/colonies', function (req, res) {
   cols.colonies.find().toArray(function (err, results) {
-    async.map(results, colonyJSON, function (err, json) {
-      res.json(json);
-    });
+    res.json(results.map(colonyJSON));
   });
 });
 
@@ -246,9 +244,7 @@ app.get('/colonies/:id', function (req, res) {
     _id: String(req.params.id)
   }, function (err, colony) {
     if (ant) {
-      colonyJSON(colony, function (err, json) {
-        res.json(json);
-      });
+      res.json(colonyJSON(colony));
     } else {
       res.json({message: 'No such colony.'}, 404);
     }
@@ -272,9 +268,7 @@ app.put('/colonies/:id', function (req, res) {
     res.json({message: 'Succeeded in assigning colony.'});
 
     // Notify streaming clients.
-    colonyJSON(colony, function (err, json) {
-      io.sockets.emit('colony:update', json);
-    })
+    io.sockets.emit('colony:update', colonyJSON(colony));
   });
 });
 
@@ -293,13 +287,13 @@ app.get('/destroyallbinddataiamserious', function (req, res) {
 
 // Users.
 
-function userJSON (user, next) {
-  next(null, {
+function userJSON (user) {
+  return {
     id: user.id,
     name: user.name,
     facebookid: user.facebookid,
     email: user.email
-  });
+  };
 }
 
 app.get('/users', function (req, res) {
@@ -308,9 +302,7 @@ app.get('/users', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else {
-      async.map(result.rows, userJSON, function (err, json) {
-        res.json(json);
-      });
+      res.json(result.rows.map(userJSON));
     }
   });
 });
@@ -323,9 +315,7 @@ app.get('/users/:id', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else if (users.rows.length) {
-      userJSON(users.rows[0], function (err, json) {
-        res.json(json);
-      })
+      res.json(userJSON(users.rows[0]));
     } else {
       res.json({message: 'No such user.'}, 404);
     }
@@ -335,12 +325,12 @@ app.get('/users/:id', function (req, res) {
 // Location.
 
 function locationJSON (loc, next) {
-  next(null, {
+  return {
     "id": loc.id,
     "floor": loc.floor,
     "type": loc.type,
     "index": loc.index
-  });
+  };
 }
 
 app.get('/locations', function (req, res) {
@@ -349,9 +339,7 @@ app.get('/locations', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else {
-      async.map(result.rows, locationJSON, function (err, json) {
-        res.json(json);
-      });
+      res.json(result.rows.map(locationJSON));
     }
   });
 });
@@ -364,9 +352,7 @@ app.get('/locations/:id', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else if (locations.rows.length) {
-      locationJSON(locations.rows[0], function (err, json) {
-        res.json(json);
-      })
+      res.json(locationJSON(locations.rows[0]));
     } else {
       res.json({message: 'No such location.'}, 404);
     }
@@ -375,9 +361,9 @@ app.get('/locations/:id', function (req, res) {
 
 // Presentations.
 
-function presentationJSON (presentation, next) {
+function presentationJSON (presentation) {
   // TODO strip fields
-  next(null, presentation);
+  return presentation;
 }
 
 app.get('/presentations', function (req, res) {
@@ -386,9 +372,7 @@ app.get('/presentations', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else {
-      async.map(result.rows, presentationJSON, function (err, json) {
-        res.json(json);
-      });
+      res.json(presentationJSON(result.rows));
     }
   });
 });
@@ -401,9 +385,7 @@ app.get('/presentations/:id', function (req, res) {
       console.error(err);
       res.json({message: err}, 500);
     } else if (presentations.rows.length) {
-      presentationJSON(presentations.rows[0], function (err, json) {
-        res.json(json);
-      })
+      res.json(presentationJSON(presentations.rows[0]));
     } else {
       res.json({message: 'No such user.'}, 404);
     }

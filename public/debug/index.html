@@ -2,13 +2,13 @@
 h3 { margin: 0; }
 div { width: 47%; margin-right: 1%; float: left; padding: 15px; border: 1px solid #ccc; box-sizing: border-box; margin: 15px 1%;}
 pre { overflow: auto; background: #ddd; padding: 15px; }
-hr, br { clear: both; }
+h2, hr, br { clear: both; }
 </style>
 
 <h2>Mongo</h1>
 
 <div>
-  <h3>Binds</h3>
+  <h3>Active Sessions</h3>
   <pre id="log-binds"></pre>
   <form id="bind-control">
     ant: <select id="bind-control-ant"></select>
@@ -71,9 +71,15 @@ olinexpo({
     if (this.loaded) {
       $('#log-stream').append('bind:create - ' + JSON.stringify(bind) + '\n');
     }
-    $('#log-binds').text(this.state.binds.map(function (bind) {
-      return JSON.stringify(bind);
-    }).join('\n'));
+  },
+
+  onsegmentupdate: function (seg) {
+    $('#log-binds').text(Object.keys(this.state.segments).map(function (antid) {
+      var seg = this.state.segments[antid];
+      return 'ant:' + antid + ' =>\n  ' + seg.map(function (bind) {
+        return 'at colony:' + bind.first.colony + ' lasting ' + ((bind.last.time - bind.first.time)/1000) + ' seconds'
+      }.bind(this)).join('\n  ');
+    }.bind(this)).join('\n'));
   },
 
   onantupdate: function (ant) {

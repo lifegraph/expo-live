@@ -22,8 +22,18 @@ var olinexpo = (function () {
     var socket = io.connect('http://' + window.location.host);
     socket.on('connect', next);
     socket.on('bind:create', function (bind) {
-      this.state.binds.push(bind);
       (this.controller.onbindcreate || noop).call(this, bind);
+
+      // Find last segment and update.
+      if (!this.state.segments[bind.ant]) {
+        this.state.segments[bind.ant] = [{first: null, last: null}];
+      }
+      var seg = this.state.segments[bind.ant][this.state.segments[bind.ant].length - 1];
+      if (!seg.first) {
+        seg.first = bind;
+      }
+      seg.last = bind;
+      (this.controller.onsegmentupdate || noop).call(this, seg);
     }.bind(this));
     socket.on('ant:update', function (ant) {
       (this.state.ants = this.state.ants.filter(function (ant2) {
@@ -44,19 +54,21 @@ var olinexpo = (function () {
     var api = this;
     $.getJSON('/users/', function (users) {
       $.getJSON('/locations/', function (locations) {
-        $.getJSON('/binds/', function (binds) {
+        $.getJSON('/segments/?drop=30', function (segments) {
           $.getJSON('/presentations/', function (presentations) {
             $.getJSON('/ants/', function (ants) {
               $.getJSON('/colonies/', function (colonies) {
                 api.state.users = users;
                 api.state.locations = locations;
                 api.state.presentations = presentations;
-                api.state.binds = binds;
+                api.state.segments = segments;
                 api.state.ants = ants;
                 api.state.colonies = colonies;
 
-                // Push binds, ants, colonies.
-                binds.forEach((api.controller.onbindcreate || noop).bind(api));
+                // Push segments, ants, colonies.
+                Object.keys(segments).forEach(function (key) {
+                  segments[key].forEach((api.controller.onsegmentupdate || noop).bind(api));
+                });
                 ants.forEach((api.controller.onantupdate || noop).bind(api));
                 colonies.forEach((api.controller.oncolonyupdate || noop).bind(api));
 
