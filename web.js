@@ -166,41 +166,8 @@ app.get('/binds/:id', function (req, res) {
 // GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
-  var segments = {}, drop = Number(req.query.drop || 10), first = true;
-  res.write('[');
-  cols.binds.find().sort('time').each(function (err, bind) {
-    if (err) {
-      console.error(err);
-      console.write(']');
-      res.json({error: true, message: err}, 500);
-      return;
-    }
-
-    // End loop.
-    if (!bind) {
-      res.json(segments);
-      return;
-    }
-
-    // Put in new bucket.
-    if (!segments[bind.ant]) {
-      segments[bind.ant] = [{first: null, last: null}];
-    }
-
-    // Get ant bucket for this segment.
-    var seg = segments[bind.ant][segments[bind.ant].length - 1];
-    if (seg.last) {
-      if (bind.time - seg.last.time > drop*1000) {
-        segments[bind.ant].push(seg = {first: null, last: null});
-      }
-    }
-
-    // Update segment duration.
-    if (!seg.first) {
-      seg.first = bind;
-    }
-    seg.last = bind;
-    last = bind;
+  cols.binds.find().sort('start').toArray(function (err, segments) {
+    res.json(segments);
   });
 });
 
@@ -310,6 +277,7 @@ app.get('/destroyallbinddataiamserious', function (req, res) {
   cols.colonies.remove();
   cols.ants.remove();
   cols.binds.remove();
+  cols.segments.remove();
   res.json('You did it. Murderer.');
 });
 
