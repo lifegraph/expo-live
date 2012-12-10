@@ -18,6 +18,8 @@ var POSTGRES_URI = "postgres://dfgpdzocobqufp:aHD8_vXdE75M9mthWts2rVXSIf@ec2-54-
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 var port = process.env.PORT || 5000;
 
+var SEGMENT_THRESHOLD = 3*60*1000;
+
 
 /**
  * App
@@ -111,11 +113,37 @@ app.post('/hardware', function (req, res) {
       _id: bind.colony
     }, function (err, colony) {
       colony && (bind.location = colony.location);
-  
-      // Insert bind.
-      cols.binds.insert(bind, function (err) {
-        res.json({message: 'Succeeded in adding bind.'});
-        io.sockets.emit('bind:create', bindJSON(bind));
+
+      // Extend most recent time segment, or create new one.
+      // TODO! user, location instead?
+      cols.segments.find({
+        ant: bind.ant,
+        colony: bind.colony
+      }).sort({time: -1}).limit(1).nextObject(function (err, lastsegment) {
+        if (lastsegment && bind.time - lastsegment.end < SEGMENT_THRESHOLD) {
+          lastsegment.end = lastsegment.last.time = bind.time;
+          cols.segments.update({
+            _id: lastsegment._id
+          }, lastsegment, insertBind)
+        } else {
+          // create new segment
+          cols.segments.insert({
+            ant: bind.ant,
+            colony: bind.colony,
+            start: bind.time,
+            end: bind.time,
+            first: bind,
+            last: bind
+          }, insertBind);
+        }
+
+        function insertBind () {
+          // Insert bind.
+          cols.binds.insert(bind, function (err) {
+            res.json({message: 'Succeeded in adding bind.'});
+            io.sockets.emit('bind:create', bindJSON(bind));
+          });
+        }
       });
     });
   });
@@ -138,11 +166,13 @@ app.get('/binds/:id', function (req, res) {
 // GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
-  var segments = {}, drop = Number(req.query.drop || 10);
+  var segments = {}, drop = Number(req.query.drop || 10), first = true;
+  res.write('[');
   cols.binds.find().sort('time').each(function (err, bind) {
     if (err) {
       console.error(err);
-      res.json({error: true, message: err});
+      console.write(']');
+      res.json({error: true, message: err}, 500);
       return;
     }
 
@@ -435,6 +465,7 @@ function setupMongo (next) {
     cols.binds = new mongo.Collection(dbmongo, 'binds');
     cols.ants = new mongo.Collection(dbmongo, 'ants');
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
+    cols.segments = new mongo.Collection(dbmongo, 'segments');
 
     next();
   });
@@ -453,6 +484,48 @@ function setupPostgres (next) {
 }
 
 function setupServer (next) {
+  var cur = cols.binds.find().sort('time');
+
+  function next () {
+    cur.nextObject(function (err, bind) {
+      console.log(err, bind);
+      cols.segments.find({
+        ant: bind.ant,
+        colony: bind.colony
+      }).sort({time: -1}).limit(1).nextObject(function (err, lastsegment) {
+        if (lastsegment && bind.time - lastsegment.end < SEGMENT_THRESHOLD) {
+          lastsegment.end = lastsegment.last.time = bind.time;
+          console.log(lastsegment);
+          //cols.segments.update({
+          //  _id: lastsegment._id
+          //}, lastsegment, insertBind)
+          next();
+        } else {
+          // create new segment
+          /*
+          cols.segments.insert({
+            ant: bind.ant,
+            colony: bind.colony,
+            start: bind.time,
+            end: bind.time,
+            first: bind,
+            last: bind
+          }, insertBind);
+          */
+          console.log({
+            ant: bind.ant,
+            colony: bind.colony,
+            start: bind.time,
+            end: bind.time,
+            first: bind,
+            last: bind
+          }); next();
+        }
+      });
+    });
+  }
+  next();
+
   server.listen(port, next);
 }
 
