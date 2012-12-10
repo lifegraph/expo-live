@@ -28,7 +28,7 @@ while 1:
     colony_id = chunks(colony_id, 2)
     colony_id.reverse()
     colony_id = ''.join(colony_id)
-    ant_id = chunks(colony_id, 2)
+    ant_id = chunks(ant_id, 2)
     ant_id.reverse()
     ant_id = ''.join(ant_id)
 
