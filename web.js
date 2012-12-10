@@ -484,48 +484,6 @@ function setupPostgres (next) {
 }
 
 function setupServer (next) {
-  var cur = cols.binds.find().sort('time');
-
-  function next () {
-    cur.nextObject(function (err, bind) {
-      console.log(err, bind);
-      cols.segments.find({
-        ant: bind.ant,
-        colony: bind.colony
-      }).sort({time: -1}).limit(1).nextObject(function (err, lastsegment) {
-        if (lastsegment && bind.time - lastsegment.end < SEGMENT_THRESHOLD) {
-          lastsegment.end = lastsegment.last.time = bind.time;
-          console.log(lastsegment);
-          //cols.segments.update({
-          //  _id: lastsegment._id
-          //}, lastsegment, insertBind)
-          next();
-        } else {
-          // create new segment
-          /*
-          cols.segments.insert({
-            ant: bind.ant,
-            colony: bind.colony,
-            start: bind.time,
-            end: bind.time,
-            first: bind,
-            last: bind
-          }, insertBind);
-          */
-          console.log({
-            ant: bind.ant,
-            colony: bind.colony,
-            start: bind.time,
-            end: bind.time,
-            first: bind,
-            last: bind
-          }); next();
-        }
-      });
-    });
-  }
-  next();
-
   server.listen(port, next);
 }
 
