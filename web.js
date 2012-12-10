@@ -18,7 +18,7 @@ var POSTGRES_URI = "postgres://dfgpdzocobqufp:aHD8_vXdE75M9mthWts2rVXSIf@ec2-54-
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 var port = process.env.PORT || 5000;
 
-var SEGMENT_THRESHOLD = 3*60*1000;
+var SEGMENT_THRESHOLD = 1*60*1000;
 
 
 /**
@@ -166,7 +166,7 @@ app.get('/binds/:id', function (req, res) {
 // GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
-  cols.binds.find().sort('start').toArray(function (err, segments) {
+  cols.segments.find().sort('start').toArray(function (err, segments) {
     res.json(segments);
   });
 });
