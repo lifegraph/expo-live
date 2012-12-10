@@ -166,7 +166,11 @@ app.get('/binds/:id', function (req, res) {
 // GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
-  cols.segments.find().sort('start').toArray(function (err, segments) {
+  cols.segments.find().sort('start').toArray(function (err, json) {
+    var segments = {};
+    json.forEach(function (segment) {
+      (segments[segment.ant] || (segments[segment.ant] = [])).push(segment);
+    })
     res.json(segments);
   });
 });
