@@ -30,7 +30,7 @@ while 1:
     colony_id = ''.join(colony_id)
     ant_id = chunks(colony_id, 2)
     ant_id.reverse()
-    ant_id = ''.join(colony_id)
+    ant_id = ''.join(ant_id)
 
     # POST that biznatch
     print "colony:", json.dumps(colony_id), "ant:", json.dumps(ant_id)

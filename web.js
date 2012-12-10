@@ -141,7 +141,9 @@ app.get('/segments', function (req, res) {
   var segments = {}, drop = Number(req.query.drop || 10);
   cols.binds.find().sort('time').each(function (err, bind) {
     if (err) {
-      return console.error(err);
+      console.error(err);
+      res.json({error: true, message: err});
+      return;
     }
 
     // End loop.
