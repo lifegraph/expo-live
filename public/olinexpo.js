@@ -117,5 +117,9 @@ var olinexpo = (function () {
     })[0];
   }
 
+  API.prototype.watchPresentation = function (id, callback) {
+    //this.on
+  };
+
   return olinexpo;
 })();
