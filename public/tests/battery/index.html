@@ -29,23 +29,8 @@ var api = olinexpo({
 function refresh () {
   $('div').html('');
   Object.keys(api.state.segments).forEach(function (antid) {
-    var ant = api.state.segments[antid][api.state.segments[antid].length - 1];
-    if (!ant) return;
-    var start = ant.first.time, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
-    var end = ant.last.time, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
-    var running_seconds = Math.round((end - start)/1000);
-    var latest_seconds = Math.round((Date.now() - end)/1000);
     $('div').append($('<h3>Ant: ' + antid + ' <a class="btn btn-mini btn-danger">Delete</a></h3>'))
-
-    $('<blockquote><small class="muted">' + 
-        '<b>Start:</b>' + strstart +
-        '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small> </
-
-    for (var )
-      '<blockquote>' +
-      '<i>time running:</i> ' + running_seconds + ' seconds, ' + Math.round(running_seconds/60) + ' minutes<br>' +
-      (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago, ' + Math.round(latest_seconds/60) + ' minutes ago' + (latest_seconds > 10 ? '</span>' : '') +
-      '</blockquote>').on('click', '.btn', function () {
+      .on('click', '.btn', function () {
         if (confirm('Are you sure you wanna delete these binds?')) {
           $.ajax({
             type: 'DELETE',
@@ -56,7 +41,23 @@ function refresh () {
             }
           });
         }
-      }));
+      });
+
+    api.state.segments[antid].forEach(function (segment) {
+      if (!segment) {
+        return;
+      }
+      var start = segment.first.time, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
+      var end = segment.last.time, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
+      var running_seconds = Math.round((end - start)/1000);
+      var latest_seconds = Math.round((Date.now() - end)/1000);
+      $('div').append($('<blockquote><span class="muted">' + 
+          '<b>Start:</b>' + strstart +
+          '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</span><br>' +
+        '<i>time running:</i> ' + running_seconds + ' seconds, ' + Math.round(running_seconds/60) + ' minutes<br>' +
+        (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago, ' + Math.round(latest_seconds/60) + ' minutes ago' + (latest_seconds > 10 ? '</span>' : '') +
+        '</blockquote>'));
+    });
   });
 }
 
