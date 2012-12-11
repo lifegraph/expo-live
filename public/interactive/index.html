@@ -22,14 +22,8 @@ var locations = {
  * Visual code
  */
 
-function drawCanvasImage (ctx, src, x, y, w, h, next) {
-  var img = new Image();
-  img.onload = function () {
-    ctx.drawImage(img, x, y, w, h);
-    next();
-  };
-  img.src = src;
-}
+var image_ac = new Image();
+image_ac.src = 'ac1.png';
 
 function Visual (width, height) {
   this.width = width;
@@ -60,11 +54,10 @@ Visual.prototype.mark = function (id, radius) {
 }
 
 Visual.prototype.render = function () {
-  drawCanvasImage(this.ctx, "ac1.png", -this.width/2, -this.height/2, this.width, this.height, function () {
-    Object.keys(this.markers).forEach(function (room) {
-      var x = locations[room].x, y = locations[room].y, radius = this.markers[room];
-      this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-    }.bind(this));
+  this.ctx.drawImage(image_ac, -this.width/2, -this.height/2, this.width, this.height);
+  Object.keys(this.markers).forEach(function (room) {
+    var x = locations[room].x, y = locations[room].y, radius = this.markers[room];
+    this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
   }.bind(this));
 };
 
