@@ -13,7 +13,8 @@ var ants = {};
 
 var api = olinexpo({
   onconnect: function () {
-    setInterval(refresh, 5000);
+    //setInterval(refresh, 5000);
+    refresh()
   },
   onbindcreate: function (bind) {
     console.log('bind received');
