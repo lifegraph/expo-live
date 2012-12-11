@@ -35,10 +35,13 @@ function refresh () {
     var end = ant.last.time, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
     var running_seconds = Math.round((end - start)/1000);
     var latest_seconds = Math.round((Date.now() - end)/1000);
-    $('div').append($(
-      '<h3>Ant: ' + antid + ' <small class="muted">' + 
+    $('div').append($('<h3>Ant: ' + antid + ' <a class="btn btn-mini btn-danger">Delete</a></h3>'))
+
+    $('<blockquote><small class="muted">' + 
         '<b>Start:</b>' + strstart +
-        '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
+        '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small> </
+
+    for (var )
       '<blockquote>' +
       '<i>time running:</i> ' + running_seconds + ' seconds, ' + Math.round(running_seconds/60) + ' minutes<br>' +
       (latest_seconds > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' + latest_seconds + ' seconds ago, ' + Math.round(latest_seconds/60) + ' minutes ago' + (latest_seconds > 10 ? '</span>' : '') +
