@@ -69,7 +69,7 @@ var visual = new Visual(1000, 400);
 
 var segincreaser = 10, theloc = null;
 
-olinexpo({
+var expo = olinexpo({
   onsegmentupdate: function (seg) {
     if (seg.last && seg.last.location && seg.last.user) {
       console.log('Segment with user+location:', seg.last.location, seg.last.user);

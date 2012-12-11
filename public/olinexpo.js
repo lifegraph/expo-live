@@ -75,12 +75,12 @@ var olinexpo = (function () {
 
   API.prototype.loadResources = function (next) {
     var api = this;
-    $.getJSON('/users/', function (users) {
-      $.getJSON('/locations/', function (locations) {
-        $.getJSON('/segments/?drop=180', function (segments) {
-          $.getJSON('/presentations/', function (presentations) {
-            $.getJSON('/ants/', function (ants) {
-              $.getJSON('/colonies/', function (colonies) {
+    $.getJSON('http://' + olinexpoHost + '/users/', function (users) {
+      $.getJSON('http://' + olinexpoHost + '/locations/', function (locations) {
+        $.getJSON('http://' + olinexpoHost + '/segments/?drop=180', function (segments) {
+          $.getJSON('http://' + olinexpoHost + '/presentations/', function (presentations) {
+            $.getJSON('http://' + olinexpoHost + '/ants/', function (ants) {
+              $.getJSON('http://' + olinexpoHost + '/colonies/', function (colonies) {
                 api.state.users = users;
                 api.state.locations = locations;
                 api.state.presentations = presentations;
