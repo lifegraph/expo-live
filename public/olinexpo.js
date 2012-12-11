@@ -1,3 +1,20 @@
+// Get script host.
+var olinexpoHost = (function () {
+  var scripts = document.getElementsByTagName('script');
+  var path = scripts[scripts.length-1].src;
+  var a = document.createElement('a');
+  a.href = path;
+  return a.host;
+})();
+
+// Include Socket.io
+(function () {
+  var s = document.createElement('script');
+  s.src = 'http://' + olinexpoHost + '/socket.io/socket.io.js';
+  document.getElementsByTagName('head')[0].appendChild(s);
+})();
+
+// Create constructor.
 var olinexpo = (function () {
   var noop = function () { };
 
@@ -19,7 +36,7 @@ var olinexpo = (function () {
   }
 
   API.prototype.connectSocket = function (next) {
-    var socket = io.connect('http://' + window.location.host);
+    var socket = io.connect('http://' + olinexpoHost);
     socket.on('connect', next);
     socket.on('bind:create', function (bind) {
       (this.controller.onbindcreate || noop).call(this, bind);
