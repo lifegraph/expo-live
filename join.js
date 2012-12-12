@@ -172,30 +172,12 @@ app.get('/binds/:id', function (req, res) {
 // GET /segments? drop=<time between delimited segments>
 
 app.get('/segments', function (req, res) {
-  var crit = {}, sort = 'start';
-  if (req.query.ant) {
-    crit.ant = req.query.ant;
-  }
-  if (req.query.colony) {
-    crit.colony = req.query.colony;
-  }
-  if (req.query.sort == 'latest') {
-    sort = 'end';
-  }
-  cols.segments.find(crit).sort(sort).toArray(function (err, json) {
+  cols.segments.find().sort('start').toArray(function (err, json) {
     var segments = {};
     json.forEach(function (segment) {
       (segments[segment.ant] || (segments[segment.ant] = [])).push(segment);
     })
     res.json(segments);
-  });
-});
-
-app.get('/segments/:id', function (req, res) {
-  cols.segments.findOne({
-    _id: req.params.id
-  }, function (err, json) {
-    res.json(json, json ? 200 : 404);
   });
 });
 
