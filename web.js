@@ -148,7 +148,7 @@ app.post('/binds', function (req, res) {
         }
 
         function updateAnt (err, segment) {
-          io.sockets.emit('segment:update', segment);
+          io.sockets.emit('segment:update', segmentJSON(segment));
 
           cols.ants.update({
             _id: bind.ant

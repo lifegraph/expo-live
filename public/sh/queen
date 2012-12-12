@@ -1,6 +1,6 @@
 cd ~
 sudo apt-get install python-setuptools curl
 sudo easy_install pyserial
-wget http://olinexpoapi.herokuapp.com/sh/queen_listener.py
+wget -N http://olinexpoapi.herokuapp.com/sh/queen_listener.py
 echo "print 'Queen setup complete. Running queen_listener.py now.'" | python
 sudo python queen_listener.py
