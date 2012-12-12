@@ -99,7 +99,10 @@ app.get('/binds', function (req, res) {
 // and colonies <=> locations exist server-side and augmented to
 // this information.
 
-app.post('/hardware', function (req, res) {
+app.post('/hardware', postBind); // deprecated
+app.post('/binds', postBind);
+
+function postBind (req, res) {
   if (!req.body.ant || !req.body.colony) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
@@ -140,6 +143,14 @@ app.post('/hardware', function (req, res) {
             end: bind.time,
             first: bind,
             last: bind
+          }, updateAnt);
+        }
+
+        function updateAnt (err, segment) {
+          cols.ants.update({
+            _id: bind.ant
+          }, {
+            $set: {'currentSegment': segment}
           }, insertBind);
         }
 
@@ -153,7 +164,7 @@ app.post('/hardware', function (req, res) {
       });
     });
   });
-});
+}
 
 // GET /binds/<bind id>
 
@@ -169,26 +180,36 @@ app.get('/binds/:id', function (req, res) {
   });
 });
 
-// GET /segments? drop=<time between delimited segments>
+/**
+ * Segments
+ */
+
+// GET /segments
 
 app.get('/segments', function (req, res) {
-  var crit = {}, sort = 'start';
-  if (req.query.ant) {
-    crit.ant = req.query.ant;
-  }
-  if (req.query.colony) {
-    crit.colony = req.query.colony;
-  }
-  if (req.query.sort == 'latest') {
-    sort = 'end';
-  }
-  cols.segments.find(crit).sort(sort).toArray(function (err, json) {
-    var segments = {};
-    json.forEach(function (segment) {
-      (segments[segment.ant] || (segments[segment.ant] = [])).push(segment);
+  if ('latest' in req.query) {
+    cols.segments.distinct('ant', 'end', function (id, antids) {
+      res.json(arguments);
     })
-    res.json(segments);
-  });
+  } else {
+    var crit = {}, sort = 'start';
+    if (req.query.ant) {
+      crit.ant = req.query.ant;
+    }
+    if (req.query.colony) {
+      crit.colony = req.query.colony;
+    }
+    if (req.query.sort == 'latest') {
+      sort = 'end';
+    }
+    cols.segments.find(crit).sort(sort).toArray(function (err, json) {
+      var segments = {};
+      json.forEach(function (segment) {
+        (segments[segment.ant] || (segments[segment.ant] = [])).push(segment);
+      })
+      res.json(segments);
+    });
+  }
 });
 
 app.get('/segments/:id', function (req, res) {
@@ -206,7 +227,8 @@ app.get('/segments/:id', function (req, res) {
 function antJSON (ant, next) {
   return {
     ant: ant._id,
-    user: ant.user
+    user: ant.user,
+    currentSegment: ant.currentSegment
   };
 }
 
