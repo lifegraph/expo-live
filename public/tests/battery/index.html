@@ -11,20 +11,13 @@
 
 var ants = {};
 
-var api = olinexpo({
-  onconnect: function () {
+var api = olinexpo()
+  .on('connect', function () {
     setInterval(refresh, 1000);
-  },
-  onbindcreate: function (bind) {
+  })
+  .on('bind:create', function (bind) {
     console.log('bind received');
-  },
-  onantupdate: function (ant) {
-  },
-  oncolonyupdate: function (colony) {
-  },
-  onload: function () {
-  }
-});
+  });
 
 function readableTimedelta (s) {
   return (0|(s/3600)) + ' hours, ' + (0|((s % 3600)/60)) + ' minutes, ' + (0|((s%60))) + ' seconds'

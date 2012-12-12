@@ -69,8 +69,8 @@ var visual = new Visual(1000, 400);
 
 var segincreaser = 10, theloc = null;
 
-var expo = olinexpo({
-  onsegmentupdate: function (seg) {
+olinexpo()
+  .on('segment:update', function (seg) {
     if (seg.last && seg.last.location && seg.last.user) {
       console.log('Segment with user+location:', seg.last.location, seg.last.user);
       var user = this.getUserById(seg.last.user);
@@ -79,14 +79,13 @@ var expo = olinexpo({
       visual.ctx.fillStyle = seg.last.user == 2 ? 'green' : 'blue';
       visual.mark(locid, segincreaser = 10);
     }
-  },
-  onload: function () {
+  })
+  .on('load', function () {
     setInterval(visual.render.bind(visual), 50);
-  },
-  onconnect: function () {
+  })
+  .on('connect', function () {
     console.log('Websocket connected.');
-  }
-});
+  });
 
     </script>
   </body>

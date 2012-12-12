@@ -191,15 +191,44 @@ app.get('/binds/:id', function (req, res) {
  * Segments
  */
 
+function segmentJSON (seg) {
+  return {
+    id: seg._id,
+    ant: seg.ant,
+    colony: seg.colony,
+    start: seg.start,
+    end: seg.end,
+    user: seg.user,
+    location: seg.location,
+    first: seg.first,
+    last: seg.last
+  };
+}
+
 // GET /segments
 
 app.get('/segments', function (req, res) {
+  var crit = {}, sort = 'start';
+
+  // Query from ants, which have a .currentSegment DBRef.
   if ('latest' in req.query) {
-    cols.segments.distinct('ant', 'end', function (id, antids) {
-      res.json(arguments);
+    if (req.query.ant) {
+      crit.ant = req.query.ant;
+    }
+    cols.ants.find(crit).toArray(function (id, ants) {
+      async.map(ants, function (ant, next) {;
+        dbmongo.dereference(ant.currentSegment, next);
+      }, function (err, json) {
+        var segments = {};
+        json.forEach(function (segment) {
+          (segments[segment.ant] || (segments[segment.ant] = [])).push(segmentJSON(segment));
+        })
+        res.json(segments);
+      });
     })
+
+  // Query from segments collection.
   } else {
-    var crit = {}, sort = 'start';
     if (req.query.ant) {
       crit.ant = req.query.ant;
     }
@@ -212,7 +241,7 @@ app.get('/segments', function (req, res) {
     cols.segments.find(crit).sort(sort).toArray(function (err, json) {
       var segments = {};
       json.forEach(function (segment) {
-        (segments[segment.ant] || (segments[segment.ant] = [])).push(segment);
+        (segments[segment.ant] || (segments[segment.ant] = [])).push(segmentJSON(segment));
       })
       res.json(segments);
     });
@@ -234,8 +263,7 @@ app.get('/segments/:id', function (req, res) {
 function antJSON (ant, next) {
   return {
     ant: ant._id,
-    user: ant.user,
-    currentSegment: ant.currentSegment
+    user: ant.user
   };
 }
 
