@@ -1,170 +1,73 @@
-<style>
-h3 { margin: 0; }
-div { width: 47%; margin-right: 1%; float: left; padding: 15px; border: 1px solid #ccc; box-sizing: border-box; margin: 15px 1%;}
-pre { overflow: auto; background: #ddd; padding: 15px; }
-h2, hr, br { clear: both; }
-</style>
+<!DOCTYPE html>
 
-<h2>Mongo</h1>
+<html>
+<body>
+  <div class="container-fluid">
+  <h2>Antfarm Debug</h2>
+<b>Data:</b> <a href="/segments/?latest" class="btn">Current Segments</a>
+<a href="/ants/" class="btn">Ants</a>
+<a href="/colonies/" class="btn">Colonies</a>
+<a href="/users/" class="btn">Users</a>
+<a href="/locations/" class="btn">Locations</a>
+<a href="/presentations/" class="btn">Presentations</a>
 
-<div>
-  <h3>Active Sessions</h3>
-  <pre id="log-binds"></pre>
-  <form id="bind-control">
-    ant: <select id="bind-control-ant"></select>
-    colony: <select id="bind-control-colony"></select>
-    <button>Submit</button>
-  </form>
-</div>
-<div>
-  <h3>Ants</h3>
-  <pre id="log-ants"></pre>
-  <form id="ant-control">
-    id: <input id="ant-control-name"><br>
-    user: <select id="ant-control-user"></select>
-    <button>Submit</button>
-  </form>
-</div>
-<br>
-<div>
-  <h3>Colonies</h3>
-  <pre id="log-colonies"></pre>
-  <form id="colony-control">
-    id: <input id="colony-control-name"><br>
-    location: <select id="colony-control-location"></select>
-    <button>Submit</button>
-  </form>
-</div>
-<div>
-  <h3>Stream</h3>
-  <pre id="log-stream"></pre>
-</div>
-
-<h2>Postgres</h2>
-
-<div>
-  <h3>Users</h3>
-  <pre id="log-users"></pre>
-</div>
-<div>
-  <h3>Locations</h3>
-  <pre id="log-locations"></pre>
-</div>
-<br>
-<div>
-  <h3>Presentations</h3>
-  <pre id="log-presentations"></pre>
-</div>
 <hr>
+<div id="results">
+</div>
 
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
 <script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/olinexpo.js"></script>
 <script>
 
-olinexpo({
-  onconnect: function () {
-    $('#log-stream').append('(Connected to websocket.)\n');
-  },
+var segments = {};
 
-  onbindcreate: function (bind) {
-    if (this.loaded) {
-      $('#log-stream').append('bind:create - ' + JSON.stringify(bind) + '\n');
-    }
-  },
+var api = olinexpo()
+  .on('connect', function () {
+    setInterval(refresh, 1000);
+  })
+  .listenAll(false, function (_, _segments) {
+    segments = _segments;
+  });
 
-  onsegmentupdate: function (seg) {
-    $('#log-binds').text(Object.keys(this.state.segments).map(function (antid) {
-      var seg = this.state.segments[antid];
-      return 'ant:' + antid + ' =>\n  ' + seg.map(function (bind) {
-        return 'at colony:' + bind.first.colony + ' lasting ' + ((bind.last.time - bind.first.time)/1000) + ' seconds'
-      }.bind(this)).join('\n  ');
-    }.bind(this)).join('\n'));
-  },
+function readableTimedelta (s) {
+  return (0|(s/3600)) + ' hours, ' + (0|((s % 3600)/60)) + ' minutes, ' + (0|((s%60))) + ' seconds'
+}
 
-  onantupdate: function (ant) {
-    if (this.loaded) {
-      $('#log-stream').append('ant:update - ' + JSON.stringify(ant) + '\n');
-    }
-    $('#log-ants').text(this.state.ants.map(function (ant) {
-      return JSON.stringify(ant);
-    }).join('\n'));
-
-    // Ant selection for new bind.
-    $('#bind-control-ant').html('').append(this.state.ants.map(function (ant) {
-      return $('<option>').val(ant.ant).text(ant.ant);
-    }));
-  },
-
-  oncolonyupdate: function (colony) {
-    if (this.loaded) {
-      $('#log-stream').append('colony:update - ' + JSON.stringify(colony) + '\n');
-    }
-    $('#log-colonies').text(this.state.colonies.map(function (colony) {
-      return JSON.stringify(colony);
-    }).join('\n'));
-
-    $('#bind-control-colony').html('').append(this.state.colonies.map(function (colony) {
-      return $('<option>').val(colony.colony).text(colony.colony);
-    }));
-  },
-
-  onload: function () {
-    // Log users.
-    $('#log-users').text(this.state.users.map(function (user) {
-      return JSON.stringify(user);
-    }).join('\n'));
-
-    $('#ant-control-user').html('').append(this.state.users.map(function (user) {
-      return $('<option>').val(user.id).text(user.name);
-    }));
-
-    // Log locations.
-    $('#log-locations').text(this.state.locations.map(function (location) {
-      return JSON.stringify(location);
-    }).join('\n'));
-
-    $('#colony-control-location').html('').append(this.state.locations.map(function (location) {
-      return $('<option>').val(location.id).text(location.floor + location.index);
-    }));
-
-    // Log presentations.
-    $('#log-presentations').text(this.state.presentations.map(function (presentation) {
-      return JSON.stringify(presentation);
-    }).join('\n'));
-
-    // Events.
-
-    $('#bind-control').on('submit', function () {
-      var ant = $('#bind-control-ant').val();
-      var colony = $('#bind-control-colony').val();
-      $.post('/hardware', {ant: ant, colony: colony}, console.log);
-      return false;
-    });
-
-    $('#ant-control').on('submit', function () {
-      var name = $('#ant-control-name').val();
-      var user = $('#ant-control-user').val();
-      $.ajax({
-        type: 'put',
-        url: '/ants/' + name,
-        data: {user: user},
-        success: console.log
-      });
-      return false;
-    });
-
-    $('#colony-control').on('submit', function () {
-      var name = $('#colony-control-name').val();
-      var location = $('#colony-control-location').val();
-      $.ajax({
-        type: 'put',
-        url: '/colonies/' + name,
-        data: {location: location},
-        success: console.log
-      });
-      return false;
-    });
-  }
-});
+function refresh () {
+  $('#results').html('');
+  segments.forEach(function (seg) {
+    var start = seg.start, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
+    var end = seg.end, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
+    var running_s = Math.round((end - start)/1000);
+    var latest_s = Math.round((Date.now() - end)/1000);
+    $('#results').append($(
+      '<h3>Ant: ' + seg.ant + ' <small class="muted">' + 
+        '<b>Start:</b>' + strstart +
+        '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
+      '<blockquote>' +
+      '<i>time running:</i> ' + 
+        readableTimedelta(running_s) + '<br>' +
+      (latest_s > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' +
+        readableTimedelta(latest_s) +
+      (latest_s > 10 ? '</span>' : '') +
+      '</blockquote>').on('click', '.btn', function () {
+        if (confirm('Are you sure you wanna delete these binds?')) {
+          $.ajax({
+            type: 'DELETE',
+            url: '/binds/?ant=' + seg.ant,
+            success: function (res, error) {
+              console.log(error);
+              window.location.reload();
+            }
+          });
+        }
+      }));
+  });
+}
 
 </script>
+</div>
+</body>
+</html>

@@ -10,7 +10,7 @@ def chunks(l, n):
   return [l[i:i+n] for i in range(0, len(l), n)]
 
 def post_to_server(queen_id, ant_id):
-  subprocess.call(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "api.olinexpo.com/hardware"])
+  subprocess.call(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "api.olinexpo.com/binds"])
 
 prefix = 'Got payload: '
 while 1:

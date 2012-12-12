@@ -99,10 +99,7 @@ app.get('/binds', function (req, res) {
 // and colonies <=> locations exist server-side and augmented to
 // this information.
 
-app.post('/hardware', postBind); // deprecated
-app.post('/binds', postBind);
-
-function postBind (req, res) {
+app.post('/binds', function (req, res) {
   if (!req.body.ant || !req.body.colony) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
@@ -172,7 +169,7 @@ function postBind (req, res) {
       });
     });
   });
-}
+});
 
 // GET /binds/<bind id>
 
@@ -341,16 +338,6 @@ app.put('/colonies/:id', function (req, res) {
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning colony.'});
   });
-});
-
-// Reset api
-
-app.get('/destroyallbinddataiamserious', function (req, res) {
-  cols.colonies.remove();
-  cols.ants.remove();
-  cols.binds.remove();
-  cols.segments.remove();
-  res.json('You did it. Murderer.');
 });
 
 /**
