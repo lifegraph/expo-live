@@ -133,7 +133,9 @@ function postBind (req, res) {
           lastsegment.end = lastsegment.last.time = bind.time;
           cols.segments.update({
             _id: lastsegment._id
-          }, lastsegment, insertBind)
+          }, lastsegment, function (err) {
+            updateAnt(err, lastsegment._id);
+          })
         } else {
           // create new segment
           cols.segments.insert({
@@ -143,14 +145,19 @@ function postBind (req, res) {
             end: bind.time,
             first: bind,
             last: bind
-          }, updateAnt);
+          }, function (err, docs) {
+            updateAnt(err, docs[0]._id)
+          });
         }
 
         function updateAnt (err, segment) {
           cols.ants.update({
             _id: bind.ant
           }, {
-            $set: {'currentSegment': segment}
+            currentSegment:  new mongo.DBRef('segments', segment),
+            _id: bind.ant
+          }, {
+            upsert: true
           }, insertBind);
         }
 
