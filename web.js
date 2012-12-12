@@ -124,7 +124,9 @@ app.post('/binds', function (req, res) {
       // TODO! user, location instead?
       cols.segments.find({
         ant: bind.ant,
-        colony: bind.colony
+        colony: bind.colony,
+        user: bind.user,
+        location: bind.location
       }).sort({end: -1}).limit(1).nextObject(function (err, lastsegment) {
         if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
           lastsegment.end = lastsegment.last.time = bind.time;

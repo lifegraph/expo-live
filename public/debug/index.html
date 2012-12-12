@@ -78,11 +78,12 @@ function updateAnt (seg) {
   var row = $('#results div[data-ant=' + seg.ant + ']');
   row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('blockquote').html(
-    '<i>time running:</i> ' + 
+    '<b>Ran for:</b> ' + 
       readableTimedelta(running_s) + '<br>' +
-    (latest_s > 10 ? '<span style="color: red">' : '') + '<i>time since latest:</i> ' +
+    (latest_s > 60 ? '<span style="color: red">' : '') +
+    '<b>Time since latest:</b> ' +
       readableTimedelta(latest_s) +
-    (latest_s > 10 ? '</span>' : '')
+    (latest_s > 60 ? '</span>' : '')
     );
 }
 
