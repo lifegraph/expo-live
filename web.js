@@ -125,8 +125,8 @@ app.post('/hardware', function (req, res) {
       cols.segments.find({
         ant: bind.ant,
         colony: bind.colony
-      }).sort({time: -1}).limit(1).nextObject(function (err, lastsegment) {
-        if (lastsegment && bind.time - lastsegment.end < SEGMENT_THRESHOLD) {
+      }).sort({end: -1}).limit(1).nextObject(function (err, lastsegment) {
+        if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
           lastsegment.end = lastsegment.last.time = bind.time;
           cols.segments.update({
             _id: lastsegment._id
