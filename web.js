@@ -153,8 +153,10 @@ app.post('/binds', function (req, res) {
           cols.ants.update({
             _id: bind.ant
           }, {
-            currentSegment: new mongo.DBRef('segments', segment._id),
-            _id: bind.ant
+            $set: {
+              currentSegment: new mongo.DBRef('segments', segment._id),
+              _id: bind.ant
+            }
           }, {
             upsert: true
           }, insertBind);
@@ -214,8 +216,12 @@ app.get('/segments', function (req, res) {
       crit.ant = req.query.ant;
     }
     cols.ants.find(crit).toArray(function (id, ants) {
-      async.map(ants, function (ant, next) {;
-        dbmongo.dereference(ant.currentSegment, next);
+      async.map(ants, function (ant, next) {
+        if (!ant.currentSegment) {
+          next(null, ant);
+        } else {
+          dbmongo.dereference(ant.currentSegment, next);
+        }
       }, function (err, segments) {
         res.json(segments.map(segmentJSON));
       });
@@ -286,7 +292,9 @@ app.put('/ants/:id', function (req, res) {
   };
   cols.ants.update({
     _id: String(req.params.id)
-  }, ant, {
+  }, {
+    $set: ant
+  }, {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});

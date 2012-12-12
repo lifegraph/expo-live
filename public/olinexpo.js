@@ -73,8 +73,12 @@ var olinexpo = (function () {
 
   inherits(API, EventEmitter);
 
-  function olinexpo () {
-    return new API();
+  function olinexpo (onload) {
+    var api = new API();
+    if (onload) {
+      api.on('load', onload);
+    }
+    return api;
   }
 
   function API () {
@@ -126,7 +130,7 @@ var olinexpo = (function () {
     $.getJSON('http://' + olinexpoHost + '/segments/?' + (history ? '' : 'latest&'), function (segments) {
       segments.forEach(function (seg) {
         cache.push(seg);
-        callback.call(this, seg, cache, true);
+        callback.call(this, seg, cache, false);
       }.bind(this));
       this.socket.on('segment:update', function (seg) {
         var isNew = true;
@@ -154,6 +158,19 @@ var olinexpo = (function () {
   API.prototype.listenUser = function (history, id, callback) {
     return this._listen(history, 'user=' + id, callback);
   };
+
+  API.prototype._assignAnt = function (ant, user, next) {
+    $.ajax({
+      type: 'put',
+      url: 'http://' + olinexpoHost + '/ants/' + ant,
+      data: {
+        user: user
+      },
+      success: function (data) {
+        next && next();
+      }
+    });
+  }
 
   return olinexpo;
 })();
