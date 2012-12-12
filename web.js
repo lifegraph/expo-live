@@ -124,9 +124,7 @@ app.post('/binds', function (req, res) {
       // TODO! user, location instead?
       cols.segments.find({
         ant: bind.ant,
-        colony: bind.colony,
-        user: bind.user,
-        location: bind.location
+        colony: bind.colony
       }).sort({end: -1}).limit(1).nextObject(function (err, lastsegment) {
         if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
           lastsegment.end = lastsegment.last.time = bind.time;
@@ -167,6 +165,7 @@ app.post('/binds', function (req, res) {
         function insertBind () {
           // Insert bind.
           cols.binds.insert(bind, function (err) {
+            io.of('/binds').emit('bind', bind);
             res.json({message: 'Succeeded in adding bind.'});
           });
         }
@@ -220,11 +219,14 @@ app.get('/segments', function (req, res) {
     cols.ants.find(crit).toArray(function (id, ants) {
       async.map(ants, function (ant, next) {
         if (!ant.currentSegment) {
-          next(null, ant);
+          next(null, null);
         } else {
           dbmongo.dereference(ant.currentSegment, next);
         }
       }, function (err, segments) {
+        segments = segments.filter(function (seg) {
+          return seg;
+        });
         res.json(segments.map(segmentJSON));
       });
     })
@@ -294,9 +296,7 @@ app.put('/ants/:id', function (req, res) {
   };
   cols.ants.update({
     _id: String(req.params.id)
-  }, {
-    $set: ant
-  }, {
+  }, ant, {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});
@@ -503,6 +503,8 @@ function setupMongo (next) {
     cols.ants = new mongo.Collection(dbmongo, 'ants');
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.segments = new mongo.Collection(dbmongo, 'segments');
+
+    cols.segments.remove();
 
     next();
   });
