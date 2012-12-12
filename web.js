@@ -134,7 +134,7 @@ function postBind (req, res) {
           cols.segments.update({
             _id: lastsegment._id
           }, lastsegment, function (err) {
-            updateAnt(err, lastsegment._id);
+            updateAnt(err, lastsegment);
           })
         } else {
           // create new segment
@@ -146,15 +146,17 @@ function postBind (req, res) {
             first: bind,
             last: bind
           }, function (err, docs) {
-            updateAnt(err, docs[0]._id)
+            updateAnt(err, docs[0])
           });
         }
 
         function updateAnt (err, segment) {
+          io.sockets.emit('segment:update', segment);
+
           cols.ants.update({
             _id: bind.ant
           }, {
-            currentSegment:  new mongo.DBRef('segments', segment),
+            currentSegment: new mongo.DBRef('segments', segment._id),
             _id: bind.ant
           }, {
             upsert: true
@@ -165,7 +167,6 @@ function postBind (req, res) {
           // Insert bind.
           cols.binds.insert(bind, function (err) {
             res.json({message: 'Succeeded in adding bind.'});
-            io.sockets.emit('bind:create', bindJSON(bind));
           });
         }
       });
@@ -218,12 +219,8 @@ app.get('/segments', function (req, res) {
     cols.ants.find(crit).toArray(function (id, ants) {
       async.map(ants, function (ant, next) {;
         dbmongo.dereference(ant.currentSegment, next);
-      }, function (err, json) {
-        var segments = {};
-        json.forEach(function (segment) {
-          (segments[segment.ant] || (segments[segment.ant] = [])).push(segmentJSON(segment));
-        })
-        res.json(segments);
+      }, function (err, segments) {
+        res.json(segments.map(segmentJSON));
       });
     })
 
@@ -238,12 +235,8 @@ app.get('/segments', function (req, res) {
     if (req.query.sort == 'latest') {
       sort = 'end';
     }
-    cols.segments.find(crit).sort(sort).toArray(function (err, json) {
-      var segments = {};
-      json.forEach(function (segment) {
-        (segments[segment.ant] || (segments[segment.ant] = [])).push(segmentJSON(segment));
-      })
-      res.json(segments);
+    cols.segments.find(crit).sort(sort).toArray(function (err, segments) {
+      res.json(segments.map(segmentJSON));
     });
   }
 });
@@ -300,9 +293,6 @@ app.put('/ants/:id', function (req, res) {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});
-
-    // Notify streaming clients.
-    io.sockets.emit('ant:update', antJSON(ant));
   });
 });
 
@@ -350,9 +340,6 @@ app.put('/colonies/:id', function (req, res) {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning colony.'});
-
-    // Notify streaming clients.
-    io.sockets.emit('colony:update', colonyJSON(colony));
   });
 });
 

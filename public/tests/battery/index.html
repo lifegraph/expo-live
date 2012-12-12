@@ -9,14 +9,14 @@
 <script src="/olinexpo.js"></script>
 <script>
 
-var ants = {};
+var segments = {};
 
 var api = olinexpo()
   .on('connect', function () {
     setInterval(refresh, 1000);
   })
-  .on('bind:create', function (bind) {
-    console.log('bind received');
+  .listenAll(false, function (_, _segments) {
+    segments = _segments;
   });
 
 function readableTimedelta (s) {
@@ -25,15 +25,13 @@ function readableTimedelta (s) {
 
 function refresh () {
   $('div').html('');
-  Object.keys(api.state.segments).forEach(function (antid) {
-    var ant = api.state.segments[antid][api.state.segments[antid].length - 1];
-    if (!ant) return;
-    var start = ant.first.time, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
-    var end = ant.last.time, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
+  segments.forEach(function (seg) {
+    var start = seg.start, strstart = String(new Date(start)).split(/\s+/g).slice(0, 5).join(' ');
+    var end = seg.end, strend = String(new Date(end)).split(/\s+/g).slice(0, 5).join(' ')
     var running_s = Math.round((end - start)/1000);
     var latest_s = Math.round((Date.now() - end)/1000);
     $('div').append($(
-      '<h3>Ant: ' + antid + ' <small class="muted">' + 
+      '<h3>Ant: ' + seg.ant + ' <small class="muted">' + 
         '<b>Start:</b>' + strstart +
         '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + strend + '</small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
       '<blockquote>' +
@@ -46,7 +44,7 @@ function refresh () {
         if (confirm('Are you sure you wanna delete these binds?')) {
           $.ajax({
             type: 'DELETE',
-            url: '/binds/?ant=' + antid,
+            url: '/binds/?ant=' + seg.ant,
             success: function (res, error) {
               console.log(error);
               window.location.reload();

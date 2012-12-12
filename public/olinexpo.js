@@ -78,53 +78,12 @@ var olinexpo = (function () {
   }
 
   function API () {
-    this.state = {};
+    this.socket = io.connect('http://' + olinexpoHost).on('connect', this.emit.bind(this, 'connect'));
     this.loaded = false;
     this.loadResources(function () {
       this.emit('load');
-      this.connectSocket(function () {
-        this.emit('connect');
-        this.loaded = true;
-      }.bind(this));
+      this.loaded = true;
     }.bind(this))
-  }
-
-  API.prototype.connectSocket = function (next) {
-    var socket = io.connect('http://' + olinexpoHost);
-    socket.on('connect', next);
-    socket.on('bind:create', function (bind) {
-      this.emit('bind:create', bind);
-
-      // Find last segment and update.
-      if (!this.state.segments[bind.ant]) {
-        this.state.segments[bind.ant] = [{first: null, last: null}];
-      }
-      var seg = this.state.segments[bind.ant][this.state.segments[bind.ant].length - 1];
-      // Split segments.
-      if (seg.last) {
-        if ((bind.time - seg.last.time) > 180*1000) {
-          this.state.segments[bind.ant].push(seg = {first: null, last: null});
-        }
-      }
-      if (!seg.first) {
-        seg.first = bind;
-      }
-      seg.last = bind;
-      this.emit('segment:update', seg);
-    }.bind(this));
-    socket.on('ant:update', function (ant) {
-      (this.state.ants = this.state.ants.filter(function (ant2) {
-        return ant2.ant != ant.ant;
-      })).push(ant);
-      this.emit('ant:update', ant);
-    }.bind(this));
-    socket.on('colony:update', function (colony) {
-      (this.state.colonies = this.state.colonies.filter(function (colony2) {
-        console.log(colony, colony2);
-        return colony2.colony != colony.colony;
-      })).push(colony);
-      this.emit('colony:update', colony);
-    }.bind(this));
   }
 
   API.prototype.loadResources = function (next) {
@@ -132,44 +91,69 @@ var olinexpo = (function () {
     $.getJSON('http://' + olinexpoHost + '/users/', function (users) {
       $.getJSON('http://' + olinexpoHost + '/locations/', function (locations) {
         $.getJSON('http://' + olinexpoHost + '/presentations/', function (presentations) {
-          $.getJSON('http://' + olinexpoHost + '/segments/?latest', function (segments) {
-            $.getJSON('http://' + olinexpoHost + '/ants/', function (ants) {
-              $.getJSON('http://' + olinexpoHost + '/colonies/', function (colonies) {
-                api.state.users = users;
-                api.state.locations = locations;
-                api.state.presentations = presentations;
-                api.state.segments = segments;
-                api.state.ants = ants;
-                api.state.colonies = colonies;
+          api.users = users;
+          api.locations = locations;
+          api.presentations = presentations;
+          api.segments = segments;
 
-                // Push segments, ants, colonies.
-                Object.keys(segments).forEach(function (key) {
-                  segments[key].forEach(api.emit.bind(api, 'segment:create'));
-                });
-                ants.forEach(api.emit.bind(api, 'ant:update'));
-                colonies.forEach(api.emit.bind(api, 'colony:update'));
-
-                // Next function.
-                next();
-              });
-            });
-          });
+          // Next function.
+          next();
         });
       });
     });
   }
 
   API.prototype.getUserById = function (id) {
-    return this.state.users.filter(function (item) {
+    return this.users.filter(function (item) {
       return item.id == id;
     })[0];
   }
 
   API.prototype.getLocationById = function (id) {
-    return this.state.locations.filter(function (item) {
+    return this.locations.filter(function (item) {
       return item.id == id;
     })[0];
   }
+
+  API.prototype.getPresentationById = function (id) {
+    return this.presentations.filter(function (item) {
+      return item.id == id;
+    })[0];
+  }
+
+  API.prototype._listen = function (history, query, callback) {
+    var cache = [];
+    $.getJSON('http://' + olinexpoHost + '/segments/?' + (history ? '' : 'latest&'), function (segments) {
+      segments.forEach(function (seg) {
+        cache.push(seg);
+        callback.call(this, seg, cache, true);
+      }.bind(this));
+      this.socket.on('segment:update', function (seg) {
+        var isNew = true;
+        if (!history) {
+          cache = cache.map(function (item) {
+            isNew = isNew || item.id == seg.id;
+            return item.id == seg.id ? seg : item;
+          })
+        }
+        var isUpdate = !isNew;
+        callback.call(this, seg, cache, isUpdate);
+      });
+    }.bind(this));
+    return this;
+  };
+
+  API.prototype.listenAll = function (history, callback) {
+    return this._listen(history, '', callback);
+  };
+
+  API.prototype.listenPresentation = function (history, id, callback) {
+    return this._listen(history, 'presentation=' + id, callback);
+  };
+
+  API.prototype.listenUser = function (history, id, callback) {
+    return this._listen(history, 'user=' + id, callback);
+  };
 
   return olinexpo;
 })();

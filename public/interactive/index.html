@@ -49,8 +49,13 @@ function Visual (width, height) {
   }.bind(this), 50);
 }
 
-Visual.prototype.mark = function (id, radius) {
-  this.markers[id] = radius;
+Visual.prototype.resetMarkers = function () {
+  delete this.markers;
+  this.markers = {};
+}
+
+Visual.prototype.mark = function (id, increase) {
+  this.markers[id] = (this.markers[id] || 0) + increase;
 }
 
 Visual.prototype.render = function () {
@@ -67,24 +72,22 @@ Visual.prototype.render = function () {
 
 var visual = new Visual(1000, 400);
 
-var segincreaser = 10, theloc = null;
-
 olinexpo()
-  .on('segment:update', function (seg) {
-    if (seg.last && seg.last.location && seg.last.user) {
-      console.log('Segment with user+location:', seg.last.location, seg.last.user);
-      var user = this.getUserById(seg.last.user);
-      var location = this.getLocationById(seg.last.location);
-      var locid = location.floor + location.index;
-      visual.ctx.fillStyle = seg.last.user == 2 ? 'green' : 'blue';
-      visual.mark(locid, segincreaser = 10);
-    }
-  })
   .on('load', function () {
     setInterval(visual.render.bind(visual), 50);
   })
   .on('connect', function () {
     console.log('Websocket connected.');
+  })
+  .listenAll(false, function (seg, segments, isUpdate) {
+    visual.resetMarkers();
+    segments.forEach(function () {
+      console.log('Segment with user+location:', seg.location, seg.user);
+      var user = this.getUserById(seg.user);
+      var location = this.getLocationById(seg.location);
+      var locid = location.floor + location.index;
+      visual.mark(locid, 5);
+    });
   });
 
     </script>
