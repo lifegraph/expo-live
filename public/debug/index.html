@@ -18,6 +18,7 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/olinexpo.js"></script>
+<style> td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; } </style>
 <script>
 
 var segments = {};
@@ -30,6 +31,7 @@ var api = olinexpo(function () {
       case '000A002C': console.log('Shane is at presentation #', Number(seg.colony.substr(-3))); break;
       case '000A0038': console.log('Jon is at presentation #', Number(seg.colony.substr(-3))); break;
     }
+    $('#results div[data-ant=' + seg.ant + '] td').text(0);
     if (!isUpdate) {
       addAnt(seg);
     }
@@ -94,7 +96,6 @@ function updateAnt (seg) {
 
   var row = $('#results div[data-ant=' + seg.ant + ']');
 
-  $('td', row).text(0);
   //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('small.time').text(seg.colony);
   row.find('blockquote').html(
