@@ -193,6 +193,15 @@ app.get('/segments', function (req, res) {
     if (req.query.colony) {
       crit.colony = req.query.colony;
     }
+    if (req.query.user) {
+      crit.user = req.query.user;
+    }
+    if (req.query.location) {
+      crit.location = req.query.location;
+    }
+    if (req.query.presentation) {
+      crit.presentation = req.query.presentation;
+    }
     if (req.query.sort == 'latest') {
       sort = 'end';
     }
@@ -221,72 +230,89 @@ function pollSegments () {
     lastPollTime = Date.now();
   }
 
-  var segments = {};
-
   console.log('Consuming binds from', lastPollTime, 'to', Date.now());
 
+  var segments = {};
+
+  // Query for the last SEGMENT_LENGTH of binds. 
   var curPollTime = Date.now();
   cols.binds.find({
-    time: {$gt: lastPollTime}
+    time: {
+      $gt: lastPollTime
+    }
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
+      // Fetched all binds. Start next cycle, and continue.
       console.log('Fetched binds.');
       lastPollTime = curPollTime;
       setTimeout(pollSegments, SEGMENT_THRESHOLD);
-
-      Object.keys(segments).forEach(function (antid) {
-        var bestlocid, bestloc = -1;
-        Object.keys(segments[antid]).forEach(function (locid) {
-          if (bestloc < segments[antid][locid]) {
-            bestlocid = locid;
-            bestloc = segments[antid][locid];
-          }
-        })
-        console.log(segments[antid]);
-        if (bestloc > 0) {
-          cols.colonies.findOne({
-            _id: bestlocid
-          }, function (err, colony) {
-            cols.colonies.findOne({
-              _id: antid
-            }, function (err, ant) {
-              // Note, ant or colony may be false by now
-              cols.segments.insert({
-                time: curPollTime,
-                ant: antid,
-                user: ant && ant.user,
-                colony: bestlocid,
-                location: colony && colony.location
-              }, function (err, docs) {
-                if (err) {
-                  console.error(err);
-                }
-                if (!err && docs[0]) {
-                  console.log('Added segment', docs[0]);
-                  io.sockets.emit('segment:update', docs[0]);
-
-                  cols.ants.update({
-                    _id: antid
-                  }, {
-                    _id: antid,
-                    currentSegment: docs[0]._id
-                  }, {
-                    upsert: true
-                  }, function (err, docs) {
-                    console.log('Updated', docs);
-                  });
-                }
-              });
-            });
-          });
-        }
-      });
+      consumeBinds();
     } else {
+      // Group binds by ant ID.
       var bundle = (segments[bind.ant] || (segments[bind.ant] = {}));
       (bundle[bind.colony] || (bundle[bind.colony] = 0));
       bundle[bind.colony]++;
     }
   });
+
+  function consumeBinds () {
+    // For each ant's bundle of binds, perform our algorithm.
+    Object.keys(segments).forEach(function (antid) {
+
+      // Check maximum location.
+      var bestlocid, bestloc = -1;
+      Object.keys(segments[antid]).forEach(function (locid) {
+        if (bestloc < segments[antid][locid]) {
+          bestlocid = locid;
+          bestloc = segments[antid][locid];
+        }
+      })
+      // If there is no location with binds, return.
+      console.log(segments[antid]);
+      if (!(bestloc > 0)) {
+        return;
+      }
+
+      // The colony user is most likely located at
+      // is stored in "bestloc".
+      cols.colonies.findOne({
+        _id: bestlocid
+      }, function (err, colony) {
+        cols.colonies.findOne({
+          _id: antid
+        }, function (err, ant) {
+          // Note, ant or colony may be false by now
+          cols.segments.insert({
+            sampleStart: lastPollTime,
+            time: curPollTime,
+            ant: antid,
+            user: ant && ant.user,
+            colony: bestlocid,
+            location: colony && colony.location
+          }, function (err, docs) {
+            if (err) {
+              console.error(err);
+            }
+            if (!err && docs[0]) {
+              console.log('Added segment', docs[0]);
+              io.sockets.emit('segment:update', docs[0]);
+
+              cols.ants.update({
+                _id: antid
+              }, {
+                _id: antid,
+                currentSegment: docs[0]._id
+              }, {
+                upsert: true
+              }, function (err, docs) {
+                console.log('Updated', docs);
+              });
+            }
+          });
+        });
+      });
+    });
+  }
 }
 
 /*
