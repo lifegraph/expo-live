@@ -564,7 +564,7 @@ function setupMongo (next) {
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.segments = new mongo.Collection(dbmongo, 'segments');
 
-    //pollSegments();
+    //fpollSegments();
 
     next();
   });
