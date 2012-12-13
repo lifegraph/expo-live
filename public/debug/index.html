@@ -34,25 +34,21 @@ var segments = {};
 var api = olinexpo(function () {
   var segments = [];
   api.listenAll(false, function (seg, _segments, isUpdate) {
-    switch (seg.ant) {
-      case '000A0035': console.log('Jialiya is at presentation #', Number(seg.colony.substr(-3))); break;
-      case '000A002C': console.log('Shane is at presentation #', Number(seg.colony.substr(-3))); break;
-      case '000A0038': console.log('Jon is at presentation #', Number(seg.colony.substr(-3))); break;
-    }
-    $('#results div[data-ant=' + seg.ant + '] td').text(0)
+    var col = Number(seg.colony.substr(-3))
+    $('#results div[data-ant="' + seg.ant + '"] td').text(0)
+    $($('#results div[data-ant="' + seg.ant + '"] th').css('background-color', 'white').get(col - 1)).css('background-color', '#0f0');
     if (!isUpdate) {
       addAnt(seg);
     }
     segments = _segments;
   });
   setInterval(function () {
-    console.log('------');
     segments.map(updateAnt);
   }, 100)
 
   api._listenBinds(function (bind) {
     var col = Number(bind.colony.substr(-3))
-    var $td = $($('#results div[data-ant=' + bind.ant + '] td').get(col - 1));
+    var $td = $($('#results div[data-ant="' + bind.ant + '"] td').get(col - 1));
     $td.text(Number($td.text()) + 1).addClass('ping').removeClass('unping');
     setTimeout(function () {
       $td.removeClass('ping').addClass('unping')
@@ -105,7 +101,7 @@ function updateAnt (seg) {
   var running_s = 0; //Math.round((seg.end - seg.start)/1000);
   var latest_s = Math.round((Date.now() - seg.time)/1000);
 
-  var row = $('#results div[data-ant=' + seg.ant + ']');
+  var row = $('#results div[data-ant="' + seg.ant + '"]');
 
   //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('small.time').text(seg.colony);
