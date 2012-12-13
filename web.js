@@ -227,6 +227,7 @@ function pollSegments () {
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
       console.log('Fetched binds.');
+      lastPollTime = curPollTime;
       setTimeout(pollSegments, 5000);
 
       Object.keys(segments).forEach(function (antid) {
