@@ -137,7 +137,10 @@ var olinexpo = (function () {
           cache = cache.map(function (item) {
             isUpdate = isUpdate || item.ant == seg.ant;
             return item.ant == seg.ant ? seg : item;
-          })
+          });
+        }
+        if (!isUpdate) {
+          cache.push(segment);
         }
         callback.call(this, seg, cache, isUpdate);
       });
