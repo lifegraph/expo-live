@@ -120,55 +120,10 @@ app.post('/binds', function (req, res) {
     }, function (err, colony) {
       colony && (bind.location = colony.location);
 
-      // Extend most recent time segment, or create new one.
-      // TODO! user, location instead?
-      cols.segments.find({
-        ant: bind.ant,
-        colony: bind.colony
-      }).sort({end: -1}).limit(1).nextObject(function (err, lastsegment) {
-        if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
-          lastsegment.end = lastsegment.last.time = bind.time;
-          cols.segments.update({
-            _id: lastsegment._id
-          }, lastsegment, function (err) {
-            updateAnt(err, lastsegment);
-          })
-        } else {
-          // create new segment
-          cols.segments.insert({
-            ant: bind.ant,
-            colony: bind.colony,
-            start: bind.time,
-            end: bind.time,
-            first: bind,
-            last: bind
-          }, function (err, docs) {
-            updateAnt(err, docs[0])
-          });
-        }
-
-        function updateAnt (err, segment) {
-          io.sockets.emit('segment:update', segmentJSON(segment));
-
-          cols.ants.update({
-            _id: bind.ant
-          }, {
-            $set: {
-              currentSegment: new mongo.DBRef('segments', segment._id),
-              _id: bind.ant
-            }
-          }, {
-            upsert: true
-          }, insertBind);
-        }
-
-        function insertBind () {
-          // Insert bind.
-          cols.binds.insert(bind, function (err) {
-            io.of('/binds').emit('bind', bind);
-            res.json({message: 'Succeeded in adding bind.'});
-          });
-        }
+      // Insert bind.
+      cols.binds.insert(bind, function (err) {
+        io.of('/binds').emit('bind', bind);
+        res.json({message: 'Succeeded in adding bind.'});
       });
     });
   });
@@ -200,9 +155,7 @@ function segmentJSON (seg) {
     start: seg.start,
     end: seg.end,
     user: seg.user,
-    location: seg.location,
-    first: seg.first,
-    last: seg.last
+    location: seg.location
   };
 }
 
@@ -255,6 +208,105 @@ app.get('/segments/:id', function (req, res) {
     res.json(json, json ? 200 : 404);
   });
 });
+
+var lastPollTime = null;
+
+function pollSegments () {
+  if (lastPollTime === null) {
+    lastPollTime = Date.now();
+  }
+
+  var segments = {};
+
+  var curPollTime = Date.now();
+  cols.binds.find({
+    time: {$gt: lastPollTime}
+  }).sort({time: 1}).each(function (err, bind) {
+    if (bind == null) {
+      Object.keys(segments).forEach(function (antid) {
+        var bestlocid, bestloc = -1;
+        Object.keys(segments[antid]).forEach(function (locid) {
+          if (bestloc < segments[antid][locid]) {
+            bestlocid = locid;
+            bestloc = segments[antid][locid];
+          }
+        })
+        if (bestloc > 0) {
+          cols.colonies.findOne({
+            _id: bestlocid
+          }, function (err, colony) {
+            cols.colonies.findOne({
+              _id: antid
+            }, function (err, ant) {
+              // Note, ant or colony may be false by now
+              cols.segments.insert({
+                time: curPollTime,
+                ant: antid,
+                user: ant && ant.user,
+                colony: bestlocid,
+                location: colony && colony.location
+              }, function (err, docs) {
+                if (!err && docs[0]) {
+                  console.log('Added segment', docs[0]);
+                  cols.ants.update({
+                    _id: bestlocid
+                  }, {
+                    $set: {
+                      currentSegment: new mongo.DBRef('segments', docs[0]._id)
+                    }
+                  });
+                }
+              });
+            });
+          });
+        }
+      })
+      lastPollTime = curPollTime;
+      setTimeout(pollSegments, 3000);
+    } else {
+      var bundle = (segments[bind.ant] || (segments[bind.ant] = {}));
+      (bundle[bind.colony] || (bundle[bind.colony] = 0));
+      bundle[bind.colony]++;
+    }
+  });
+
+  /*
+    if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
+      lastsegment.end = lastsegment.last.time = bind.time;
+      cols.segments.update({
+        _id: lastsegment._id
+      }, lastsegment, function (err) {
+        updateAnt(err, lastsegment);
+      })
+    } else {
+      // create new segment
+      cols.segments.insert({
+        ant: bind.ant,
+        colony: bind.colony,
+        start: bind.time,
+        end: bind.time,
+        first: bind,
+        last: bind
+      }, function (err, docs) {
+        updateAnt(err, docs[0])
+      });
+    }
+
+    function updateAnt (err, segment) {
+      io.sockets.emit('segment:update', segmentJSON(segment));
+
+      cols.ants.update({
+        _id: bind.ant
+      }, {
+        user: bind.ant
+        currentSegment: new mongo.DBRef('segments', segment._id),
+        _id: bind.ant
+      }, {
+        upsert: true
+      }, insertBind);
+    }
+  */
+}
 
 /*
  * Ants
@@ -504,7 +556,7 @@ function setupMongo (next) {
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.segments = new mongo.Collection(dbmongo, 'segments');
 
-    cols.segments.remove();
+    pollSegments();
 
     next();
   });
