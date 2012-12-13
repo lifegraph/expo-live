@@ -33,7 +33,7 @@ var api = olinexpo(function () {
       case '000A002C': console.log('Shane is at presentation #', Number(seg.colony.substr(-3))); break;
       case '000A0038': console.log('Jon is at presentation #', Number(seg.colony.substr(-3))); break;
     }
-    $('#results div[data-ant=' + seg.ant + '] td').text(0);
+    $('#results div[data-ant=' + seg.ant + '] td').text(0)
     if (!isUpdate) {
       addAnt(seg);
     }
@@ -48,7 +48,10 @@ var api = olinexpo(function () {
     var col = Number(bind.colony.substr(-3))
     if (col > 0 && col < 9) {
       var $td = $($('#results div[data-ant=' + bind.ant + '] td').get(col));
-      $td.text(Number($td.text()) + 1);
+      $td.text(Number($td.text()) + 1).addClass('ping');
+      setTimeout(function () {
+        $td.removeClass('ping');
+      })
     }
   })
 });
