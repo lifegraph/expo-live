@@ -10,8 +10,13 @@
 <a href="/users/" class="btn">Users</a>
 <a href="/locations/" class="btn">Locations</a>
 <a href="/presentations/" class="btn">Presentations</a>
+<br>
 
 <hr>
+
+
+<b>Toggle:</b> <span class="btn" onclick="$('blockquote').toggle()">Last Received</span>
+
 <div id="results"></div>
 
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
@@ -106,7 +111,6 @@ function updateAnt (seg) {
 
   //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('small.time').text(seg.colony);
-  return;
   row.find('blockquote').html(
     '<b>Ran for:</b> ' + 
       readableTimedelta(running_s) + '<br>' +
