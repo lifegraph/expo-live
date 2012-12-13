@@ -226,6 +226,9 @@ function pollSegments () {
     time: {$gt: lastPollTime}
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
+      console.log('Fetched binds.');
+      setTimeout(pollSegments, 5000);
+
       Object.keys(segments).forEach(function (antid) {
         var bestlocid, bestloc = -1;
         Object.keys(segments[antid]).forEach(function (locid) {
@@ -270,7 +273,7 @@ function pollSegments () {
             });
           });
         }
-      })
+      });
     } else {
       var bundle = (segments[bind.ant] || (segments[bind.ant] = {}));
       (bundle[bind.colony] || (bundle[bind.colony] = 0));
