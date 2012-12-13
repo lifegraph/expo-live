@@ -21,6 +21,7 @@
 <style>
 th, td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; }
 .ping { font-weight: bold; background: yellow; }
+.ant { width: 40%; float: left; }
 td.unping {
 -webkit-transition-property: background-color, font-weight; 
 -webkit-transition-duration: 1s, 1s; 
@@ -62,7 +63,7 @@ function readableTimedelta (s) {
 
 function addAnt (seg) {
   var row;
-  $('#results').append(row = $('<div data-ant=' + seg.ant + '>' +
+  $('#results').append(row = $('<div class="ant" data-ant=' + seg.ant + '>' +
     '<h3>Ant: ' + seg.ant + ' <small class="muted time"></small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
     //'User: <select><option>Select a user</option></select><br>' +
     '<table>' +
@@ -105,6 +106,7 @@ function updateAnt (seg) {
 
   //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('small.time').text(seg.colony);
+  return;
   row.find('blockquote').html(
     '<b>Ran for:</b> ' + 
       readableTimedelta(running_s) + '<br>' +
