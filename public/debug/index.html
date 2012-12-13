@@ -35,11 +35,11 @@ var api = olinexpo(function () {
   var segments = [];
   api.listenAll(false, function (seg, _segments, isUpdate) {
     var col = Number(seg.colony.substr(-3))
-    $('#results div[data-ant="' + seg.ant + '"] td').text(0)
-    $($('#results div[data-ant="' + seg.ant + '"] th').css('background-color', 'white').get(col - 1)).css('background-color', '#0f0');
     if (!isUpdate) {
       addAnt(seg);
     }
+    $('#results div[data-ant="' + seg.ant + '"] td').text(0)
+    $($('#results div[data-ant="' + seg.ant + '"] th').css('background-color', 'white').get(col - 1)).css('background-color', '#0f0');
     segments = _segments;
   });
   setInterval(function () {
