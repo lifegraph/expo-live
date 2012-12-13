@@ -25,13 +25,18 @@ var segments = {};
 var api = olinexpo(function () {
   var segments = [];
   api.listenAll(false, function (seg, _segments, isUpdate) {
-    console.log(seg);
+    switch (seg.ant) {
+      case '000A0035': console.log('Jialiya is at presentation #', Number(seg.colony.substr(-3))); break;
+      case '000A002C': console.log('Shane is at presentation #', Number(seg.colony.substr(-3))); break;
+      case '000A0038': console.log('Jon is at presentation #', Number(seg.colony.substr(-3))); break;
+    }
     if (!isUpdate) {
       addAnt(seg);
     }
     segments = _segments;
   });
   setInterval(function () {
+    console.log('------');
     segments.map(updateAnt);
   }, 100)
 });
