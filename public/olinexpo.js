@@ -146,6 +146,12 @@ var olinexpo = (function () {
     return this;
   };
 
+  API.prototype._listenBinds = function (callback) {
+    this.socket = io.connect('http://' + olinexpoHost + '/binds');
+    this.socket.on('bind', callback);
+    return this;
+  };
+
   API.prototype.listenAll = function (history, callback) {
     return this._listen(history, '', callback);
   };

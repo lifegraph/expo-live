@@ -39,6 +39,14 @@ var api = olinexpo(function () {
     console.log('------');
     segments.map(updateAnt);
   }, 100)
+
+  api._listenBinds(function (bind) {
+    var col = Number(bind.colony.substr(-3))
+    if (col > 0 && col < 9) {
+      var $td = $($('#results div[data-ant=' + bind.ant + '] td').get(col));
+      $td.text(Number($td.text()) + 1);
+    }
+  })
 });
 
 function readableTimedelta (s) {
@@ -49,7 +57,8 @@ function addAnt (seg) {
   var row;
   $('#results').append(row = $('<div data-ant=' + seg.ant + '>' +
     '<h3>Ant: ' + seg.ant + ' <small class="muted time"></small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
-    'User: <select><option>Select a user</option></select><br>' +
+    //'User: <select><option>Select a user</option></select><br>' +
+    '<table><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>' +
     '<blockquote></blockquote></div>').on('click', '.btn', function () {
       if (confirm('Are you sure you wanna delete these binds?')) {
         $.ajax({
@@ -62,6 +71,8 @@ function addAnt (seg) {
         });
       }
     }));
+
+  $('td', row).text('0');
 
   api.users.forEach(function (user) {
     $('select', row).append($('<option>').val(user.id).text(user.name));
@@ -82,6 +93,8 @@ function updateAnt (seg) {
   var latest_s = Math.round((Date.now() - seg.time)/1000);
 
   var row = $('#results div[data-ant=' + seg.ant + ']');
+
+  $('td', row).text(0);
   //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
   row.find('small.time').text(seg.colony);
   row.find('blockquote').html(
