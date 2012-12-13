@@ -56,27 +56,6 @@ function bindJSON (bind) {
   };
 }
 
-// DELETE /binds/? ant=<ant id> || colony=<colony id>
-
-app.del('/binds', function (req, res) {
-  var ant = req.query.ant, colony = req.query.colony;
-  if (!ant && !colony && !req.query.force) {
-    res.json({'message': 'Pleace specify force=1 to delete all binds.'}, 400);
-    return;
-  }
-  var crit = {};
-  if (ant) {
-    crit.ant = ant;
-  }
-  if (colony) {
-    crit.colony = colony;
-  }
-  cols.binds.remove(crit, function (err) {
-    console.log(arguments);
-    res.json({message: 'Successfully removed binds.'});
-  })
-});
-
 // GET /binds
 
 app.get('/binds', function (req, res) {
@@ -158,6 +137,27 @@ function segmentJSON (seg) {
   };
 }
 
+// DELETE /binds/? ant=<ant id> || colony=<colony id>
+
+app.del('/segments', function (req, res) {
+  var ant = req.query.ant, colony = req.query.colony;
+  if (!ant && !colony && !req.query.force) {
+    res.json({'message': 'Pleace specify force=1 to delete all binds.'}, 400);
+    return;
+  }
+  var crit = {};
+  if (ant) {
+    crit.ant = ant;
+  }
+  if (colony) {
+    crit.colony = colony;
+  }
+  cols.segments.remove(crit, function (err) {
+    console.log(arguments);
+    res.json({message: 'Successfully removed binds.'});
+  })
+});
+
 // GET /segments
 
 app.get('/segments', function (req, res) {
@@ -209,6 +209,10 @@ app.get('/segments/:id', function (req, res) {
     res.json(json, json ? 200 : 404);
   });
 });
+
+/** 
+ * Create segments
+ */
 
 var lastPollTime = null;
 

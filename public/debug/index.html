@@ -73,7 +73,7 @@ function addAnt (seg) {
       if (confirm('Are you sure you wanna delete these binds?')) {
         $.ajax({
           type: 'DELETE',
-          url: '/binds/?ant=' + seg.ant,
+          url: '/segments/?ant=' + seg.ant,
           success: function (res, error) {
             console.log(error);
             window.location.reload();
