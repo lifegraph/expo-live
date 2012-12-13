@@ -210,6 +210,7 @@ app.get('/segments/:id', function (req, res) {
   });
 });
 
+/*
 var lastPollTime = null;
 
 function pollSegments () {
@@ -277,44 +278,8 @@ function pollSegments () {
       bundle[bind.colony]++;
     }
   });
-
-  /*
-    if (lastsegment && ((bind.time - lastsegment.end) < SEGMENT_THRESHOLD)) {
-      lastsegment.end = lastsegment.last.time = bind.time;
-      cols.segments.update({
-        _id: lastsegment._id
-      }, lastsegment, function (err) {
-        updateAnt(err, lastsegment);
-      })
-    } else {
-      // create new segment
-      cols.segments.insert({
-        ant: bind.ant,
-        colony: bind.colony,
-        start: bind.time,
-        end: bind.time,
-        first: bind,
-        last: bind
-      }, function (err, docs) {
-        updateAnt(err, docs[0])
-      });
-    }
-
-    function updateAnt (err, segment) {
-      io.sockets.emit('segment:update', segmentJSON(segment));
-
-      cols.ants.update({
-        _id: bind.ant
-      }, {
-        user: bind.ant
-        currentSegment: new mongo.DBRef('segments', segment._id),
-        _id: bind.ant
-      }, {
-        upsert: true
-      }, insertBind);
-    }
-  */
 }
+*/
 
 /*
  * Ants
