@@ -253,9 +253,7 @@ function pollSegments () {
                   console.error(err);
                 }
                 if (!err && docs[0]) {
-                  var segment = docs[0];
                   console.log('Added segment', docs[0]);
-                  io.sockets.emit('segment:update', segmentJSON(segment));
 
                   cols.ants.update({
                     _id: antid
@@ -273,10 +271,6 @@ function pollSegments () {
           });
         }
       })
-
-      // Roll over to next time.
-      lastPollTime = curPollTime;
-      setTimeout(pollSegments, 3000);
     } else {
       var bundle = (segments[bind.ant] || (segments[bind.ant] = {}));
       (bundle[bind.colony] || (bundle[bind.colony] = 0));
@@ -362,9 +356,7 @@ app.put('/ants/:id', function (req, res) {
   };
   cols.ants.update({
     _id: String(req.params.id)
-  }, {
-    $set: ant
-  }, {
+  }, ant, {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});
@@ -572,7 +564,7 @@ function setupMongo (next) {
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.segments = new mongo.Collection(dbmongo, 'segments');
 
-    pollSegments();
+    //pollSegments();
 
     next();
   });
