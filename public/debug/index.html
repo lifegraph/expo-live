@@ -72,8 +72,8 @@ function readableDate (date) {
 }
 
 function updateAnt (seg) {
-  var running_s = Math.round((seg.end - seg.start)/1000);
-  var latest_s = Math.round((Date.now() - seg.end)/1000);
+  var running_s = 0; //Math.round((seg.end - seg.start)/1000);
+  var latest_s = Math.round((Date.now() - seg.time)/1000);
 
   var row = $('#results div[data-ant=' + seg.ant + ']');
   row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));

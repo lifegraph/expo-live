@@ -152,8 +152,7 @@ function segmentJSON (seg) {
     id: seg._id,
     ant: seg.ant,
     colony: seg.colony,
-    start: seg.start,
-    end: seg.end,
+    time: seg.time,
     user: seg.user,
     location: seg.location
   };
@@ -174,7 +173,9 @@ app.get('/segments', function (req, res) {
         if (!ant.currentSegment) {
           next(null, null);
         } else {
-          dbmongo.dereference(ant.currentSegment, next);
+          cols.segments.findOne({
+            _id: ant.currentSegment
+          }, next);
         }
       }, function (err, segments) {
         segments = segments.filter(function (seg) {
@@ -218,6 +219,8 @@ function pollSegments () {
 
   var segments = {};
 
+  console.log('Consuming binds from', lastPollTime, 'to', Date.now());
+
   var curPollTime = Date.now();
   cols.binds.find({
     time: {$gt: lastPollTime}
@@ -246,14 +249,21 @@ function pollSegments () {
                 colony: bestlocid,
                 location: colony && colony.location
               }, function (err, docs) {
+                if (err) {
+                  console.error(err);
+                }
                 if (!err && docs[0]) {
                   console.log('Added segment', docs[0]);
+
                   cols.ants.update({
-                    _id: bestlocid
+                    _id: antid
                   }, {
-                    $set: {
-                      currentSegment: new mongo.DBRef('segments', docs[0]._id)
-                    }
+                    _id: antid,
+                    currentSegment: docs[0]._id
+                  }, {
+                    upsert: true
+                  }, function (err, docs) {
+                    console.log('Updated', docs);
                   });
                 }
               });
@@ -261,6 +271,8 @@ function pollSegments () {
           });
         }
       })
+
+      // Roll over to next time.
       lastPollTime = curPollTime;
       setTimeout(pollSegments, 3000);
     } else {
@@ -314,7 +326,7 @@ function pollSegments () {
 
 function antJSON (ant, next) {
   return {
-    ant: ant._id,
+    id: ant._id,
     user: ant.user
   };
 }
