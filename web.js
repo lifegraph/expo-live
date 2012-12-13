@@ -210,7 +210,6 @@ app.get('/segments/:id', function (req, res) {
   });
 });
 
-/*
 var lastPollTime = null;
 
 function pollSegments () {
@@ -279,7 +278,6 @@ function pollSegments () {
     }
   });
 }
-*/
 
 /*
  * Ants
@@ -529,7 +527,7 @@ function setupMongo (next) {
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.segments = new mongo.Collection(dbmongo, 'segments');
 
-    //fpollSegments();
+    pollSegments();
 
     next();
   });
