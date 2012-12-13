@@ -122,7 +122,7 @@ app.post('/binds', function (req, res) {
 
       // Insert bind.
       cols.binds.insert(bind, function (err) {
-        io.of('/binds').emit('bind', bind);
+        io.sockets.emit('bind', bind);
         res.json({message: 'Succeeded in adding bind.'});
       });
     });
