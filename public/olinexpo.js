@@ -98,7 +98,6 @@ var olinexpo = (function () {
           api.users = users;
           api.locations = locations;
           api.presentations = presentations;
-          api.segments = segments;
 
           // Next function.
           next();
