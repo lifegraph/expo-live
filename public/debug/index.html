@@ -18,8 +18,10 @@
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/olinexpo.js"></script>
-<style> td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; }
-.ping { font-weight: bold; background: yellow; -webkit-transition: background 1s linear; -webkit-transition: font-weight 1s linear;}
+<style>
+th, td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; }
+.ping { font-weight: bold; background: yellow; }
+td { -webkit-transition: background 1s linear; -webkit-transition: font-weight 1s linear;}
 </style>
 <script>
 
@@ -46,13 +48,11 @@ var api = olinexpo(function () {
 
   api._listenBinds(function (bind) {
     var col = Number(bind.colony.substr(-3))
-    if (col > 0 && col < 9) {
-      var $td = $($('#results div[data-ant=' + bind.ant + '] td').get(col));
-      $td.text(Number($td.text()) + 1).addClass('ping');
-      setTimeout(function () {
-        $td.removeClass('ping');
-      })
-    }
+    var $td = $($('#results div[data-ant=' + bind.ant + '] td').get(col - 1));
+    $td.text(Number($td.text()) + 1).addClass('ping');
+    setTimeout(function () {
+      $td.removeClass('ping');
+    });
   })
 });
 
@@ -65,7 +65,9 @@ function addAnt (seg) {
   $('#results').append(row = $('<div data-ant=' + seg.ant + '>' +
     '<h3>Ant: ' + seg.ant + ' <small class="muted time"></small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
     //'User: <select><option>Select a user</option></select><br>' +
-    '<table><tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>' +
+    '<table>' +
+    '<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>' +
+    '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>' +
     '<blockquote></blockquote></div>').on('click', '.btn', function () {
       if (confirm('Are you sure you wanna delete these binds?')) {
         $.ajax({
