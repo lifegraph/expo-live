@@ -253,7 +253,9 @@ function pollSegments () {
                   console.error(err);
                 }
                 if (!err && docs[0]) {
+                  var segment = docs[0];
                   console.log('Added segment', docs[0]);
+                  io.sockets.emit('segment:update', segmentJSON(segment));
 
                   cols.ants.update({
                     _id: antid
