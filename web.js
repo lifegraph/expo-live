@@ -18,7 +18,7 @@ var POSTGRES_URI = "postgres://dfgpdzocobqufp:aHD8_vXdE75M9mthWts2rVXSIf@ec2-54-
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 var port = process.env.PORT || 5000;
 
-var SEGMENT_THRESHOLD = 1*60*1000;
+var SEGMENT_THRESHOLD = process.env.SEGMENT_THRESHOLD || 12*1000;
 
 
 /**
@@ -228,7 +228,7 @@ function pollSegments () {
     if (bind == null) {
       console.log('Fetched binds.');
       lastPollTime = curPollTime;
-      setTimeout(pollSegments, 5000);
+      setTimeout(pollSegments, SEGMENT_THRESHOLD);
 
       Object.keys(segments).forEach(function (antid) {
         var bestlocid, bestloc = -1;
