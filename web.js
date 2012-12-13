@@ -237,6 +237,7 @@ function pollSegments () {
             bestloc = segments[antid][locid];
           }
         })
+        console.log(segments[antid]);
         if (bestloc > 0) {
           cols.colonies.findOne({
             _id: bestlocid
