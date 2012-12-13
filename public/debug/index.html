@@ -21,7 +21,11 @@
 <style>
 th, td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; }
 .ping { font-weight: bold; background: yellow; }
-td { -webkit-transition: background 1s linear; -webkit-transition: font-weight 1s linear;}
+td { 
+-webkit-transition-property: background-color, font-weight; 
+-webkit-transition-duration: 1s, 1s; 
+-webkit-transition-timing-function: linear, linear;
+}
 </style>
 <script>
 
