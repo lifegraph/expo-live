@@ -25,6 +25,7 @@ var segments = {};
 var api = olinexpo(function () {
   var segments = [];
   api.listenAll(false, function (seg, _segments, isUpdate) {
+    console.log(seg);
     if (!isUpdate) {
       addAnt(seg);
     }
@@ -76,7 +77,8 @@ function updateAnt (seg) {
   var latest_s = Math.round((Date.now() - seg.time)/1000);
 
   var row = $('#results div[data-ant=' + seg.ant + ']');
-  row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
+  //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
+  row.find('small.time').text(seg.colony);
   row.find('blockquote').html(
     '<b>Ran for:</b> ' + 
       readableTimedelta(running_s) + '<br>' +

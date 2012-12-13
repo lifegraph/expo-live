@@ -362,7 +362,9 @@ app.put('/ants/:id', function (req, res) {
   };
   cols.ants.update({
     _id: String(req.params.id)
-  }, ant, {
+  }, {
+    $set: ant
+  }, {
     upsert: true
   }, function (err, docs) {
     res.json({message: 'Succeeded in assigning ant.'});

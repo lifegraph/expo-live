@@ -133,14 +133,13 @@ var olinexpo = (function () {
         callback.call(this, seg, cache, false);
       }.bind(this));
       this.socket.on('segment:update', function (seg) {
-        var isNew = true;
+        var isUpdate = false;
         if (!history) {
           cache = cache.map(function (item) {
-            isNew = isNew || item.id == seg.id;
-            return item.id == seg.id ? seg : item;
+            isUpdate = isUpdate || item.ant == seg.ant;
+            return item.ant == seg.ant ? seg : item;
           })
         }
-        var isUpdate = !isNew;
         callback.call(this, seg, cache, isUpdate);
       });
     }.bind(this));
