@@ -252,7 +252,7 @@ var CORRECT = {
   "D7D7": "??"
 }
 
-var DIFFTIME = 1355450685349, STARTTIME = DIFFTIME;
+var DIFFTIME = 1355517708658, STARTTIME = DIFFTIME;
 var ANT_STATS = {}, COL_STATS = {}, ANT_LIKELY = {}, SUCCESS_RATE = 0, SUCCESS_TOTAL = 0, SUCCESS_DROPPED = 0;
 
 function calculateGuesses () {
@@ -682,7 +682,7 @@ function setupPostgres (next) {
 }
 
 function setupServer (next) {
-  server.listen(port, next);
+  //server.listen(port, next);
 }
 
 

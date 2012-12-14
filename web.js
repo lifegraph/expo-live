@@ -347,14 +347,12 @@ app.get('/ants/:id', function (req, res) {
 });
 
 app.put('/ants/:id', function (req, res) {
-  if (!req.body.user) {
-    return res.json({message: 'Need user parameter.'}, 500);
-  }
-
   var ant = {
-    _id: String(req.params.id),
-    user: parseInt(req.body.user)
+    _id: String(req.params.id)
   };
+  if (req.body.user) {
+    user: parseInt(req.body.user)
+  }
   cols.ants.update({
     _id: String(req.params.id)
   }, ant, {
