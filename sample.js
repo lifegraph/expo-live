@@ -19,9 +19,6 @@ var POSTGRES_URI = "postgres://dfgpdzocobqufp:aHD8_vXdE75M9mthWts2rVXSIf@ec2-54-
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 var port = process.env.PORT || 5000;
 
-var GUESS_INTERVAL = process.env.GUESS_INTERVAL || 10*1000;
-var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || .5*60*1000;
-
 
 /**
  * App
@@ -250,26 +247,48 @@ var CORRECT = {
   "3200": "07"
 }
 
-var ANT_STATS = {}, COL_STATS = {}, ANT_LIKELY = {};
-var SUCCESS_RATE = 0, SUCCESS_TOTAL = 0, SUCCESS_DROPPED = 0;
+var ANTS = ['1900', '08FF', '3500', '2C00', '3A00', '063D', '3400', '3500', '05FF', '3200'];
 
-function calculateGuesses (DIFFTIME) {
+var COLONIES = ['01', '02', '03', '06', '07'];
+var COLONIES_SET = (function () {
+  var set = {};
+  COLONIES.forEach(function (k) {
+    set[k] = 0;
+  });
+  return set;
+})();
+
+var INCORRECT_ANTS = {}, INCORRECT_COLS = {}, ANT_GUESSES = {};
+var CONFIDENCE_SUCCESSFUL = 0, CONFIDENCE_TOTAL = 0, CONFIDENCE_DROPPED = 0;
+
+// Variables.
+var GUESS_INTERVAL = process.env.GUESS_INTERVAL || 10*1000;
+var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || .5*60*1000;
+var CONFIDENCE_CUTOFF = 0.65;
+var ADEQUATE_THRESHOLD = 8; // Threshold for confidence by # of binds available.
+var ADEQUATE_THRESHOLD_LIMIT = 0; // Threshold for limit of # of binds.
+var NEARBY_BONUS = 0.9; // Bonus for 1 away
+var FARBY_BONUS = 0.5; // Bonus for 2 away
+var FRESHNESS_WEIGHT = 0; // How fresh the bind is
+var BEST_WEIGHT = 0.5; // How certain the colony is
+
+function calculateGuesses (currenttime) {
   // Query for the last GUESS_THRESHOLD of binds. 
   var guesses = {};
   var adequateness = {};
-  var querytime = DIFFTIME - GUESS_THRESHOLD, guesstime = DIFFTIME;
-  DIFFTIME += 10*1000;
+  var querytime = currenttime - GUESS_THRESHOLD;
 
-  console.log('\nGuessing location based on binds from', querytime, 'to', guesstime);
-  console.log('ANT STATS:', JSON.stringify(ANT_STATS));
-  console.log('COLONY wrongest STATS:', JSON.stringify(COL_STATS));
+  // Log some sod.
+  console.log('\nGuessing location based on binds from', querytime, 'to', currenttime);
+  console.log('Incorrectest ants:', JSON.stringify(INCORRECT_ANTS));
+  console.log('Incorrectest colonies:', JSON.stringify(INCORRECT_COLS));
   console.log(new Date(querytime));
   console.log('-----------------');
 
   cols.binds.find({
     time: {
       $gt: querytime,
-      $lt: guesstime
+      $lt: currenttime
     }   
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
@@ -277,10 +296,10 @@ function calculateGuesses (DIFFTIME) {
       consumeBinds();
 
       // Consume next binds.
-      setTimeout(calculateGuesses.bind(null, DIFFTIME + 10*1000), 0);
+      setTimeout(calculateGuesses.bind(null, currenttime + GUESS_INTERVAL), 0);
     } else {
-      if (bind.ant in CORRECT && bind.colony in {"01": 0, "02": 0, "03": 0, "06": 0, "07": 0}) {
-        consumeGuess(guesses, bind, querytime, guesstime);
+      if (bind.ant in CORRECT && COLONIES.indexOf(bind.colony) >= 0) {
+        consumeGuess(guesses, bind, querytime, currenttime);
         (adequateness[bind.ant] || (adequateness[bind.ant] = 0));
         adequateness[bind.ant]++;
       }
@@ -295,32 +314,30 @@ function calculateGuesses (DIFFTIME) {
         return;
       }
       // Adjust confidence by sample size
-      guess.confidence *= (Math.min(16, adequateness[antid])/16);
-
-      var CONFIDENCE_CUTOFF = 0.48;
+      guess.confidence *= ADEQUATE_THRESHOLD_LIMIT + ((Math.min(ADEQUATE_THRESHOLD, adequateness[antid])/ADEQUATE_THRESHOLD) * (1 - ADEQUATE_THRESHOLD_LIMIT));
 
       var log = (antid + ' => ' + guess.location + ' (confidence ' + guess.confidence + ')');
       console.log(guess.confidence < CONFIDENCE_CUTOFF ? log.yellow : CORRECT[antid] == guess.location ? log.green : log.red);
       if (guess.confidence >= CONFIDENCE_CUTOFF) {
-        SUCCESS_TOTAL++;
+        CONFIDENCE_TOTAL++;
         if (CORRECT[antid] == guess.location) {
-          SUCCESS_RATE++;
+          CONFIDENCE_SUCCESSFUL++;
         }
       } else {
-        SUCCESS_DROPPED++;
+        CONFIDENCE_DROPPED++;
       }
 
       // Stats for "wrongest" colonies.
       if (CORRECT[antid] != guess.location) {
-        (ANT_STATS[antid] || (ANT_STATS[antid] = 0));
-        ANT_STATS[antid]++;
-        (COL_STATS[guess.location] || (COL_STATS[guess.location] = 0));
-        COL_STATS[guess.location]++;
+        (INCORRECT_ANTS[antid] || (INCORRECT_ANTS[antid] = 0));
+        INCORRECT_ANTS[antid]++;
+        (INCORRECT_COLS[guess.location] || (INCORRECT_COLS[guess.location] = 0));
+        INCORRECT_COLS[guess.location]++;
       }
 
-      ANT_LIKELY[antid] || (ANT_LIKELY[antid] = {});
-      ANT_LIKELY[antid][guess.location] || (ANT_LIKELY[antid][guess.location] = 0);
-      ANT_LIKELY[antid][guess.location]++;
+      // Set what the likelyhood of the ant guess is overall for this location.
+      ANT_GUESSES[antid] || (ANT_GUESSES[antid] = JSON.parse(JSON.stringify(COLONIES_SET)));
+      ANT_GUESSES[antid][guess.location]++;
 
       // Populate the guess with a user/location.
       cols.colonies.findOne({
@@ -336,7 +353,7 @@ function calculateGuesses (DIFFTIME) {
             colony: guess.location,
             confidence: guess.confidence,
             location: colony && colony.location,
-            time: guesstime,
+            time: currenttime,
             ant: antid,
             user: ant && ant.user,
           }, function (err, docs) {
@@ -369,29 +386,29 @@ function calculateGuesses (DIFFTIME) {
 
       return true;
     }).indexOf(true) < 0) {
-      console.log('Start:', new Date(STARTTIME))
-      console.log('End:', new Date(DIFFTIME))
-      Object.keys(ANT_LIKELY).forEach(function (antid) {
-        console.log(antid, '(' + CORRECT[antid] + ')', '=>', ANT_LIKELY[antid])
+      console.log('Start:', new Date(querytime))
+      console.log('End:', new Date(currenttime))
+      ANTS.forEach(function (antid) {
+        console.log(antid, '(' + CORRECT[antid] + ')', '=>', ANT_GUESSES[antid])
       });
-      console.log('Success rate:', SUCCESS_RATE, '/', SUCCESS_TOTAL, '(dropped ' + SUCCESS_DROPPED + ') => ', (SUCCESS_RATE/SUCCESS_TOTAL) + '%')
+      console.log('Success rate:', CONFIDENCE_SUCCESSFUL, '/', CONFIDENCE_TOTAL, '(accepting ' + (CONFIDENCE_TOTAL/(CONFIDENCE_TOTAL+CONFIDENCE_DROPPED)) + '%) => ', (CONFIDENCE_SUCCESSFUL/CONFIDENCE_TOTAL) + '%')
       process.exit(1);
     }
   }
 
   function consumeGuess (guesses, bind, start, end) {
     // Group binds by ant ID.
-    var bindFreshness = 1.0; //0.5 + (bind.time - start)/(end - start) * 0.5;
+    var bindFreshness = (1 - FRESHNESS_WEIGHT) + (bind.time - start)/(end - start) * FRESHNESS_WEIGHT;
     var binds = (guesses[bind.ant] || (guesses[bind.ant] = {}));
     (binds[bind.colony] || (binds[bind.colony] = 0));
     binds[bind.colony] += 1.0 * bindFreshness;
     (nearby[bind.colony] || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
-      binds[near] += 0.9 * bindFreshness;
+      binds[near] += NEARBY_BONUS * bindFreshness;
     });
     (farby[bind.colony] || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
-      binds[near] += 0.5 * bindFreshness;
+      binds[near] += FARBY_BONUS * bindFreshness;
     });
   }
 
@@ -410,7 +427,7 @@ function calculateGuesses (DIFFTIME) {
     console.log('Guess data:', JSON.stringify(binds));
     return !(bestloc > 0) ? null : {
       location: bestlocid,
-      confidence: 0.3 + ((bestloc / total) * 0.7)
+      confidence: (1 - BEST_WEIGHT) + ((bestloc / total) * BEST_WEIGHT)
     };
   }
 }
