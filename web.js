@@ -351,7 +351,7 @@ app.put('/ants/:id', function (req, res) {
     _id: String(req.params.id)
   };
   if (req.body.user) {
-    user: parseInt(req.body.user)
+    ant.user = parseInt(req.body.user)
   }
   cols.ants.update({
     _id: String(req.params.id)
@@ -392,13 +392,11 @@ app.get('/colonies/:id', function (req, res) {
 });
 
 app.put('/colonies/:id', function (req, res) {
-  if (!req.body.location) {
-    return res.json({message: 'Need location parameter.'}, 500);
-  }
-
   var colony = {
-    _id: String(req.params.id),
-    location: parseInt(req.body.location)
+    _id: String(req.params.id)
+  };
+  if (!req.body.location) {
+    colony.location = parseInt(req.body.location)
   };
   cols.colonies.update({
     _id: String(req.params.id)

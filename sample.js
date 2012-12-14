@@ -225,47 +225,47 @@ app.get('/guesses/:id', function (req, res) {
 var nearby = {
   "01": ["02"],
   "02": ["01", "03"],
-  "03": ["02", "04"],
-  "04": ["03", "05"],
-  "05": ["04"]
+  "03": ["02", "06"],
+  "06": ["03", "07"],
+  "06": ["06"]
 };
 var farby = {
   "01": ["03"],
-  "02": ["04"],
-  "03": ["01", "05"],
-  "04": ["02"],
-  "05": ["03"]
+  "02": ["06"],
+  "03": ["01", "07"],
+  "06": ["02"],
+  "07": ["03"]
 };
 
 var CORRECT = {
-  "AA07": "04",
-  "2C00": "03",
-  "3A00": "01",
-  "3400": "05",
-  "AA09": "03",
-  "05FF": "02",
-  "063D": "02",
-  "3500": "01",
-  "1900": "04",
-  "AA13": "05",
-  "0202": "??",
-  "D7D7": "??"
+  "1900": "01",
+  "08FF": "01",
+  "3500": "02",
+  "2C00": "02",
+  "3A00": "03",
+  "063D": "03",
+  "3400": "06",
+  "3500": "06",
+  "05FF": "07",
+  "3200": "07"
 }
 
-var DIFFTIME = 1355517708658, STARTTIME = DIFFTIME;
-var ANT_STATS = {}, COL_STATS = {}, ANT_LIKELY = {}, SUCCESS_RATE = 0, SUCCESS_TOTAL = 0, SUCCESS_DROPPED = 0;
+var ANT_STATS = {}, COL_STATS = {}, ANT_LIKELY = {};
+var SUCCESS_RATE = 0, SUCCESS_TOTAL = 0, SUCCESS_DROPPED = 0;
 
-function calculateGuesses () {
+function calculateGuesses (DIFFTIME) {
   // Query for the last GUESS_THRESHOLD of binds. 
   var guesses = {};
   var adequateness = {};
   var querytime = DIFFTIME - GUESS_THRESHOLD, guesstime = DIFFTIME;
   DIFFTIME += 10*1000;
+
   console.log('\nGuessing location based on binds from', querytime, 'to', guesstime);
   console.log('ANT STATS:', JSON.stringify(ANT_STATS));
-  console.log('COLONY STATS:', JSON.stringify(COL_STATS));
+  console.log('COLONY wrongest STATS:', JSON.stringify(COL_STATS));
   console.log(new Date(querytime));
   console.log('-----------------');
+
   cols.binds.find({
     time: {
       $gt: querytime,
@@ -277,9 +277,9 @@ function calculateGuesses () {
       consumeBinds();
 
       // Consume next binds.
-      setTimeout(calculateGuesses, 0);
+      setTimeout(calculateGuesses.bind(null, DIFFTIME + 10*1000), 0);
     } else {
-      if (bind.ant in CORRECT && bind.colony in {"01": 0, "02": 0, "03": 0, "04": 0, "05": 0}) {
+      if (bind.ant in CORRECT && bind.colony in {"01": 0, "02": 0, "03": 0, "06": 0, "07": 0}) {
         consumeGuess(guesses, bind, querytime, guesstime);
         (adequateness[bind.ant] || (adequateness[bind.ant] = 0));
         adequateness[bind.ant]++;
@@ -387,11 +387,11 @@ function calculateGuesses () {
     binds[bind.colony] += 1.0 * bindFreshness;
     (nearby[bind.colony] || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
-      binds[near] += 0.7 * bindFreshness;
+      binds[near] += 0.9 * bindFreshness;
     });
     (farby[bind.colony] || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
-      binds[near] += 0.2 * bindFreshness;
+      binds[near] += 0.5 * bindFreshness;
     });
   }
 
@@ -663,7 +663,7 @@ function setupMongo (next) {
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.guesses = new mongo.Collection(dbmongo, 'guesses');
 
-    calculateGuesses();
+    calculateGuesses(1355517708698);
 
     next();
   });
