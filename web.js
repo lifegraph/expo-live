@@ -226,6 +226,8 @@ app.get('/segments/:id', function (req, res) {
 var lastPollTime = null;
 
 function pollSegments () {
+  return;
+
   if (lastPollTime === null) {
     lastPollTime = Date.now();
   }
