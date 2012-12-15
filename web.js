@@ -18,8 +18,6 @@ var POSTGRES_URI = "postgres://dfgpdzocobqufp:aHD8_vXdE75M9mthWts2rVXSIf@ec2-54-
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 var port = process.env.PORT || 5000;
 
-var SEGMENT_THRESHOLD = process.env.SEGMENT_THRESHOLD || 12*1000;
-
 
 /**
  * App
@@ -123,26 +121,27 @@ app.get('/binds/:id', function (req, res) {
 });
 
 /**
- * Segments
+ * Guesses
  */
 
-function segmentJSON (seg) {
+function guessJSON (guess) {
   return {
-    id: seg._id,
-    ant: seg.ant,
-    colony: seg.colony,
-    time: seg.time,
-    user: seg.user,
-    location: seg.location
+    id: guess._id,
+    confidence: guess.confidence,
+    ant: guess.ant,
+    colony: guess.colony,
+    time: guess.time,
+    user: guess.user,
+    location: guess.location
   };
 }
 
-// DELETE /binds/? ant=<ant id> || colony=<colony id>
+// DELETE /guesses/? ant=<ant id> || colony=<colony id>
 
-app.del('/segments', function (req, res) {
+app.del('/guesses', function (req, res) {
   var ant = req.query.ant, colony = req.query.colony;
   if (!ant && !colony && !req.query.force) {
-    res.json({'message': 'Pleace specify force=1 to delete all binds.'}, 400);
+    res.json({'message': 'Pleace specify force=1 to delete all guesses.'}, 400);
     return;
   }
   var crit = {};
@@ -152,40 +151,40 @@ app.del('/segments', function (req, res) {
   if (colony) {
     crit.colony = colony;
   }
-  cols.segments.remove(crit, function (err) {
+  cols.guesses.remove(crit, function (err) {
     console.log(arguments);
-    res.json({message: 'Successfully removed binds.'});
+    res.json({message: 'Successfully removed guesses.'});
   })
 });
 
-// GET /segments
+// GET /guesses
 
-app.get('/segments', function (req, res) {
+app.get('/guesses', function (req, res) {
   var crit = {}, sort = 'start';
 
-  // Query from ants, which have a .currentSegment DBRef.
+  // Query from ants, which have a .guess ID.
   if ('latest' in req.query) {
     if (req.query.ant) {
       crit.ant = req.query.ant;
     }
     cols.ants.find(crit).toArray(function (id, ants) {
       async.map(ants, function (ant, next) {
-        if (!ant.currentSegment) {
+        if (!ant.guess) {
           next(null, null);
         } else {
-          cols.segments.findOne({
-            _id: ant.currentSegment
+          cols.guesses.findOne({
+            _id: ant.guess
           }, next);
         }
-      }, function (err, segments) {
-        segments = segments.filter(function (seg) {
-          return seg;
+      }, function (err, guesses) {
+        guesses = guesses.filter(function (guess) {
+          return guess;
         });
-        res.json(segments.map(segmentJSON));
+        res.json(guesses.map(guessJSON));
       });
     })
 
-  // Query from segments collection.
+  // Query from guesses collection.
   } else {
     if (req.query.ant) {
       crit.ant = req.query.ant;
@@ -205,14 +204,14 @@ app.get('/segments', function (req, res) {
     if (req.query.sort == 'latest') {
       sort = 'end';
     }
-    cols.segments.find(crit).sort(sort).toArray(function (err, segments) {
-      res.json(segments.map(segmentJSON));
+    cols.guesses.find(crit).sort(sort).toArray(function (err, guesses) {
+      res.json(guesses.map(guessJSON));
     });
   }
 });
 
-app.get('/segments/:id', function (req, res) {
-  cols.segments.findOne({
+app.get('/guesses/:id', function (req, res) {
+  cols.guesses.findOne({
     _id: req.params.id
   }, function (err, json) {
     res.json(json, json ? 200 : 404);
@@ -220,102 +219,10 @@ app.get('/segments/:id', function (req, res) {
 });
 
 /** 
- * Create segments
+ * Create guesses
  */
 
-var lastPollTime = null;
-
-function pollSegments () {
-  return;
-
-  if (lastPollTime === null) {
-    lastPollTime = Date.now();
-  }
-
-  console.log('Consuming binds from', lastPollTime, 'to', Date.now());
-
-  var segments = {};
-
-  // Query for the last SEGMENT_LENGTH of binds. 
-  var curPollTime = Date.now();
-  cols.binds.find({
-    time: {
-      $gt: lastPollTime
-    }
-  }).sort({time: 1}).each(function (err, bind) {
-    if (bind == null) {
-      // Fetched all binds. Start next cycle, and continue.
-      console.log('Fetched binds.');
-      lastPollTime = curPollTime;
-      setTimeout(pollSegments, SEGMENT_THRESHOLD);
-      consumeBinds();
-    } else {
-      // Group binds by ant ID.
-      var bundle = (segments[bind.ant] || (segments[bind.ant] = {}));
-      (bundle[bind.colony] || (bundle[bind.colony] = 0));
-      bundle[bind.colony]++;
-    }
-  });
-
-  function consumeBinds () {
-    // For each ant's bundle of binds, perform our algorithm.
-    Object.keys(segments).forEach(function (antid) {
-
-      // Check maximum location.
-      var bestlocid, bestloc = -1;
-      Object.keys(segments[antid]).forEach(function (locid) {
-        if (bestloc < segments[antid][locid]) {
-          bestlocid = locid;
-          bestloc = segments[antid][locid];
-        }
-      })
-      // If there is no location with binds, return.
-      console.log(segments[antid]);
-      if (!(bestloc > 0)) {
-        return;
-      }
-
-      // The colony user is most likely located at
-      // is stored in "bestloc".
-      cols.colonies.findOne({
-        _id: bestlocid
-      }, function (err, colony) {
-        cols.colonies.findOne({
-          _id: antid
-        }, function (err, ant) {
-          // Note, ant or colony may be false by now
-          cols.segments.insert({
-            sampleStart: lastPollTime,
-            time: curPollTime,
-            ant: antid,
-            user: ant && ant.user,
-            colony: bestlocid,
-            location: colony && colony.location
-          }, function (err, docs) {
-            if (err) {
-              console.error(err);
-            }
-            if (!err && docs[0]) {
-              console.log('Added segment', docs[0]);
-              io.sockets.emit('segment:update', docs[0]);
-
-              cols.ants.update({
-                _id: antid
-              }, {
-                _id: antid,
-                currentSegment: docs[0]._id
-              }, {
-                upsert: true
-              }, function (err, docs) {
-                console.log('Updated', docs);
-              });
-            }
-          });
-        });
-      });
-    });
-  }
-}
+var sampler = require('./sampler');
 
 /*
  * Ants
@@ -559,9 +466,34 @@ function setupMongo (next) {
     cols.binds = new mongo.Collection(dbmongo, 'binds');
     cols.ants = new mongo.Collection(dbmongo, 'ants');
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
-    cols.segments = new mongo.Collection(dbmongo, 'segments');
+    cols.guesses = new mongo.Collection(dbmongo, 'guesses');
 
-    pollSegments();
+    sampler(cols, function (json) {
+      cols.guesses.insert(json, function (err, docs) {
+        if (err) {
+          console.error(err);
+        } else if (!err && docs[0]) {
+
+          // Guess created.
+          var guess = docs[0];
+          console.log('Added guess', guess);
+          io.sockets.emit('guess:create', guess);
+
+          // Update ants with current guess.
+          cols.ants.update({
+            _id: guess.ant
+          }, {
+            _id: guess.ant,
+            guess: guess._id,
+            user: guess.user
+          }, {
+            upsert: true
+          }, function (err, docs) {
+            console.log('Updated ant with current guess.');
+          });
+        }
+      });
+    });
 
     next();
   });
