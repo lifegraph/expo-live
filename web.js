@@ -275,7 +275,7 @@ app.put('/ants/:id', function (req, res) {
 
 function colonyJSON (colony) {
   return {
-    colony: colony._id,
+    id: colony._id,
     location: colony.location
   };
 }
@@ -302,8 +302,8 @@ app.put('/colonies/:id', function (req, res) {
   var colony = {
     _id: String(req.params.id)
   };
-  if (!req.body.location) {
-    colony.location = parseInt(req.body.location)
+  if (req.body.location) {
+    colony.location = String(req.body.location);
   };
   cols.colonies.update({
     _id: String(req.params.id)

@@ -175,12 +175,49 @@ var olinexpo = (function () {
     });
   }
 
+  API.prototype._getColonies = function (next) {
+    $.ajax({
+      type: 'get',
+      url: 'http://' + olinexpoHost + '/colonies/',
+      success: function (data, type) {
+        next && next(type != 'success' && type, data);
+      }
+    });
+  }
+
+  API.prototype._createBind = function (ant, colony, next) {
+    $.ajax({
+      type: 'post',
+      url: 'http://' + olinexpoHost + '/binds/',
+      data: {
+        ant: ant,
+        colony: colony
+      },
+      success: function (data) {
+        next && next();
+      }
+    });
+  }
+
   API.prototype._assignAnt = function (ant, user, next) {
     $.ajax({
       type: 'put',
       url: 'http://' + olinexpoHost + '/ants/' + ant,
       data: user && {
         user: user
+      },
+      success: function (data) {
+        next && next();
+      }
+    });
+  }
+
+  API.prototype._assignColony = function (colony, location, next) {
+    $.ajax({
+      type: 'put',
+      url: 'http://' + olinexpoHost + '/colonies/' + colony,
+      data: location && {
+        location: location
       },
       success: function (data) {
         next && next();
