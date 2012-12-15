@@ -126,23 +126,23 @@ var olinexpo = (function () {
 
   API.prototype._listen = function (history, query, callback) {
     var cache = [];
-    $.getJSON('http://' + olinexpoHost + '/segments/?' + (history ? '' : 'latest&'), function (segments) {
-      segments.forEach(function (seg) {
-        cache.push(seg);
-        callback.call(this, seg, cache, false);
+    $.getJSON('http://' + olinexpoHost + '/guesses/?' + (history ? '' : 'latest&'), function (guesses) {
+      guesses.forEach(function (guess) {
+        cache.push(sguesseg);
+        callback.call(this, guess, cache, false);
       }.bind(this));
-      this.socket.on('segment:update', function (seg) {
+      this.socket.on('guess:create', function (guess) {
         var isUpdate = false;
         if (!history) {
           cache = cache.map(function (item) {
-            isUpdate = isUpdate || item.ant == seg.ant;
-            return item.ant == seg.ant ? seg : item;
+            isUpdate = isUpdate || item.ant == guess.ant;
+            return item.ant == guess.ant ? guess : item;
           });
         }
         if (!isUpdate) {
-          cache.push(segment);
+          cache.push(guess);
         }
-        callback.call(this, seg, cache, isUpdate);
+        callback.call(this, guess, cache, isUpdate);
       });
     }.bind(this));
     return this;
