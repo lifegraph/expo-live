@@ -128,7 +128,7 @@ var olinexpo = (function () {
     var cache = [];
     $.getJSON('http://' + olinexpoHost + '/guesses/?' + (history ? '' : 'latest&'), function (guesses) {
       guesses.forEach(function (guess) {
-        cache.push(sguesseg);
+        cache.push(guess);
         callback.call(this, guess, cache, false);
       }.bind(this));
       this.socket.on('guess:create', function (guess) {

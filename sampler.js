@@ -63,7 +63,7 @@ var CONFIDENCE_SUCCESSFUL = 0, CONFIDENCE_TOTAL = 0, CONFIDENCE_DROPPED = 0;
 
 // Variables.
 var GUESS_INTERVAL = process.env.GUESS_INTERVAL || 10*1000;
-var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || .5*60*1000;
+var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || 3*60*1000;
 var CONFIDENCE_CUTOFF = 0.70;
 var ADEQUATE_THRESHOLD = 8; // Threshold for confidence by # of binds available.
 var ADEQUATE_THRESHOLD_LIMIT = 0; // Threshold for limit of # of binds.
@@ -88,8 +88,8 @@ function sampler (cols, callback) {
 
   cols.binds.find({
     time: {
-      $gt: querytime,
-      $lt: currenttime
+      $gt: querytime
+     // $lt: currenttime
     }   
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
