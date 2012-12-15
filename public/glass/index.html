@@ -12,8 +12,8 @@
     <script src="/olinexpo.js"></script>
     <script>
 
-// Static mapping locations to positions
-
+// Static mapping locations to graphical positions.
+// This needs to be fleshed out much more.
 var locations = {
   "AC118": {x: -100, y: -25}
 };
@@ -47,7 +47,7 @@ function Visual (width, height) {
       this.mark(locid, this.markers[locid] - 0.1);
     }.bind(this))
   }.bind(this), 50);
-}
+}d
 
 Visual.prototype.resetMarkers = function () {
   delete this.markers;
@@ -72,20 +72,16 @@ Visual.prototype.render = function () {
 
 var visual = new Visual(1000, 400);
 
-olinexpo()
-  .on('load', function () {
-    setInterval(visual.render.bind(visual), 50);
-  })
-  .on('connect', function () {
-    console.log('Websocket connected.');
-  })
+var api = olinexpo(function () {
+  // Loaded. Start rendering visual.
+  setInterval(visual.render.bind(visual), 50);
 
   // Listen the current locations of all ants (listenAll with history == false).
   // This callback will be called every time a person changes position, where
   // the first argument is the guess where they are, the second argument is a list of 
   // all positions received by the client up until this point, and the third argument
   // is FALSE if the user has not been seen before (i.e. is a new user)
-  .listenAll(false, function (guess, guesses, isUpdate) {
+  api.listenAll(false, function (guess, guesses, isUpdate) {
     visual.resetMarkers();
     guesses.forEach(function (guess) {
       console.log('Segment with user+location:', guess.location, guess.user);
@@ -93,6 +89,7 @@ olinexpo()
       visual.mark(guess.location, 5); 
     });
   });
+});
 
     </script>
   </body>
