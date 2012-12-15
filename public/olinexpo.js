@@ -157,19 +157,29 @@ var olinexpo = (function () {
     return this._listen(history, '', callback);
   };
 
-  API.prototype.listenPresentation = function (history, id, callback) {
-    return this._listen(history, 'presentation=' + id, callback);
+  API.prototype.listenLocation = function (history, id, callback) {
+    return this._listen(history, 'location=' + id, callback);
   };
 
   API.prototype.listenUser = function (history, id, callback) {
     return this._listen(history, 'user=' + id, callback);
   };
 
+  API.prototype._getAnts = function (next) {
+    $.ajax({
+      type: 'get',
+      url: 'http://' + olinexpoHost + '/ants/',
+      success: function (data, type) {
+        next && next(type != 'success' && type, data);
+      }
+    });
+  }
+
   API.prototype._assignAnt = function (ant, user, next) {
     $.ajax({
       type: 'put',
       url: 'http://' + olinexpoHost + '/ants/' + ant,
-      data: {
+      data: user && {
         user: user
       },
       success: function (data) {
