@@ -126,23 +126,23 @@ var olinexpo = (function () {
 
   API.prototype._listen = function (history, query, callback) {
     var cache = [];
-    $.getJSON('http://' + olinexpoHost + '/segments/?' + (history ? '' : 'latest&'), function (segments) {
-      segments.forEach(function (seg) {
-        cache.push(seg);
-        callback.call(this, seg, cache, false);
+    $.getJSON('http://' + olinexpoHost + '/guesses/?' + (history ? '' : 'latest&'), function (guesses) {
+      guesses.forEach(function (guess) {
+        cache.push(guess);
+        callback.call(this, guess, cache, false);
       }.bind(this));
-      this.socket.on('segment:update', function (seg) {
+      this.socket.on('guess:create', function (guess) {
         var isUpdate = false;
         if (!history) {
           cache = cache.map(function (item) {
-            isUpdate = isUpdate || item.ant == seg.ant;
-            return item.ant == seg.ant ? seg : item;
+            isUpdate = isUpdate || item.ant == guess.ant;
+            return item.ant == guess.ant ? guess : item;
           });
         }
         if (!isUpdate) {
-          cache.push(segment);
+          cache.push(guess);
         }
-        callback.call(this, seg, cache, isUpdate);
+        callback.call(this, guess, cache, isUpdate);
       });
     }.bind(this));
     return this;
@@ -157,20 +157,67 @@ var olinexpo = (function () {
     return this._listen(history, '', callback);
   };
 
-  API.prototype.listenPresentation = function (history, id, callback) {
-    return this._listen(history, 'presentation=' + id, callback);
+  API.prototype.listenLocation = function (history, id, callback) {
+    return this._listen(history, 'location=' + id, callback);
   };
 
   API.prototype.listenUser = function (history, id, callback) {
     return this._listen(history, 'user=' + id, callback);
   };
 
+  API.prototype._getAnts = function (next) {
+    $.ajax({
+      type: 'get',
+      url: 'http://' + olinexpoHost + '/ants/',
+      success: function (data, type) {
+        next && next(type != 'success' && type, data);
+      }
+    });
+  }
+
+  API.prototype._getColonies = function (next) {
+    $.ajax({
+      type: 'get',
+      url: 'http://' + olinexpoHost + '/colonies/',
+      success: function (data, type) {
+        next && next(type != 'success' && type, data);
+      }
+    });
+  }
+
+  API.prototype._createBind = function (ant, colony, next) {
+    $.ajax({
+      type: 'post',
+      url: 'http://' + olinexpoHost + '/binds/',
+      data: {
+        ant: ant,
+        colony: colony
+      },
+      success: function (data) {
+        next && next();
+      }
+    });
+  }
+
   API.prototype._assignAnt = function (ant, user, next) {
     $.ajax({
       type: 'put',
       url: 'http://' + olinexpoHost + '/ants/' + ant,
-      data: {
+      data: user && {
         user: user
+      },
+      success: function (data) {
+        next && next();
+      }
+    });
+  }
+
+  API.prototype._assignColony = function (colony, location, next) {
+    $.ajax({
+      type: 'put',
+      url: 'http://' + olinexpoHost + '/colonies/' + colony,
+      data: location && {
+        location: location
       },
       success: function (data) {
         next && next();

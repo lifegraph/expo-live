@@ -9,11 +9,12 @@
   <body>
     <canvas id="canvas" width="1000" height="400">Lol</canvas>
     <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/olinexpo.js"></script>
     <script>
 
-// Static mapping locations to positions
-
+// Static mapping locations to graphical positions.
+// This needs to be fleshed out much more.
 var locations = {
   "AC118": {x: -100, y: -25}
 };
@@ -54,8 +55,8 @@ Visual.prototype.resetMarkers = function () {
   this.markers = {};
 }
 
-Visual.prototype.mark = function (id, increase) {
-  this.markers[id] = (this.markers[id] || 0) + increase;
+Visual.prototype.mark = function (id, amountToIncrease) {
+  this.markers[id] = (this.markers[id] || 0) + amountToIncrease;
 }
 
 Visual.prototype.render = function () {
@@ -72,23 +73,24 @@ Visual.prototype.render = function () {
 
 var visual = new Visual(1000, 400);
 
-olinexpo()
-  .on('load', function () {
-    setInterval(visual.render.bind(visual), 50);
-  })
-  .on('connect', function () {
-    console.log('Websocket connected.');
-  })
-  .listenAll(false, function (seg, segments, isUpdate) {
+var api = olinexpo(function () {
+  // Loaded. Start rendering visual.
+  setInterval(visual.render.bind(visual), 50);
+
+  // Listen the current locations of all ants (listenAll with history == false).
+  // This callback will be called every time a person changes position, where
+  // the first argument is the guess where they are, the second argument is a list of 
+  // all positions received by the client up until this point, and the third argument
+  // is FALSE if the user has not been seen before (i.e. is a new user)
+  api.listenAll(false, function (guess, guesses, isUpdate) {
     visual.resetMarkers();
-    segments.forEach(function () {
-      console.log('Segment with user+location:', seg.location, seg.user);
-      var user = this.getUserById(seg.user);
-      var location = this.getLocationById(seg.location);
-      var locid = location.floor + location.index;
-      visual.mark(locid, 5);
+    guesses.forEach(function (guess) {
+      console.log('Segment with user+location:', guess.location, guess.user);
+      var user = this.getUserById(guess.user); // user object
+      visual.mark(guess.location, 5); 
     });
   });
+});
 
     </script>
   </body>
