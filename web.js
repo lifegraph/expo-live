@@ -359,24 +359,25 @@ app.get('/users/:id', function (req, res) {
 
 function locationJSON (loc, next) {
   return {
-    "id": loc.id,
-    "floor": loc.floor,
-    "type": loc.type,
-    "index": loc.index
+    "id": loc.room
   };
 }
 
 app.get('/locations', function (req, res) {
-  dbpg.query('SELECT * FROM locations', [], function (err, result) {
+  dbpg.query('SELECT DISTINCT room FROM projects', [], function (err, result) {
     if (err) {
       console.error(err);
       res.json({message: err}, 500);
     } else {
-      res.json(result.rows.map(locationJSON));
+      console.log(result);
+      res.json(result.rows.map(locationJSON).filter(function (loc) {
+        return loc.id;
+      }));
     }
   });
 });
 
+/*
 app.get('/locations/:id', function (req, res) {
   dbpg.query('SELECT * FROM locations WHERE id = $1 LIMIT 1', [
     req.params.id
@@ -391,6 +392,7 @@ app.get('/locations/:id', function (req, res) {
     }
   });
 });
+*/
 
 // Presentations.
 
