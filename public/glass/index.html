@@ -9,6 +9,7 @@
   <body>
     <canvas id="canvas" width="1000" height="400">Lol</canvas>
     <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/olinexpo.js"></script>
     <script>
 
@@ -47,7 +48,7 @@ function Visual (width, height) {
       this.mark(locid, this.markers[locid] - 0.1);
     }.bind(this))
   }.bind(this), 50);
-}d
+}
 
 Visual.prototype.resetMarkers = function () {
   delete this.markers;
