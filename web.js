@@ -255,11 +255,48 @@ var sampler = require('./sampler');
  * History endpoint
  */
 
+// minimum amount of time to be considered at a location
+var MIN_MS_GUESS = 3*60*(1000);
+
 app.get('/history/:uid', function (req, res) {
   var uid = req.params.uid;
-  cols.guesses.find({user: parseInt(uid)}).toArray(function (err, guesses) {
-    res.json(guesses.sort(function(a,b) { return a.time < b.time ? 1 : -1}).map(guessJSON));
-  });
+  var history = [];
+  var last_guess;
+  var oldest_same_location_guess;
+
+  cols.guesses.find({user: parseInt(uid)}).sort({time: 1})
+    .each(function (err, guess) {
+      if (!guess) {
+        return res.json(history);
+      }
+      var elapsed_time = 0;
+      if (last_guess) {
+        // get the elapsed time between the two guesses
+        var elapsed_time = last_guess.time - oldest_same_location_guess.time;
+
+        // new history call when locations have changed
+        // be at location for at least MIN_MS_GUESS amount of time
+        if (last_guess.location != guess.location &&
+          elapsed_time > MIN_MS_GUESS ) {
+
+          var starting_time = oldest_same_location_guess.time;
+          history.push({started: starting_time, length: elapsed_time, 
+            location: last_guess.location, ant: last_guess.ant, user: last_guess.user,
+            colony: last_guess.colony});
+        }
+
+        // if the location stayed the same, don't update the oldest
+        if (oldest_same_location_guess.location != guess.location) {
+          oldest_same_location_guess = guess;
+        }
+
+      } else {
+        oldest_same_location_guess = guess;
+      }
+      // keep track of the last guess
+      last_guess =  guess;
+    }
+  );
 });
 
 /*
