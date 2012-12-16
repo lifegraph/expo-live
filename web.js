@@ -24,15 +24,23 @@ var port = process.env.PORT || 5000;
  */
 
 var app = express();
-app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
+
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', 'http://node.example.com:3000');
+    res.header('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Origin, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    if( req.method.toLowerCase() === "options" ) {
+        res.send( 200 );
+    }
+    else {
+        next();
+    }
+});
 
 var server = http.createServer(app);
 
