@@ -14,7 +14,7 @@
 
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="http://api.olinexpo.com/olinexpo.js"></script>
+    <script src="/olinexpo.js"></script>
     <script>
 
 var lastbind = {};
@@ -32,18 +32,22 @@ var api = olinexpo(function () {
 });
 
 function timesince (d) {
-  var delta = Date.now() - d;
+  var delta = (Date.now() - d) / 1000;
   var seconds = delta % 60;
   var minutes = (0|(delta / 60)) % 60;
   var hours = (0|(delta / 3600));
-  return hours + ' hours, ' + minutes + ' minutes, ' + seconds + ' seconds';
+  var str = hours + ' hours, ' + minutes + ' minutes, ' + seconds + ' seconds';
+  if (delta > 10) {
+    str = '<span style="color: red">' + str + '</span>';
+  }
+  return str;
 }
 
 setInterval(function () {
   Object.keys(lastbind).forEach(function (antid) {
     var bind = lastbind[antid];
     var $row = $('#binds li[data-ant=' + JSON.stringify(antid) + ']');
-    $row.find('b').text(timesince(bind.time));
+    $row.find('b').html(timesince(bind.time));
   });
 }, 200);
 
