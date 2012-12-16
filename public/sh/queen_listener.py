@@ -9,7 +9,7 @@ arduino = serial.Serial('/dev/ttyACM0', 57600) # serial port# and baud rate
 def chunks(l, n):
   return [l[i:i+n] for i in range(0, len(l), n)]
 
-def post_to_server(queen_id, ant_id, ping_id):
+def post_to_server(queen_id, ant_id, ping_id, colony_id):
   subprocess.call(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "-d", "ping=" + ping_id, "api.olinexpo.com/binds"])
 
 def append_to_file(filename, data):
@@ -61,4 +61,4 @@ while 1:
       
       # POST that biznatch
       print "queen:", json.dumps(queen_id), "colony:", json.dumps(colony_id), "ant:", json.dumps(ant_id), "ping:", json.dumps(ping_id)
-      
+      post_to_server(queen_id, ant_id, ping_id, colony_id)
