@@ -360,6 +360,7 @@ function userJSON (user) {
     id: user.id,
     name: user.name,
     facebookid: user.facebookid,
+    created_time: user.created_time,
     email: user.email
   };
 }
