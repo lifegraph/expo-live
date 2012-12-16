@@ -67,9 +67,9 @@ setInterval(function () {
       .find('b').html(timesince(bind.time));
   });
 
-  Object.keys(colonies).forEach(function (antid) {
-    var bind = ants[antid];
-    $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
+  Object.keys(colonies).forEach(function (colonyid) {
+    var bind = colines[colonyid];
+    $('#colonies li[data-colony=' + JSON.stringify(colonyid) + ']')
       .addClass('flash')
       .find('b').html(timesince(bind.time));
   });
