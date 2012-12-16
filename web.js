@@ -292,8 +292,8 @@ app.put('/ants/:id', function (req, res) {
   var ant = {
     _id: String(req.params.id)
   };
-  if (req.body.user) {
-    ant.user = parseInt(req.body.user)
+  if ('user' in req.body) {
+    ant.user = req.body.user || null;
   }
   cols.ants.update({
     _id: String(req.params.id)

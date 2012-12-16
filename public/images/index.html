@@ -1,0 +1,34 @@
+<div></div>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+
+<script>
+
+var url = "https://graph.facebook.com/4069900105999/photos?callback=?&access_token=AAACEdEose0cBAJJeNdORp1xZAPCl1VAbCWTvT9x2p3VmRR2l7ZC3EU74IxHwvvdXBCcFddHemRwqJhWraNH1br7ZAJp7ZCTt7XuZADr9O728ABD88E5AR";
+
+var lasttime = null;
+function poll () {
+  $.getJSON(url, function () {
+    try {
+      if (arguments[0]) {
+        var json = arguments[0].data;
+        for (var i = 0; i < json.length; i++) {
+          if (Date.parse(json[i].updated_time) > lasttime) {
+            lasttime = Date.parse(json[i].updated_time);
+            addImage(json[i]);
+          }
+        }
+      }
+    } catch (e) {
+    }
+    setTimeout(poll, 5000);
+  });
+}
+
+function addImage (json) {
+  $('div').append($('<img>').prop('src', json.images[json.images.length - 1].source));
+}
+
+poll();
+
+</script>
