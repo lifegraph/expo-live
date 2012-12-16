@@ -59,12 +59,14 @@ function bindJSON (bind) {
     time: bind.time,
     user: bind.user,
     location: bind.location,
-    queen: bind.queen
+    queen: bind.queen,
+    ping: bind.ping
   };
 }
 
 // GET /binds
 
+/*
 app.get('/binds', function (req, res) {
   var first = null;
   res.write('[');
@@ -79,6 +81,7 @@ app.get('/binds', function (req, res) {
     res.write(JSON.stringify(bind));
   });
 });
+*/
 
 // POST /hardware? ant=<ant id> && colony=<colony id>
 // This creates a new bind. Associations between ants <=> users
@@ -86,7 +89,7 @@ app.get('/binds', function (req, res) {
 // this information.
 
 app.post('/binds', function (req, res) {
-  var timeChunk = Math.floor(Date.now() / (5 * 1000 * 60 )); // grab the 5-minute chunk of time since the ping_id's will reset eventually
+  var timeChunk = Math.floor(Date.now() / (25 * 1000)); // grab the 5-minute chunk of time since the ping_id's will reset eventually
   if (!req.body.ant || !req.body.colony) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
@@ -94,7 +97,7 @@ app.post('/binds', function (req, res) {
   var bind = {
     ant: req.body.ant,
     colony: req.body.colony,
-    ping: String(req.body.ping) + String(timeChunk),
+    ping: 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony,
     queen: req.body.queen,
     time: Date.now()
   };
