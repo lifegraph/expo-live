@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+  <div class="container-fluid">
+    <h2>Presentation Viewer Extreme Mode</h2>
+  </div>
+<br>
+
+<hr>
+
+
+
+<div id="people"></div>
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/olinexpo.js"></script>
+<style>
+
+</style>
+<script>
+var colonyId = "02FF";
+var resetDisplayTimeout = null;
+var lasttime = 0;
+console.log("hi"); 
+var api = olinexpo(function () {
+  // api._listen(false, '', function(segment, segments, update){
+  //   console.log(segment);
+  //   console.log(segments);
+  //   console.log(update);
+  // });
+  api._listenBinds(function (bind) {
+    console.log("bind");
+    console.log(bind);
+    if (colonyId == bind.colony) {
+      if (bind.user) {
+        console.log("Found a user!");
+        var user = api.users[bind.user];
+        console.log(user);
+        var time = Date.now();
+        console.log(time - lasttime);
+        lasttime = time;
+        if (user.name) {
+          clearTimeout(resetDisplayTimeout);
+          $('#people').text(user.name);
+          if (user.facebookid) {
+            var fbid = user.facebookid;
+          }
+          resetDisplayTimeout = setTimeout(function(){ $('#people').text('')}, 3000);
+        }
+      }
+    }
+  })
+});
+
+</script>
+</div>
+</body>
+</html>

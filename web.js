@@ -128,6 +128,7 @@ function guessJSON (guess) {
   return {
     id: guess._id,
     confidence: guess.confidence,
+    confident: guess.confident,
     ant: guess.ant,
     colony: guess.colony,
     time: guess.time,

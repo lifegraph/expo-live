@@ -112,6 +112,7 @@ function sampler (cols, callback) {
     // For each ant's bundle of binds, perform our algorithm.
     if (Object.keys(guesses).map(function (antid) {
       var guess = makeGuess(guesses[antid], antid);
+      console.log(guess);
       if (!guess) {
         return;
       }
@@ -147,7 +148,7 @@ function sampler (cols, callback) {
       cols.colonies.findOne({
         _id: guess.location
       }, function (err, colony) {
-        cols.colonies.findOne({
+        cols.ants.findOne({
           _id: antid
         }, function (err, ant) {
 
@@ -155,6 +156,7 @@ function sampler (cols, callback) {
           callback({
             colony: guess.location,
             confidence: guess.confidence,
+            confident: guess.confidence >= CONFIDENCE_CUTOFF,
             location: colony && colony.location,
             time: currenttime,
             ant: antid,

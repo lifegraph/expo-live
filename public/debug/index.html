@@ -50,12 +50,19 @@ var api = olinexpo(function () {
   });
   setInterval(function () {
     segments.map(updateAnt);
-  }, 100)
+  }, 100);
 
   api._listenBinds(function (bind) {
     var col = Number(bind.colony.substr(-3))
     var $td = $($('#results div[data-ant="' + bind.ant + '"] td').get(col - 1));
     $td.text(Number($td.text()) + 1).addClass('ping').removeClass('unping');
+
+    var $td1 = $($('#results div[data-ant="' + bind.ant + '"] td').get(col - 2));
+    $td1.text(Number($td1.text()) + 0.5);
+
+    var $td2 = $($('#results div[data-ant="' + bind.ant + '"] td').get(col));
+    $td2.text(Number($td2.text()) + 0.5);
+
     setTimeout(function () {
       $td.removeClass('ping').addClass('unping')
     }, 500);
