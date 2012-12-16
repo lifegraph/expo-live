@@ -6,6 +6,7 @@
 
 .flash { background: yellow; }
 .unflash { -webkit-transition: background 1s; }
+.column { float: left; width: 46%; margin-right: 3%; }
 
     </style>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
@@ -14,11 +15,15 @@
 
 <h1>Diagnostics Page</h1>
 
+<div class="column">
 <h3>Ants</h3>
 <ul id="ants"></ul>
+</div>
 
+<div class="column">
 <h3>Colonies</h3>
 <ul id="colonies"></ul>
+</div>
 
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
@@ -68,12 +73,14 @@ setInterval(function () {
   Object.keys(ants).forEach(function (antid) {
     var bind = ants[antid];
     $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
+      .insertAfter($("#ants li:last"))
       .find('b').html(timesince(bind.time));
   });
 
   Object.keys(colonies).forEach(function (colonyid) {
     var bind = colonies[colonyid];
     $('#colonies li[data-colony=' + JSON.stringify(colonyid) + ']')
+      .insertAfter($("#colonies li:last"))
       .find('b').html(timesince(bind.time));
   });
 
