@@ -60,5 +60,6 @@ while 1:
       pings.append(ping_id)
       
       # POST that biznatch
-      print "queen:", json.dumps(queen_id), "colony:", json.dumps(colony_id), "ant:", json.dumps(ant_id), "ping:", json.dumps(ping_id)
-      post_to_server(queen_id, ant_id, ping_id, colony_id)
+      if colony_id != '0000' and ant_id != '0000':
+        print "queen:", json.dumps(queen_id), "colony:", json.dumps(colony_id), "ant:", json.dumps(ant_id), "ping:", json.dumps(ping_id)
+        post_to_server(queen_id, ant_id, ping_id, colony_id)
