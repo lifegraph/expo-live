@@ -58,7 +58,8 @@ function bindJSON (bind) {
     colony: bind.colony,
     time: bind.time,
     user: bind.user,
-    location: bind.location
+    location: bind.location,
+    queen: bind.queen
   };
 }
 
@@ -94,6 +95,7 @@ app.post('/binds', function (req, res) {
     ant: req.body.ant,
     colony: req.body.colony,
     ping: String(req.body.ping) + String(timeChunk),
+    queen: req.body.queen,
     time: Date.now()
   };
 
@@ -102,7 +104,7 @@ app.post('/binds', function (req, res) {
   }, function(err, repeatBind) {
     if (repeatBind) { // if it is double posted data (2+ queens reporting)
       console.log("Got a repeat bind", bind.ping);
-      return res.json({message: 'Repeat Bind. Already accounted for.'}, 409);
+      return res.json({message: 'Repeat Bind. Already accounted for.', ping: bind.ping }, 409);
     } else { // haven't seen this bind before.
       // Find corresponding user and location.
       cols.ants.findOne({
@@ -290,8 +292,8 @@ app.put('/ants/:id', function (req, res) {
   var ant = {
     _id: String(req.params.id)
   };
-  if (req.body.user) {
-    ant.user = parseInt(req.body.user)
+  if ('user' in req.body) {
+    ant.user = req.body.user || null;
   }
   cols.ants.update({
     _id: String(req.params.id)
