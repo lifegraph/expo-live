@@ -2,15 +2,40 @@
 
 <html>
   <head>
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <style>
-    html, body { margin: 0; padding: 0; background: #023; }
-    body { height: 5000px; zoom: 66%; padding-top: 200px; background: url(expolive.png) 60px 0 no-repeat; }
-    canvas { image-rendering: auto; display: block; }
+
+html, body { margin: 0; padding: 0; background: #023; }
+body { padding-top: 200px; background: url(expolive.png) 60px 0 no-repeat; background-color: transparent; }
+
+html, body, table { height: 100%; width: 100%; margin: 0; padding: 0; border-collapse: collapse; }
+td { vertical-align: middle; padding-top: 200px; }
+
+#wrapper { width: 3000px; height: 1200px; background-image: url(ac1-white.png); overflow: auto; }
+#center { margin-top: 600px; margin-left: 1500px; position: relative; }
+.marker {
+  -webkit-user-select: none;
+  text-align: center;
+  width: 0;
+  height: 0;
+  -webkit-transition-property: height, width, border-radius, margin-left, margin-top, line-height, font-size, color;
+  -webkit-transition-duration: 1s, 1s, 1s, 1s, 1s, 1s, 1s, 10s;
+}
+
     </style>
   </head>
   <body>
-    <canvas id="canvas" width="3000" height="1200">Lol</canvas>
+    <table><tr><td>
+    <div id="wrapper">
+      <div id="center"></div>
+    </div>
+  </td></tr></table>
+
     <script src="http://code.jquery.com/jquery.js"></script>
+
+<script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/js/bootstrap.min.js"></script>
+
     <script src="/socket.io/socket.io.js"></script>
     <script src="/olinexpo.js"></script>
     <script>
@@ -19,13 +44,11 @@
  * Automatically zoom screen.
  */
 
-/*
 function fitScreen () {
   $('body').css('zoom', $(window).width()/3000*100 + '%'); 
 }
 $(window).on('resize', fitScreen);
-$(fitScreen);
-*/
+fitScreen();
 
 
 /**
@@ -33,92 +56,94 @@ $(fitScreen);
  * This needs to be fleshed out much more.
  */
 
-var locations = {
-  "AC118": {x:50, y: -100}, // made up numbers, not the real location
-  "AC1D1": {x:40, y:-50},
-  "AC1D2": {x:25, y:-50},
-  "AC1D3": {x:10, y:-49},
-  "AC1D4": {x:-5, y:-45},
-  "AC1D5": {x:-20, y:-44},
-  "AC1D6": {x:-35, y:-43},
-  "AC1D7": {x:-50, y:-42},
-  "AC1D8": {x:-65, y:-40}
-};
+var locations = {};
 
+function Location (id, x, y) {
+  this.id = id;
+  this.x = x;
+  this.y = y;
 
-/**
- * Visual code
- */
+  this.$el = $('<div class="marker">').appendTo('#center');
+  this.$el.text(id);
+  this.$el.css({ position: 'absolute', background: 'red' });
+  this.$el.tooltip({
+    title: id
+  })
 
-var image_ac = new Image();
-image_ac.src = 'ac1-white.png';
+  this.position(x, y);
+  this.size(25);
+  this.confidence(0.8);
+  this.active(false);
 
-function Visual (width, height) {
-  this.width = width;
-  this.height = height;
+  this.$el.on('click', function () {
+    this.bump();
+  }.bind(this))
 
-  var canvas = document.getElementById('canvas');
-  this.ctx = canvas.getContext('2d');
-  this.ctx.translate(width/2, height/2);
-
-  this.ctx.fillStyle = 'rgba(200,220,0,.5)';
-  this.ctx.webkitImageSmoothingEnabled = true;
-
-  // $(canvas).on('click', function (e) {
-  //   e.offsetX -= cwidth / 2;
-  //   e.offsetY -= cheight / 2;
-  //   // drawMarker(this.ctx, e.offsetX, e.offsetY);
-  // }.bind(this));
-
-  this.markers = {};
-
-  // setInterval(function () {
-  //   Object.keys(this.markers).forEach(function (locid) {
-  //     this.mark(locid, - 0.1);
-  //   }.bind(this))
-  // }.bind(this), 50);
-}
-
-Visual.prototype.resetMarkers = function () {
-  delete this.markers;
-  this.markers = {};
-}
-
-Visual.prototype.mark = function (id, amountToIncrease) {
-  // console.log("MARKING", id, amountToIncrease);
-  // console.log("before", this.markers[id])
-  this.markers[id] = (this.markers[id] || 0) + amountToIncrease;
-  // console.log("after", this.markers[id])
-  if (this.markers[id] < 0 ) {
-    this.markers[id] = 0;
-  }
-}
-
-Visual.prototype.render = function () {
-  this.ctx.drawImage(image_ac, -this.width/2, -this.height/2, this.width, this.height);
-  Object.keys(this.markers).forEach(function (room) {
-    // console.log(this.markers);
-    // console.log("ROOOOOMMM", room);
-    // console.log(locations);
-    if (room && locations[room]) {
-      var x = locations[room].x, y = locations[room].y, radius = this.markers[room];
-      this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-    } else {
-      // console.log("no room")
-      // console.log(this.markers)
+  setInterval(function () {
+    // TODO! This may make rooms not have presentations
+    if (Date.now() - this._activetime > 60*1000*5) {
+      this.active(false);
     }
-  }.bind(this));
-};
+    this.size(Math.max(this._size - 0.01, 25))
+  }.bind(this), 100)
+}
 
-/**
- * Introduction code
- */
+Location.prototype.size = function (size) {
+  this._size = size;
+  this.$el.css({
+    width: size + 'px',
+    height: size + 'px',
+    lineHeight: size + 'px',
+    borderRadius: (size / 2) + 'px',
+    marginLeft: -size/2 + 'px',
+    marginTop: -size/2 + 'px',
+    fontSize: size / 10 + 'px'
+  });
+}
 
-var visual = new Visual(3000, 1200);
+Location.prototype.position = function (x, y) {
+  this.$el.css({
+    top: y + 'px',
+    left: x + 'px'
+  })
+}
+
+Location.prototype.confidence = function (conf) {
+  this.$el.css({
+    'opacity': conf
+  });
+}
+
+Location.prototype.active = function (flag) {
+  this._active = flag;
+  this._activetime = Date.now();
+  this.$el.css({
+    'background': flag ? 'red' : '#45f'
+  });
+}
+
+Location.prototype.bump = function (loc) {
+  this.active(true);
+  this.size(this._size + (200 - (this._size - 25)) / 4);
+}
+
+
+function createLocation (id, x, y) {
+  locations[id] = new Location(id, x, y);
+}
+
+createLocation("AC118", 500, -80);
+createLocation("AC1D1", 400, -100);
+createLocation("AC1D2", 250, -120);
+createLocation("AC1D3", 100, -130);
+createLocation("AC1D4", -50, -130);
+createLocation("AC1D5", -200, -105);
+createLocation("AC1D6", -350, -80);
+createLocation("AC1D7", -500, -30);
+createLocation("AC1D8", -650, 40);
+
 
 var api = olinexpo(function () {
-  // Loaded. Start rendering visual.
-  setInterval(visual.render.bind(visual), 50);
 
   // Listen the current locations of all ants (listenAll with history == false).
   // This callback will be called every time a person changes position, where
@@ -126,23 +151,17 @@ var api = olinexpo(function () {
   // all positions received by the client up until this point, and the third argument
   // is FALSE if the user has not been seen before (i.e. is a new user)
   api.listenAll(false, function (guess, guesses, isUpdate) {
-    visual.resetMarkers();
-    // console.log('reset');
     guesses.forEach(function (guess) {
+
       console.log(new Date());
-      console.log('Segment with location+user:', guess.location, guess.user);
-      if (guess.location) {
-        var user = api.getUserById(guess.user); // user object
-        // console.log("USER");
-        // console.log(user);
-        // console.log("guess");
-        // console.log(guess);
-        name = 'UKNOWN' + guess.user;
-        if (user) {
-          name = user.name;
+      console.log('Guess for location:', guess.location, 'user:', guess.user);
+
+      var location, user;
+      if (location = locations[guess.location]) {
+        if (user = api.getUserById(guess.user)) {
+          console.log("I think that", user.name, "is at", guess.location);
+          location.bump();
         }
-        console.log("I think that", name, "is at", guess.location);
-        visual.mark(guess.location, 5);
       }
     });
   });
