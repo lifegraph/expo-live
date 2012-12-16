@@ -252,7 +252,7 @@ var sampler = require('./sampler');
 
 app.get('/history/:uid', function (req, res) {
   var uid = req.params.uid;
-  cols.guesses.find({user: uid}).sort('end').toArray(function (err, guesses) {
+  cols.guesses.find({user: parseInt(uid)}).sort('end').toArray(function (err, guesses) {
     res.json(guesses.map(guessJSON));
   });
 });
