@@ -73,14 +73,14 @@ setInterval(function () {
   Object.keys(ants).forEach(function (antid) {
     var bind = ants[antid];
     $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
-      .insertAfter($("#ants li:last"))
+      .append($("#ants"))
       .find('b').html(timesince(bind.time));
   });
 
   Object.keys(colonies).forEach(function (colonyid) {
     var bind = colonies[colonyid];
     $('#colonies li[data-colony=' + JSON.stringify(colonyid) + ']')
-      .insertAfter($("#colonies li:last"))
+      .append($("#colonies"))
       .find('b').html(timesince(bind.time));
   });
 
