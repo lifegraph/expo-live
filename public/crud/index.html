@@ -48,6 +48,10 @@ var api = olinexpo(function () {
   });
 
   api._getColonies(function (err, colonies) {
+    colonies = colonies.sort(function (a, b) {
+      return a.id > b.id ? 1 : -1;
+    });
+
     colonies.forEach(function (colony) {
       var $row = $('<li data-colony="' + colony.id + '">').append($('<span class="lead"><b>Colony id:</b></span> ').append(colony.id)).appendTo('#colonies').append('<br><select class="locations"><option>---</option></select> <button class="btn btn-success">Update</button>')
       .on('click', '.btn-success', function () {
@@ -62,7 +66,9 @@ var api = olinexpo(function () {
       $('.select-colonies').append('<option value=' + JSON.stringify(colony.id) + '>' + colony.id + '</option>');
     })
 
-    api.locations.forEach(function (loc) {
+    api.locations.sort(function (a, b) { 
+      return a.id > b.id ? 1 : -1;
+    }).forEach(function (loc) {
       $('#colonies select').append($('<option value="' + loc.id + '">').text(loc.id));
     })
 

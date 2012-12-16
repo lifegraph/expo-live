@@ -124,6 +124,19 @@ var olinexpo = (function () {
     })[0];
   }
 
+  API.prototype.getPresentationByLocationAndTime = function (location, time) {
+    var dateTime = new Date(time); // get a date object
+    // We are going to store time as fractional pieces of an hour since 9AM
+    // range of 0-6
+    var testTime = (dateTime.getHours() - 9) + dateTime.getMinutes()/60;
+    return this.presentations.filter(function (item) {
+      var startTime = (item.start_hour + (item.start_hour > 6 ? -9 : 3)) + item.start_minute/60;
+      var duration = item.duration || 60; // default to 60 minutes since possibly null
+      var endTime = startTime + duration/60; // mod 12 since could wrap around 
+      return item.room == location && (testTime >= startTime) && (testTime < endTime);
+    })[0];
+  }
+
   API.prototype._listen = function (history, query, callback) {
     var cache = [];
     $.getJSON('http://' + olinexpoHost + '/guesses/?' + (history ? '' : 'latest&'), function (guesses) {

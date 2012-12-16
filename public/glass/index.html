@@ -3,35 +3,55 @@
 <html>
   <head>
     <style>
-    canvas { border: 1px solid red; }
+    html, body { margin: 0; padding: 0; background: #023; }
+    body { height: 5000px; zoom: 66%; padding-top: 200px; background: url(expolive.png) 60px 0 no-repeat; }
+    canvas { image-rendering: auto; display: block; }
     </style>
   </head>
   <body>
-    <canvas id="canvas" width="1000" height="400">Lol</canvas>
+    <canvas id="canvas" width="3000" height="1200">Lol</canvas>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/olinexpo.js"></script>
     <script>
 
-// Static mapping locations to graphical positions.
-// This needs to be fleshed out much more.
+/**
+ * Automatically zoom screen.
+ */
+
+/*
+function fitScreen () {
+  $('body').css('zoom', $(window).width()/3000*100 + '%'); 
+}
+$(window).on('resize', fitScreen);
+$(fitScreen);
+*/
+
+
+/**
+ * Static mapping locations to graphical positions.
+ * This needs to be fleshed out much more.
+ */
+
 var locations = {
-  "AC118": {x: -100, y: -25},
-  "AC316": {x:50, y: -100}, // made up numbers, not the real location
-  "AC3D1": {x:40, y:-50},
-  "AC3D2": {x:25, y:-50},
-  "AC3D3": {x:10, y:-50},
-  "AC3D4": {x:-5, y:-50},
-  "AC3D5": {x:-20, y:-50},
-  "AC3D6": {x:-35, y:-50}
+  "AC118": {x:50, y: -100}, // made up numbers, not the real location
+  "AC1D1": {x:40, y:-50},
+  "AC1D2": {x:25, y:-50},
+  "AC1D3": {x:10, y:-49},
+  "AC1D4": {x:-5, y:-45},
+  "AC1D5": {x:-20, y:-44},
+  "AC1D6": {x:-35, y:-43},
+  "AC1D7": {x:-50, y:-42},
+  "AC1D8": {x:-65, y:-40}
 };
+
 
 /**
  * Visual code
  */
 
 var image_ac = new Image();
-image_ac.src = 'ac1.png';
+image_ac.src = 'ac1-white.png';
 
 function Visual (width, height) {
   this.width = width;
@@ -40,10 +60,11 @@ function Visual (width, height) {
   var canvas = document.getElementById('canvas');
   this.ctx = canvas.getContext('2d');
   this.ctx.translate(width/2, height/2);
-  this.ctx.fillStyle = 'rgba(00,00,200,.5)';
+
+  this.ctx.fillStyle = 'rgba(200,220,0,.5)';
+  this.ctx.webkitImageSmoothingEnabled = true;
 
   // $(canvas).on('click', function (e) {
-  //   this.ctx.fillStyle = 'blue';
   //   e.offsetX -= cwidth / 2;
   //   e.offsetY -= cheight / 2;
   //   // drawMarker(this.ctx, e.offsetX, e.offsetY);
@@ -64,10 +85,10 @@ Visual.prototype.resetMarkers = function () {
 }
 
 Visual.prototype.mark = function (id, amountToIncrease) {
-  console.log("MARKING", id, amountToIncrease);
-  console.log("before", this.markers[id])
+  // console.log("MARKING", id, amountToIncrease);
+  // console.log("before", this.markers[id])
   this.markers[id] = (this.markers[id] || 0) + amountToIncrease;
-  console.log("after", this.markers[id])
+  // console.log("after", this.markers[id])
   if (this.markers[id] < 0 ) {
     this.markers[id] = 0;
   }
@@ -79,7 +100,7 @@ Visual.prototype.render = function () {
     // console.log(this.markers);
     // console.log("ROOOOOMMM", room);
     // console.log(locations);
-    if (room && room !== "null") {
+    if (room && locations[room]) {
       var x = locations[room].x, y = locations[room].y, radius = this.markers[room];
       this.ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
     } else {
@@ -93,7 +114,7 @@ Visual.prototype.render = function () {
  * Introduction code
  */
 
-var visual = new Visual(1000, 400);
+var visual = new Visual(3000, 1200);
 
 var api = olinexpo(function () {
   // Loaded. Start rendering visual.
@@ -111,12 +132,16 @@ var api = olinexpo(function () {
       console.log(new Date());
       console.log('Segment with location+user:', guess.location, guess.user);
       if (guess.location) {
-        // var user = api.getUserById(guess.user); // user object
+        var user = api.getUserById(guess.user); // user object
         // console.log("USER");
         // console.log(user);
         // console.log("guess");
         // console.log(guess);
-        console.log(guess.location);
+        name = 'UKNOWN' + guess.user;
+        if (user) {
+          name = user.name;
+        }
+        console.log("I think that", name, "is at", guess.location);
         visual.mark(guess.location, 5);
       }
     });

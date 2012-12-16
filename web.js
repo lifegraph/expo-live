@@ -24,15 +24,23 @@ var port = process.env.PORT || 5000;
  */
 
 var app = express();
-app.use(function(req, res, next) {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-  res.header('Access-Control-Allow-Headers', 'Content-Type');
-  next();
-});
 app.use(express.logger());
 app.use(express.bodyParser());
 app.use(express.static(__dirname + '/public'));
+
+app.all('*', function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'HEAD, GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, X-Requested-With, Origin, Accept');
+    res.header('Access-Control-Allow-Credentials', 'true');
+
+    if( req.method.toLowerCase() === "options" ) {
+        res.send(200);
+    }
+    else {
+        next();
+    }
+});
 
 var server = http.createServer(app);
 
@@ -50,12 +58,15 @@ function bindJSON (bind) {
     colony: bind.colony,
     time: bind.time,
     user: bind.user,
-    location: bind.location
+    location: bind.location,
+    queen: bind.queen,
+    ping: bind.ping
   };
 }
 
 // GET /binds
 
+/*
 app.get('/binds', function (req, res) {
   var first = null;
   res.write('[');
@@ -70,6 +81,7 @@ app.get('/binds', function (req, res) {
     res.write(JSON.stringify(bind));
   });
 });
+*/
 
 // POST /hardware? ant=<ant id> && colony=<colony id>
 // This creates a new bind. Associations between ants <=> users
@@ -77,6 +89,7 @@ app.get('/binds', function (req, res) {
 // this information.
 
 app.post('/binds', function (req, res) {
+  var timeChunk = Math.floor(Date.now() / (25 * 1000)); // grab the 5-minute chunk of time since the ping_id's will reset eventually
   if (!req.body.ant || !req.body.colony) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
@@ -84,26 +97,39 @@ app.post('/binds', function (req, res) {
   var bind = {
     ant: req.body.ant,
     colony: req.body.colony,
+    ping: 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony,
+    queen: req.body.queen,
     time: Date.now()
   };
 
-  // Find corresponding user and location.
-  cols.ants.findOne({
-    _id: bind.ant
-  }, function (err, ant) {
-    ant && (bind.user = ant.user);
-    cols.colonies.findOne({
-      _id: bind.colony
-    }, function (err, colony) {
-      colony && (bind.location = colony.location);
+  cols.binds.findOne({
+    ping: bind.ping
+  }, function(err, repeatBind) {
+    if (repeatBind) { // if it is double posted data (2+ queens reporting)
+      console.log("Got a repeat bind", bind.ping);
+      return res.json({message: 'Repeat Bind. Already accounted for.', ping: bind.ping }, 409);
+    } else { // haven't seen this bind before.
+      // Find corresponding user and location.
+      cols.ants.findOne({
+        _id: bind.ant
+      }, function (err, ant) {
+        ant && (bind.user = ant.user);
+        cols.colonies.findOne({
+          _id: bind.colony
+        }, function (err, colony) {
+          colony && (bind.location = colony.location);
 
-      // Insert bind.
-      cols.binds.insert(bind, function (err) {
-        io.sockets.emit('bind', bind);
-        res.json({message: 'Succeeded in adding bind.'});
+          // Insert bind.
+          cols.binds.insert(bind, function (err) {
+            io.sockets.emit('bind', bind);
+            // console.log('New bind:', bind);
+            res.json({message: 'Succeeded in adding bind.'});
+          });
+        });
       });
-    });
+    }
   });
+  
 });
 
 // GET /binds/<bind id>
@@ -161,14 +187,14 @@ app.del('/guesses', function (req, res) {
 // GET /guesses
 
 app.get('/guesses', function (req, res) {
-  var crit = {}, sort = 'start';
+  var filterCriteria = {}, sort = 'start';
 
   // Query from ants, which have a .guess ID.
   if ('latest' in req.query) {
     if (req.query.ant) {
-      crit.ant = req.query.ant;
+      filterCriteria.ant = req.query.ant;
     }
-    cols.ants.find(crit).toArray(function (id, ants) {
+    cols.ants.find(filterCriteria).toArray(function (id, ants) {
       async.map(ants, function (ant, next) {
         if (!ant.guess) {
           next(null, null);
@@ -188,24 +214,24 @@ app.get('/guesses', function (req, res) {
   // Query from guesses collection.
   } else {
     if (req.query.ant) {
-      crit.ant = req.query.ant;
+      filterCriteria.ant = req.query.ant;
     }
     if (req.query.colony) {
-      crit.colony = req.query.colony;
+      filterCriteria.colony = req.query.colony;
     }
     if (req.query.user) {
-      crit.user = req.query.user;
+      filterCriteria.user = req.query.user;
     }
     if (req.query.location) {
-      crit.location = req.query.location;
+      filterCriteria.location = req.query.location;
     }
     if (req.query.presentation) {
-      crit.presentation = req.query.presentation;
+      filterCriteria.presentation = req.query.presentation;
     }
     if (req.query.sort == 'latest') {
       sort = 'end';
     }
-    cols.guesses.find(crit).sort(sort).toArray(function (err, guesses) {
+    cols.guesses.find(filterCriteria).sort(sort).toArray(function (err, guesses) {
       res.json(guesses.map(guessJSON));
     });
   }
@@ -224,6 +250,17 @@ app.get('/guesses/:id', function (req, res) {
  */
 
 var sampler = require('./sampler');
+
+/**
+ * History endpoint
+ */
+
+app.get('/history/:uid', function (req, res) {
+  var uid = req.params.uid;
+  cols.guesses.find({user: parseInt(uid)}).toArray(function (err, guesses) {
+    res.json(guesses.sort(function(a,b) { return a.time < b.time ? 1 : -1}).map(guessJSON));
+  });
+});
 
 /*
  * Ants
@@ -258,8 +295,8 @@ app.put('/ants/:id', function (req, res) {
   var ant = {
     _id: String(req.params.id)
   };
-  if (req.body.user) {
-    ant.user = parseInt(req.body.user)
+  if ('user' in req.body) {
+    ant.user = req.body.user || null;
   }
   cols.ants.update({
     _id: String(req.params.id)
@@ -326,6 +363,7 @@ function userJSON (user) {
     id: user.id,
     name: user.name,
     facebookid: user.facebookid,
+    created_at: user.created_at,
     email: user.email
   };
 }

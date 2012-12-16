@@ -17,19 +17,27 @@ require('colors');
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 */
 
+var COLONIES = ['0019', '0008', '002C', '0024', '0025', '002A', '001B', '001E'];
+
 var nearby = {
-  "01": ["02"],
-  "02": ["01", "03"],
-  "03": ["02", "06"],
-  "06": ["03", "07"],
-  "06": ["06"]
+  '0019': ['0008'],
+  '0008': ['0019', '002C'],
+  '002C': ['0008', '0024'],
+  '0024': ['002C', '0025'],
+  '0025': ['0024', '002A'],
+  '002A': ['0025', '001B'],
+  '001B': ['002A', '001E'],
+  '001E': ['001B']
 };
 var farby = {
-  "01": ["03"],
-  "02": ["06"],
-  "03": ["01", "07"],
-  "06": ["02"],
-  "07": ["03"]
+  '0019': ['002C'],
+  '0008': ['0024'],
+  '002C': ['0019', '0025'],
+  '0024': ['0008', '002A'],
+  '0025': ['002C', '001B'],
+  '002A': ['0024', '001E'],
+  '001B': ['0025'],
+  '001E': ['002A']
 };
 
 /*
@@ -63,7 +71,7 @@ var CONFIDENCE_SUCCESSFUL = 0, CONFIDENCE_TOTAL = 0, CONFIDENCE_DROPPED = 0;
 
 // Variables.
 var GUESS_INTERVAL = process.env.GUESS_INTERVAL || 10*1000;
-var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || 3*60*1000;
+var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || (1/3)*60*1000;
 var CONFIDENCE_CUTOFF = 0.70;
 var ADEQUATE_THRESHOLD = 8; // Threshold for confidence by # of binds available.
 var ADEQUATE_THRESHOLD_LIMIT = 0; // Threshold for limit of # of binds.
