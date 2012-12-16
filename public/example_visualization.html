@@ -21,7 +21,7 @@
 
 </style>
 <script>
-var colonyId = "FF02";
+var colonyId = "FF03";
 var resetDisplayTimeout = null;
 var lasttime = 0;
 console.log("hi"); 
@@ -39,7 +39,7 @@ var api = olinexpo(function () {
     if (colonyId == bind.colony) {
       if (bind.user) {
         console.log("Found a user!");
-        var user = api.users[bind.user];
+        var user = api.getUserById(bind.user);
         console.log(user);
         var time = Date.now();
         console.log(time - lasttime);

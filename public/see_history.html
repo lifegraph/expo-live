@@ -21,7 +21,7 @@
 
 </style>
 <script>
-var colonyId = "FF02"; // the colony ID used for this display
+var colonyIds = ["FF03", "FF04"]; // the colony IDs used for this display
 var resetDisplayTimeout = null;
 var lasttime = 0;
 
@@ -37,13 +37,15 @@ var api = olinexpo(function () {
     console.log("bind");
     console.log(bind);
 
-    clearTimeout(resetDisplayTimeout);
-    resetDisplayTimeout = setTimeout(resetDisplay, 3000);
+    
 
-    if (colonyId == bind.colony) {
+    if (colonyIds.indexOf(bind.colony) > -1) {
+      console.log("YAY")
+      clearTimeout(resetDisplayTimeout);
+      resetDisplayTimeout = setTimeout(resetDisplay, 5000);
       if (bind.user) {
         console.log("Found a user!");
-        var user = api.users[bind.user];
+        var user = api.getUserById(bind.user);
         console.log(user);
         var time = Date.now();
         console.log(time - lasttime);
@@ -53,16 +55,18 @@ var api = olinexpo(function () {
         }
         if (user.id) {
           $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (guesses) {
+            var $newHistory = $('<ul></ul>');
             guesses.forEach(function(guess) {
               var location = guess.location, time = guess.time;
               console.log(guess);
               if (time && location) {
-                var presentation = api.getPresentationByLocationAndTime(location, time);
+                var presentation = api.getPresentationByLocationAndTime(location, time + 9 * 60 * 60 * 1000);
                 if (presentation) {
-                  $('#history').append($('<li></li>').text( presentation.presentation_title ));
+                  $newHistory.append($('<li></li>').text( presentation.presentation_title + " : " + presentation.room + " : " + new Date(time)));
                 }
               }
-            })
+            });
+            $('#history').html($newHistory.html());
           });
         }
           
