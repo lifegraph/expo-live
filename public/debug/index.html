@@ -70,7 +70,7 @@ setInterval(function () {
   Object.keys(colonies).forEach(function (antid) {
     var bind = ants[antid];
     $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
-      .addClass('flash');
+      .addClass('flash')
       .find('b').html(timesince(bind.time));
   });
 
