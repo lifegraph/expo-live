@@ -4,30 +4,46 @@
   <head>
     <style>
 
+.flash { background: yellow; }
+.unflash { -webkit-transition: background 1s; }
+
     </style>
     <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
   </head>
   <body>
 
-<h3>Binds</h3>
-<ul id="binds"></ul>
+<h1>Diagnostics Page</h1>
+
+<h3>Ants</h3>
+<ul id="ants"></ul>
+
+<h3>Colonies</h3>
+<ul id="colonies"></ul>
 
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/olinexpo.js"></script>
     <script>
 
-var lastbind = {};
+var ants = {}, colonies = {};
 
 var api = olinexpo(function () {
   api._listenBinds(function (bind) {
-    var $row = $('#binds li[data-ant=' + JSON.stringify(bind.ant) + ']');
-    if (!$row[0]) {
-      $row = $('<li data-ant=' + JSON.stringify(bind.ant) + '><h4></h4><span>Time since last bind: <b></b></span></li>').appendTo($('#binds'));
-      $row.find('h4').text(bind.ant);
+    // ant row
+    if (!$('#ants li[data-ant=' + JSON.stringify(bind.ant) + ']')[0]) {
+      $('<li data-ant=' + JSON.stringify(bind.ant) + '><h4></h4><span>Time since last bind: <b></b></span></li>')
+        .appendTo($('#ants'))
+        .find('h4').text(bind.ant);
+    }
+    // colony row
+    if (!$('#colonies li[data-ant=' + JSON.stringify(bind.ant) + ']')[0]) {
+      $('<li data-colony=' + JSON.stringify(bind.ant) + '><h4></h4><span>Time since last bind: <b></b></span></li>')
+        .appendTo($('#colonies'))
+        .find('h4').text(bind.colony);
     }
 
-    lastbind[bind.ant] = bind;
+    ants[bind.ant] = bind;
+    colonies[bind.colony] = bind;
   })
 });
 
@@ -44,11 +60,23 @@ function timesince (d) {
 }
 
 setInterval(function () {
-  Object.keys(lastbind).forEach(function (antid) {
-    var bind = lastbind[antid];
-    var $row = $('#binds li[data-ant=' + JSON.stringify(antid) + ']');
-    $row.find('b').html(timesince(bind.time));
+  Object.keys(ants).forEach(function (antid) {
+    var bind = ants[antid];
+    $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
+      .addClass('flash')
+      .find('b').html(timesince(bind.time));
   });
+
+  Object.keys(colonies).forEach(function (antid) {
+    var bind = ants[antid];
+    $('#ants li[data-ant=' + JSON.stringify(antid) + ']')
+      .addClass('flash');
+      .find('b').html(timesince(bind.time));
+  });
+
+  setTimeout(function () {
+    $('.flash').removeClass('flash').addClass('unflash');
+  }, 10);
 }, 200);
 
     </script>
