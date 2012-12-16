@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+
+<html>
+<body>
+  <div class="container-fluid">
+    <h2>Presentation Viewer Extreme Mode</h2>
+  </div>
+<br>
+
+<hr>
+
+
+<h2 id="person">Waiting for person.</h2>
+<ul id="history"></ul>
+
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/olinexpo.js"></script>
+<style>
+
+</style>
+<script>
+var colonyId = "FF02"; // the colony ID used for this display
+var resetDisplayTimeout = null;
+var lasttime = 0;
+
+function resetDisplay() {
+  $('#history').html('');
+  $('#person').text('Waiting for person.');
+}
+
+console.log("hi"); 
+
+var api = olinexpo(function () {
+  api._listenBinds(function (bind) {
+    console.log("bind");
+    console.log(bind);
+
+    clearTimeout(resetDisplayTimeout);
+    resetDisplayTimeout = setTimeout(resetDisplay, 3000);
+
+    if (colonyId == bind.colony) {
+      if (bind.user) {
+        console.log("Found a user!");
+        var user = api.users[bind.user];
+        console.log(user);
+        var time = Date.now();
+        console.log(time - lasttime);
+        lasttime = time;
+        if (user.name) {
+          $('#person').text("Welcome " + user.name + "!");
+        }
+        if (user.id) {
+          $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (guesses) {
+            guesses.forEach(function(guess) {
+              var location = guess.location, time = guess.time;
+              console.log(guess);
+              if (time && location) {
+                var presentation = api.getPresentationByLocationAndTime(location, time);
+                if (presentation) {
+                  $('#history').append($('<li></li>').text( presentation.presentation_title ));
+                }
+              }
+            })
+          });
+        }
+          
+      } else {
+        $('#person').text("Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?");
+        $('#history').html('');
+      }
+    }
+  })
+});
+
+</script>
+</div>
+</body>
+</html>
