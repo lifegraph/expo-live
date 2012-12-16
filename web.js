@@ -85,6 +85,7 @@ app.get('/binds', function (req, res) {
 // this information.
 
 app.post('/binds', function (req, res) {
+  var timeChunk = Math.floor(Date.now() / (5 * 1000 * 60 )); // grab the 5-minute chunk of time since the ping_id's will reset eventually
   if (!req.body.ant || !req.body.colony) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
@@ -92,26 +93,38 @@ app.post('/binds', function (req, res) {
   var bind = {
     ant: req.body.ant,
     colony: req.body.colony,
+    ping: String(req.body.ping) + String(timeChunk),
     time: Date.now()
   };
 
-  // Find corresponding user and location.
-  cols.ants.findOne({
-    _id: bind.ant
-  }, function (err, ant) {
-    ant && (bind.user = ant.user);
-    cols.colonies.findOne({
-      _id: bind.colony
-    }, function (err, colony) {
-      colony && (bind.location = colony.location);
+  cols.binds.findOne({
+    ping: bind.ping
+  }, function(err, repeatBind) {
+    if (repeatBind) { // if it is double posted data (2+ queens reporting)
+      console.log("Got a repeat bind", bind.ping);
+      return res.json({message: 'Repeat Bind. Already accounted for.'}, 409);
+    } else { // haven't seen this bind before.
+      // Find corresponding user and location.
+      cols.ants.findOne({
+        _id: bind.ant
+      }, function (err, ant) {
+        ant && (bind.user = ant.user);
+        cols.colonies.findOne({
+          _id: bind.colony
+        }, function (err, colony) {
+          colony && (bind.location = colony.location);
 
-      // Insert bind.
-      cols.binds.insert(bind, function (err) {
-        io.sockets.emit('bind', bind);
-        res.json({message: 'Succeeded in adding bind.'});
+          // Insert bind.
+          cols.binds.insert(bind, function (err) {
+            io.sockets.emit('bind', bind);
+            // console.log('New bind:', bind);
+            res.json({message: 'Succeeded in adding bind.'});
+          });
+        });
       });
-    });
+    }
   });
+  
 });
 
 // GET /binds/<bind id>
@@ -169,14 +182,14 @@ app.del('/guesses', function (req, res) {
 // GET /guesses
 
 app.get('/guesses', function (req, res) {
-  var crit = {}, sort = 'start';
+  var filterCriteria = {}, sort = 'start';
 
   // Query from ants, which have a .guess ID.
   if ('latest' in req.query) {
     if (req.query.ant) {
-      crit.ant = req.query.ant;
+      filterCriteria.ant = req.query.ant;
     }
-    cols.ants.find(crit).toArray(function (id, ants) {
+    cols.ants.find(filterCriteria).toArray(function (id, ants) {
       async.map(ants, function (ant, next) {
         if (!ant.guess) {
           next(null, null);
@@ -196,24 +209,24 @@ app.get('/guesses', function (req, res) {
   // Query from guesses collection.
   } else {
     if (req.query.ant) {
-      crit.ant = req.query.ant;
+      filterCriteria.ant = req.query.ant;
     }
     if (req.query.colony) {
-      crit.colony = req.query.colony;
+      filterCriteria.colony = req.query.colony;
     }
     if (req.query.user) {
-      crit.user = req.query.user;
+      filterCriteria.user = req.query.user;
     }
     if (req.query.location) {
-      crit.location = req.query.location;
+      filterCriteria.location = req.query.location;
     }
     if (req.query.presentation) {
-      crit.presentation = req.query.presentation;
+      filterCriteria.presentation = req.query.presentation;
     }
     if (req.query.sort == 'latest') {
       sort = 'end';
     }
-    cols.guesses.find(crit).sort(sort).toArray(function (err, guesses) {
+    cols.guesses.find(filterCriteria).sort(sort).toArray(function (err, guesses) {
       res.json(guesses.map(guessJSON));
     });
   }
@@ -232,6 +245,17 @@ app.get('/guesses/:id', function (req, res) {
  */
 
 var sampler = require('./sampler');
+
+/**
+ * History endpoint
+ */
+
+app.get('/history/:uid', function (req, res) {
+  var uid = req.params.uid;
+  cols.guesses.find({user: uid}).sort('end').toArray(function (err, guesses) {
+    res.json(guesses.map(guessJSON));
+  });
+});
 
 /*
  * Ants

@@ -21,7 +21,7 @@
 
 </style>
 <script>
-var colonyId = "02FF";
+var colonyId = "FF02";
 var resetDisplayTimeout = null;
 var lasttime = 0;
 console.log("hi"); 
@@ -34,6 +34,8 @@ var api = olinexpo(function () {
   api._listenBinds(function (bind) {
     console.log("bind");
     console.log(bind);
+    clearTimeout(resetDisplayTimeout);
+    resetDisplayTimeout = setTimeout(function(){ $('#people').text('')}, 3000);
     if (colonyId == bind.colony) {
       if (bind.user) {
         console.log("Found a user!");
@@ -43,13 +45,15 @@ var api = olinexpo(function () {
         console.log(time - lasttime);
         lasttime = time;
         if (user.name) {
-          clearTimeout(resetDisplayTimeout);
+          
           $('#people').text(user.name);
           if (user.facebookid) {
             var fbid = user.facebookid;
           }
-          resetDisplayTimeout = setTimeout(function(){ $('#people').text('')}, 3000);
+          
         }
+      } else {
+        $('#people').text("Hello there ant user " + bind.ant +". Want to log in with Facebook?");
       }
     }
   })
