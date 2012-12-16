@@ -39,7 +39,7 @@ var api = olinexpo(function () {
     $row.addClass('flash');
 
     // colony row
-    var $row = $('#colonies li[data-ant=' + JSON.stringify(bind.colony) + ']');
+    var $row = $('#colonies li[data-colony=' + JSON.stringify(bind.colony) + ']');
     if (!$row[0]) {
       $row = $('<li data-colony=' + JSON.stringify(bind.colony) + '><h4></h4><span>Time since last bind: <b></b></span></li>')
         .appendTo($('#colonies'));
