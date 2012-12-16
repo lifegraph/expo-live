@@ -1,141 +1,52 @@
 <!DOCTYPE html>
 
 <html>
-<body>
-  <div class="container-fluid">
-  <h2>Antfarm Debug</h2>
-<b>Data:</b> <a href="/segments/?latest" class="btn">Current Segments</a>
-<a href="/ants/" class="btn">Ants</a>
-<a href="/colonies/" class="btn">Colonies</a>
-<a href="/users/" class="btn">Users</a>
-<a href="/locations/" class="btn">Locations</a>
-<a href="/presentations/" class="btn">Presentations</a>
-<br>
+  <head>
+    <style>
 
-<hr>
+    </style>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+  </head>
+  <body>
 
+<h3>Binds</h3>
+<ul id="binds"></ul>
 
-<b>Toggle:</b> <span class="btn" onclick="$('blockquote').toggle()">Last Received</span>
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="http://api.olinexpo.com/olinexpo.js"></script>
+    <script>
 
-<div id="results"></div>
-
-<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
-<script src="http://code.jquery.com/jquery.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/olinexpo.js"></script>
-<style>
-th, td { border: 1px solid #aaa; width: 2em; } table { border-collapse: collapse; }
-.ping { font-weight: bold; background: yellow; }
-.ant { width: 30%; float: left; margin-right: 1%;}
-td.unping {
--webkit-transition-property: background-color, font-weight; 
--webkit-transition-duration: 1s, 1s; 
--webkit-transition-timing-function: linear, linear;
-}
-</style>
-<script>
-
-var segments = {};
+var lastbind = {};
 
 var api = olinexpo(function () {
-  var segments = [];
-  api.listenAll(false, function (seg, _segments, isUpdate) {
-    var col = Number(seg.colony.substr(-3))
-    if (!isUpdate) {
-      addAnt(seg);
-    }
-    $('#results div[data-ant="' + seg.ant + '"] td').text(0)
-    $($('#results div[data-ant="' + seg.ant + '"] th').css('background-color', 'white').get(col - 1)).css('background-color', '#0f0');
-    segments = _segments;
-  });
-  setInterval(function () {
-    segments.map(updateAnt);
-  }, 100);
-
   api._listenBinds(function (bind) {
-    var col = Number(bind.colony.substr(-3))
-    var $td = $($('#results div[data-ant="' + bind.ant + '"] td').get(col - 1));
-    $td.text(Number($td.text()) + 1).addClass('ping').removeClass('unping');
+    var $row = $('#binds li[data-ant=' + JSON.stringify(bind.ant) + ']');
+    if (!$row[0]) {
+      $row = $('<li data-ant=' + JSON.stringify(bind.ant) + '><h4></h4><span>Time since last bind: <b></b></span></li>').appendTo($('#binds'));
+      $row.find('h4').text(bind.ant);
+    }
 
-    var $td1 = $($('#results div[data-ant="' + bind.ant + '"] td').get(col - 2));
-    $td1.text(Number($td1.text()) + 0.5);
-
-    var $td2 = $($('#results div[data-ant="' + bind.ant + '"] td').get(col));
-    $td2.text(Number($td2.text()) + 0.5);
-
-    setTimeout(function () {
-      $td.removeClass('ping').addClass('unping')
-    }, 500);
+    lastbind[bind.ant] = bind;
   })
 });
 
-function readableTimedelta (s) {
-  return (0|(s/3600)) + ' hours, ' + (0|((s % 3600)/60)) + ' minutes, ' + (0|((s%60))) + ' seconds'
+function timesince (d) {
+  var delta = Date.now() - d;
+  var seconds = delta % 60;
+  var minutes = (0|(delta / 60)) % 60;
+  var hours = (0|(delta / 3600));
+  return hours + ' hours, ' + minutes + ' minutes, ' + seconds + ' seconds';
 }
 
-function addAnt (seg) {
-  var row;
-  $('#results').append(row = $('<div class="ant" data-ant=' + seg.ant + '>' +
-    '<h3><b>Ant: ' + seg.ant + '</b> <small class="muted time"></small> <a class="btn btn-mini btn-danger">Delete</a></h3>' +
-    'User: <select><option>Select a user</option></select><br>' +
-    '<table>' +
-    '<tr><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th><th>8</th></tr>' +
-    '<tr><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>' +
-    '<blockquote></blockquote></div>').on('click', '.btn', function () {
-      if (confirm('Are you sure you wanna delete these binds?')) {
-        $.ajax({
-          type: 'DELETE',
-          url: '/segments/?ant=' + seg.ant,
-          success: function (res, error) {
-            console.log(error);
-            window.location.reload();
-          }
-        });
-      }
-    }));
-
-  row.on('dblclick', 'h3', function () {
-    var name;
-    if (name = prompt('Name:')) {
-      $('b', this).text(name);
-    }
-  })
-
-  $('td', row).text('0');
-
-  api.users.forEach(function (user) {
-    $('select', row).append($('<option>').val(user.id).text(user.name));
+setInterval(function () {
+  Object.keys(lastbind).forEach(function (antid) {
+    var bind = lastbind[antid];
+    var $row = $('#binds li[data-ant=' + JSON.stringify(antid) + ']');
+    $row.find('b').text(timesince(bind.time));
   });
-  $('select', row).val(seg.user).on('change', function () {
-    api._assignAnt(seg.ant, this.value, function () {
-      console.log('Ant', seg.ant, 'assigned.');
-    })
-  })
-}
+}, 200);
 
-function readableDate (date) {
-  return String(new Date(date)).split(/\s+/g).slice(0, 5).join(' ');
-}
-
-function updateAnt (seg) {
-  var running_s = 0; //Math.round((seg.end - seg.start)/1000);
-  var latest_s = Math.round((Date.now() - seg.time)/1000);
-
-  var row = $('#results div[data-ant="' + seg.ant + '"]');
-
-  //row.find('small.time').html('<b>Start:</b>' + readableDate(seg.start) + '&nbsp;&nbsp;&nbsp;<b>Latest:</b>' + readableDate(seg.end));
-  row.find('small.time').text(seg.colony);
-  row.find('blockquote').html(
-    '<b>Ran for:</b> ' + 
-      readableTimedelta(running_s) + '<br>' +
-    (latest_s > 60 ? '<span style="color: red">' : '') +
-    '<b>Time since latest:</b> ' +
-      readableTimedelta(latest_s) +
-    (latest_s > 60 ? '</span>' : '')
-    );
-}
-
-</script>
-</div>
-</body>
+    </script>
+  </body>
 </html>
