@@ -17,7 +17,7 @@ var api = olinexpo(function () {
     });
 
     colonies.forEach(function (colony) {
-      var $row = $('<li data-colony="' + colony.id + '">').append($('<span class="lead"><b>Colony id:</b></span> ').append(colony.id)).appendTo('#colonies').append('<br><select class="locations"><option>---</option></select> <button class="btn btn-success">Update</button>')
+      var $row = $('<li data-colony="' + colony.id + '">').append($('<span class="lead"><b>Colony id:</b></span> ').append(colony.id)).appendTo('#colonies').append('<br><select class="locations"><option>---</option></select>')
       .on('change', 'select.locations', function () {
         var locid = $row.find('select.locations').val();
         if (locid) {
