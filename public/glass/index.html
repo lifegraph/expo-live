@@ -17,6 +17,8 @@ td { vertical-align: middle; padding-top: 200px; }
 .marker {
   -webkit-user-select: none;
   text-align: center;
+  color: white;
+  text-shadow: black 0 2px 2px;
   width: 0;
   height: 0;
   -webkit-transition-property: height, width, border-radius, margin-left, margin-top, line-height, font-size, color;
@@ -64,7 +66,7 @@ function Location (id, x, y) {
   this.y = y;
 
   this.$el = $('<div class="marker">').appendTo('#center');
-  this.$el.text(id);
+  this.$el.text(id.replace(/^AC[0-9]D/, ''));
   this.$el.css({ position: 'absolute', background: 'red' });
   this.$el.tooltip({
     title: id
@@ -97,7 +99,7 @@ Location.prototype.size = function (size) {
     borderRadius: (size / 2) + 'px',
     marginLeft: -size/2 + 'px',
     marginTop: -size/2 + 'px',
-    fontSize: size / 10 + 'px'
+    fontSize: size / 5 + 'px'
   });
 }
 
@@ -109,17 +111,16 @@ Location.prototype.position = function (x, y) {
 }
 
 Location.prototype.confidence = function (conf) {
+  this._conf = conf || 1.0;
   this.$el.css({
-    'opacity': conf
+    'background-color': (this._active ? 'rgba(255, 0, 0' : 'rgba(50, 60, 255') + ', ' + (this._conf || 1.0) + ')'
   });
 }
 
 Location.prototype.active = function (flag) {
   this._active = flag;
   this._activetime = Date.now();
-  this.$el.css({
-    'background': flag ? 'red' : '#45f'
-  });
+  this.confidence(this._conf);
 }
 
 Location.prototype.bump = function (loc) {
