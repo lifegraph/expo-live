@@ -705,7 +705,9 @@ function setupMongo (next) {
       console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', presid);
       try {
         makeVisitedOpenGraphRequest(userid, presid);
-      } catch (e) { }
+      } catch (e) {
+        console.error('OPENGRAPH:', e);
+      }
     });
 
     next();

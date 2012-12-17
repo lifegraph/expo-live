@@ -290,7 +290,9 @@ function historySampler (cols, opengraphPost) {
                     try {
                       console.log('OPENGRAPH: HISTORY threshold', ant.user, colony.location);
                       opengraphPost(ant.user, colony.location);
-                    } catch (e) { }
+                    } catch (e) {
+                      console.error('OPENGRAPH: opengraphPost', e);
+                    }
                   }
                 });
               } else {
