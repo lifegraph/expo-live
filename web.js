@@ -700,6 +700,7 @@ function setupMongo (next) {
         }
       });
     }, function (userid, locid) {
+      console.log('Making open graph posting...');
       var presid = getPresentationByLocation(new Date(), locid);
       console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', presid);
       try {

@@ -288,7 +288,7 @@ function historySampler (cols, opengraphPost) {
                 }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
                   if (arr.length == HISTORY_THRESHOLD) {
                     try {
-                      console.log('BIG HISTORY threshold.');
+                      console.log('OPENGRAPH: HISTORY threshold', ant.user, colony.location);
                       opengraphPost(ant.user, colony.location);
                     } catch (e) { }
                   }
