@@ -543,7 +543,9 @@ app.get('/locations', function (req, res) {
       console.log(result);
       res.json(result.rows.map(locationJSON).filter(function (loc) {
         return loc.id;
-      }).concat(['AC318', 'AC328', 'AC3D40', 'AC3D39']));
+      }).concat(['AC318', 'AC328', 'AC3D40', 'AC3D39'].map(function (k) {
+        return {id: k}
+      })));
     }
   });
 });
