@@ -117,7 +117,7 @@ function sampler (cols, callback, opengraphPost) {
       setTimeout(consumeBinds, 200);
 
       // Consume next binds.
-      setTimeout(sampler.bind(this, cols, callback), GUESS_INTERVAL);
+      setTimeout(sampler.bind(this, cols, callback, opengraphPost), GUESS_INTERVAL);
     } else {
       try {
         consumeGuess(guesses, bind, querytime, currenttime);
