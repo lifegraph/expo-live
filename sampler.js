@@ -101,10 +101,10 @@ function sampler (cols, callback) {
 
   // Log some sod.
   console.log('\nGuessing location based on binds from', querytime, 'to', currenttime);
-  console.log('Incorrectest ants:', JSON.stringify(INCORRECT_ANTS));
-  console.log('Incorrectest colonies:', JSON.stringify(INCORRECT_COLS));
-  console.log(new Date(querytime));
-  console.log('-----------------');
+  //console.log('Incorrectest ants:', JSON.stringify(INCORRECT_ANTS));
+  //console.log('Incorrectest colonies:', JSON.stringify(INCORRECT_COLS));
+  //console.log(new Date(querytime));
+  //console.log('-----------------');
 
   cols.binds.find({
     time: {
@@ -183,9 +183,11 @@ function sampler (cols, callback) {
           });
 
           // Add guess to history cache.
-          (history[antid] || (history[antid] = {}));
-          history[antid][colony.location] || (history[antid][colony.location] = 0);
-          history[antid][colony.location]++;
+          if (colony && colony.location && ant && ant.user) {
+            (historyCache[antid] || (historyCache[antid] = {}));
+            historyCache[antid][colony.location] || (historyCache[antid][colony.location] = 0);
+            historyCache[antid][colony.location]++;
+          }
         });
       })
 
@@ -255,6 +257,7 @@ function historySampler (cols) {
           if (ant && ant.user && colony && colony.location) {
 
             // Create history element
+            console.log('History ==> User', ant.user, 'was at', colony.location, 'for a minute');
             cols.history.insert({
               time: Date.now(),
               ant: antid,

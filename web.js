@@ -286,6 +286,33 @@ app.get('/guesses/:id', function (req, res) {
   });
 });
 
+/**
+ * New History
+ */
+
+app.get('/guesses', function (req, res) {
+  var filterCriteria = {}, sort = 'start';
+
+  if (req.query.ant) {
+    filterCriteria.ant = req.query.ant;
+  }
+  if (req.query.colony) {
+    filterCriteria.colony = req.query.colony;
+  }
+  if (req.query.user) {
+    filterCriteria.user = req.query.user;
+  }
+  if (req.query.location) {
+    filterCriteria.location = req.query.location;
+  }
+  if (req.query.sort == 'latest') {
+    sort = 'end';
+  }
+  cols.history.find(filterCriteria).sort(sort).toArray(function (err, guesses) {
+    res.json(guesses.map(guessJSON));
+  });
+});
+
 /** 
  * Create guesses
  */
