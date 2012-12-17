@@ -3,17 +3,24 @@
 <html>
 <body>
   <div class="container-fluid">
-    <h2>Presentation Viewer Extreme Mode</h2>
-  </div>
-<br>
-
-<hr>
-
-
-<h2 id="person">Waiting for person.</h2>
-<ul id="history"></ul>
-
+    <h2 id='top'>Presentation Viewer Extreme Mode</h2>
+  
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+
+<style>
+body { padding-left: 30px; }
+h2#top { font-size: 24px; font-weight: normal; }
+#person { font-size: 30px; }
+ul { margin: 0; padding: 0; border: 1px solid #ddd; }
+ul > div { padding: 20px 20px; font-size: 18px; }
+ul > div:nth-child(2n+2) { background: #eee; border: 1px solid #bbb; border-width: 1px 0; }
+</style>
+
+
+<h2 id="person">Waiting for person...</h2>
+<ul id="history"></ul>
+</div>
+
 <script src="http://code.jquery.com/jquery.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="/olinexpo.js"></script>
@@ -42,6 +49,8 @@ function getParameterByName(name)
 
 function resetDisplay() {
   // $('#history').html('');
+  // console.log('updating.');
+  // console.log($newHistory.html())
   $('#person').text(persontext);
   $('#history').replaceWith($newHistory);
   console.log("Updated display");
@@ -87,7 +96,7 @@ function updateIdsAndGetBestId(userid, bindtime) {
 }
 
 console.log("hi"); 
-setInterval(resetDisplay, 10 * 1000);
+// setInterval(resetDisplay, 10 * 1000);
 
 var api = olinexpo(function () {
   api._listenBinds(function (bind) {
@@ -99,38 +108,50 @@ var api = olinexpo(function () {
     if (colonyIds.indexOf(bind.colony) > -1) {
       console.log("YAY")
       // clearTimeout(resetDisplayTimeout);
-      if (bind.user) {
-        console.log("Found a user!");
+      if (bind.user) {                         
+        $('#top').css("color", "rgb(" + Math.floor(Math.random()*255) + ","+ Math.floor(Math.random()*255) + ","+ Math.floor(Math.random()*255) + ")" );
+        console.log("Found a user!", bind.user);
         var user = api.getUserById(bind.user);
-        console.log(user);
+        // console.log(user);
         var time = Date.now();
-        console.log(time - lasttime);
+        // console.log(time - lasttime);
         lasttime = time;
         if (user.id) {
-          var bestId = updateIdsAndGetBestId(user.id, bind.time);
-          var user = api.getUserById(bestId);
           if (user.name) {
             // $('#person').text("Welcome " + user.name + "!");
             persontext = "Welcome " + user.name + "!";
           } else {
             console.log("No name!");
           }
+          var bestId = updateIdsAndGetBestId(user.id, bind.time);
+          var user = api.getUserById(bestId);
 
           $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (visits) {
             $newHistory = $('<ul id="history"></ul>');
             visits.forEach(function(visit) {
               var location = visit.location, time = visit.started, duration = visit.length;
               if (time && location) {
-                console.log(time, location);
-                var presentation = api.getPresentationByLocationAndTime(location, time + 5 * 60 * 60 * 1000);
+                // console.log(time, location);
+                if (location == "AC3D38") {
+                  console.log("here", visit);
+                }
+                var presentation = api.getPresentationByLocationAndTime(location, time + 4.5 * 60 * 60 * 1000);
                 if (presentation) {
-                  console.log(presentation)
-                  $newHistory.append($('<li></li>').text( presentation.presentation_title + " : " + presentation.room + " : " + (new Date(time).getHours() + ":" + new Date(time).getMinutes()) + " - " + (new Date(time + duration).getHours() + ":" + new Date(time + duration).getMinutes()) ));
+                  // console.log(presentation)
+                  console.log("adding a prezo");
+                  $newHistory.append($('<div></div>').html( 
+                      '<b>' + (new Date(time).getHours() + ":" + new Date(time).getMinutes()) + " - " + (new Date(time + duration).getHours() + ":" + new Date(time + duration).getMinutes()) + '</b> <span>' + presentation.presentation_title + " </span><span> " + presentation.room + " </span>"
+                    ));
+
                 }
               }
             });
             console.log("done making new history");
-            console.log($newHistory.html());
+            resetDisplay();
+            // console.log($newHistory;
+            // resetDisplay();
+            // $newHistory.replaceWith($newnewHistory);
+            
             // $('#history').replaceWith($newHistory);
             // resetDisplayTimeout = setTimeout(resetDisplay, 10000);
           });
@@ -139,6 +160,7 @@ var api = olinexpo(function () {
       } else {
         // $('#person').text("Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?");
         // $('#history').html('');
+        console.log("CLEARING HISTORY");
         $newHistory = $('<ul id="history"></ul>');
         // resetDisplayTimeout = setTimeout(resetDisplay, 10000);
         persontext = "Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?"
