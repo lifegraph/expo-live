@@ -171,6 +171,15 @@ function sampler (cols, callback) {
           _id: antid
         }, function (err, ant) {
 
+          // Add guess to history cache.
+          if (colony && colony.location && ant && ant.user) {
+            (historyCache[antid] || (historyCache[antid] = {}));
+            historyCache[antid][colony.location] || (historyCache[antid][colony.location] = 0);
+            historyCache[antid][colony.location]++;
+          } else {
+            console.log('Guess has no colony', colony, 'or ant', ant);
+          }
+
           // Either ant or location may be null, don't rely on their existing
           callback({
             colony: guess.location,
@@ -181,13 +190,6 @@ function sampler (cols, callback) {
             ant: antid,
             user: ant && ant.user,
           });
-
-          // Add guess to history cache.
-          if (colony && colony.location && ant && ant.user) {
-            (historyCache[antid] || (historyCache[antid] = {}));
-            historyCache[antid][colony.location] || (historyCache[antid][colony.location] = 0);
-            historyCache[antid][colony.location]++;
-          }
         });
       })
 
@@ -238,7 +240,6 @@ function historySampler (cols) {
   historyCache = {};
 
   try {
-    console.log(hist);
     Object.keys(hist).forEach(function (antid) {
       var maxid, max = 0;
       Object.keys(hist[antid]).forEach(function (colid) {
