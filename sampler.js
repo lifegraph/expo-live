@@ -41,6 +41,21 @@ var farby = {
 };
 
 /*
+function getNearby (loc) {
+  loc = String(loc);
+  if (!loc.match(/^AC[13]D/)) {
+    return [];
+  }
+  var desk = loc.replace(/^AC[13]D/, '');
+  if (desk >= 21) {
+
+  } else {
+    if (desk == 1) return ['AC1'];
+  }
+}
+*/
+
+/*
 var CORRECT = {
   "1900": "01",
   "08FF": "01",
