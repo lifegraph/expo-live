@@ -1,0 +1,17 @@
+!!! 5
+html(lang='en')
+  head(prefix='og: http://ogp.me/ns# fb: http://ogp.me/ns/fb# olinexpo: http://ogp.me/ns/fb/olinexpo#')
+    meta(property='fb:app_id', content='573616499320153')
+    meta(property='og:type', content='olinexpo:presentation')
+    meta(property='og:title', content='#{presentation_name}')
+    meta(property='og:description', content='#{presentation_description}')
+    meta(property='og:image', content='#{presentation_image}')
+    title= presentation_name
+
+  body
+    h1 Have you visited #{presentation_name}?
+    div #{presentation_description}
+    img(src='#{presentation_image}')
+    fb:activity(actions='olinexpo:visit')
+    script
+        window.location = 'http://olinexpo.com/projects/#{presentation_id}'

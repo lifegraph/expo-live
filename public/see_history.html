@@ -52,21 +52,26 @@ var api = olinexpo(function () {
         lasttime = time;
         if (user.name) {
           $('#person').text("Welcome " + user.name + "!");
+        } else {
+          console.log("No name!");
         }
         if (user.id) {
-          $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (guesses) {
-            var $newHistory = $('<ul></ul>');
-            guesses.forEach(function(guess) {
-              var location = guess.location, time = guess.time;
-              console.log(guess);
+          $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (visits) {
+            var $newHistory = $('<ul id="history"></ul>');
+            visits.forEach(function(visit) {
+              var location = visit.location, time = visit.started, duration = visit.length;
               if (time && location) {
-                var presentation = api.getPresentationByLocationAndTime(location, time + 9 * 60 * 60 * 1000);
+                console.log(time, location);
+                var presentation = api.getPresentationByLocationAndTime(location, time + 17.5 * 60 * 60 * 1000);
                 if (presentation) {
-                  $newHistory.append($('<li></li>').text( presentation.presentation_title + " : " + presentation.room + " : " + new Date(time)));
+                  console.log(presentation)
+                  $newHistory.append($('<li></li>').text( presentation.presentation_title + " : " + presentation.room + " : " + (new Date(time).getHours() + ":" + new Date(time).getMinutes()) + " - " + (new Date(time + duration).getHours() + ":" + new Date(time + duration).getMinutes()) ));
                 }
               }
             });
-            $('#history').html($newHistory.html());
+            console.log("done making new history");
+            console.log($newHistory.html());
+            $('#history').replaceWith($newHistory);
           });
         }
           
