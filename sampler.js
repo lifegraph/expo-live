@@ -17,28 +17,21 @@ require('colors');
 var MONGO_URI = process.env.MONGOLAB_URI || "mongodb://localhost/olinexpoapi";
 */
 
-var COLONIES = ['0019', '0008', '002C', '0024', '0025', '002A', '001B', '001E'];
+var AC3 = ['0028', '0027', '0026', '0025', '0024', '0023', '0022', '0021', '0020', '001F', '001E', '001D', '001C', '001B', '001A', '0019', '0018', '0017', '0016', '0015']
+var AC1 = ['0001', '0002', '0003', '0004', '0005', '0006', '0007', '0008', '0009', '000A', '000B', '000C', '000D', '000E', '000F', '0010', '0011', '0012', '0013', '0014'];
 
-var nearby = {
-  '0019': ['0008'],
-  '0008': ['0019', '002C'],
-  '002C': ['0008', '0024'],
-  '0024': ['002C', '0025'],
-  '0025': ['0024', '002A'],
-  '002A': ['0025', '001B'],
-  '001B': ['002A', '001E'],
-  '001E': ['001B']
-};
-var farby = {
-  '0019': ['002C'],
-  '0008': ['0024'],
-  '002C': ['0019', '0025'],
-  '0024': ['0008', '002A'],
-  '0025': ['002C', '001B'],
-  '002A': ['0024', '001E'],
-  '001B': ['0025'],
-  '001E': ['002A']
-};
+function getNearby (colony, howfar) {
+  var near = [], i;
+  howfar = howfar || 1;
+  if ((i = AC3.indexOf(colony)) >= -1) {
+    near = [AC3[i-howfar], AC3[i+howfar]]
+  } else if ((i = AC1.indexOf(colony)) >= -1) {
+    near = [AC1[i-howfar], AC1[i+howfar]];
+  }
+  return near.filter(function (a) {
+    return a != null;
+  });
+}
 
 /*
 function getNearby (loc) {
@@ -208,11 +201,13 @@ function sampler (cols, callback) {
     var binds = (guesses[bind.ant] || (guesses[bind.ant] = {}));
     (binds[bind.colony] || (binds[bind.colony] = 0));
     binds[bind.colony] += 1.0 * bindFreshness;
-    (nearby[bind.colony] || []).forEach(function (near) {
+    var nearby = getNearby(bind.colony, 1);
+    (nearby || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
       binds[near] += NEARBY_BONUS * bindFreshness;
     });
-    (farby[bind.colony] || []).forEach(function (near) {
+    var farby = getNearby(bind.colony, 2);
+    (farby || []).forEach(function (near) {
       (binds[near] || (binds[near] = 0));
       binds[near] += FARBY_BONUS * bindFreshness;
     });
