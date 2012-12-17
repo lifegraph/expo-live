@@ -230,7 +230,7 @@ function sampler (cols, callback, opengraphPost) {
     })
 
     // If there is no location with binds, return null.
-    console.log('Guess data:', JSON.stringify(binds));
+    console.log('Guess data for ', antid, ': ', JSON.stringify(binds));
     return !(bestloc > 0) ? null : {
       location: bestlocid,
       confidence: (1 - BEST_WEIGHT) + ((bestloc / total) * BEST_WEIGHT)
@@ -287,20 +287,20 @@ function historySampler (cols, opengraphPost) {
 
               // Get last five history elements.
               if (dontRepeatHistory[antid] != colid) {
-                var HISTORY_THRESHOLD = 3; // THESHOLD FOR POSTING
+                /*var HISTORY_THRESHOLD = 3; // THESHOLD FOR POSTING
                 cols.history.find({
                   user: ant.user,
                   location: colony.location
                 }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
-                  if (arr.length == HISTORY_THRESHOLD) {
+                  if (arr.length == HISTORY_THRESHOLD) {*/
                     try {
                       console.log('OPENGRAPH: HISTORY threshold', ant.user, colony.location);
                       opengraphPost(ant.user, colony.location);
                     } catch (e) {
                       console.error('OPENGRAPH: opengraphPost', e);
-                    }
+                    }/*
                   }
-                });
+                });*/
               } else {
                 console.log('REPEATING HISTORY ');
               }
