@@ -3,25 +3,22 @@
 <html>
 <body>
   <div class="container-fluid">
-    <h2>Presentation Viewer Extreme Mode</h2>
-  </div>
-<br>
-
-<hr>
-
-
+    <h1>Presentation Viewer Extreme Mode</h1>
+  
 <h2 id="person">Waiting for person.</h2>
 <ul id="history"></ul>
 
+</div>
+
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
 <script src="http://code.jquery.com/jquery.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/olinexpo.js"></script>
+<script src="http://api.olinexpo.com/socket.io/socket.io.js"></script>
+<script src="http://api.olinexpo.com/olinexpo.js"></script>
 <style>
 
 </style>
 <script>
-var colonyIds = ["AA02", "001F"]; // the colony IDs used for this display
+var colonyIds = ["AA02", "001D"]; // the colony IDs used for this display
 var resetDisplayTimeout = null;
 var lasttime = 0;
 var $newHistory = $('<ul id="history"></ul>');
