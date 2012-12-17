@@ -74,13 +74,31 @@ function bindJSON (bind) {
 var openGraph = new OpenGraph('olinexpo');
 
 // makes an open graph request for when the user visits the presentation
-function makeVisitedOpenGraphRequest(access_token, presentationId ) {
+function makeVisitedOpenGraphRequest(userId, presentationId ) {
   console.log("Open Graph Request for prezo:", presentationId );
   var presentationUrl = 'http://olinexpo.com/presentation/' + presentationId;
-  elephantGraph.publish('me',access_token,'visit', 'presentation', presentationUrl, function(err,response){
+  elephantGraph.publish('me',getAccessTokenFromUserId(userId),'visit', 'presentation', presentationUrl, function(err,response){
     console.log(response);
   });
 }
+
+// Returns the access token if there is one for the given user_id.
+// hides errors and returns null if error or no result
+function getAccessTokenFromUserId(user_id) {
+  dbpg.query('SELECT * FROM authentications WHERE user_id = $1 LIMIT 1', 
+    [user_id], function (err, result) {
+    if (err) {
+      console.error(err);
+      return null;
+    } else {
+      if (result.rows.length) {
+        return result.rows[0].token;
+      } else {
+        return null;
+      }
+    }
+  });
+});
 
 // GET /binds
 
