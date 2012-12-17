@@ -97,10 +97,13 @@ function sampler (cols, callback, opengraphPost) {
   var currenttime = Date.now();
   var querytime = currenttime - GUESS_THRESHOLD;
 
-  historySampler(cols, opengraphPost);
+  if (!historyStarted) {
+    historySampler(cols, opengraphPost);
+    historyStarted = true;
+  }
 
   // Log some sod.
-  console.log('\nGuessing location based on binds from', querytime, 'to', currenttime);
+  console.log('Guessing location based on binds from', querytime, 'to', currenttime);
   //console.log('Incorrectest ants:', JSON.stringify(INCORRECT_ANTS));
   //console.log('Incorrectest colonies:', JSON.stringify(INCORRECT_COLS));
   //console.log(new Date(querytime));
@@ -237,12 +240,15 @@ function sampler (cols, callback, opengraphPost) {
 
 // dont repeat!
 var dontRepeatHistory = {};
+var historyStarted = false;
 
 function historySampler (cols, opengraphPost) {
+  historyStarted = true;
+
   var hist = historyCache;
   historyCache = {};
 
-  console.log('hi', hist);
+  console.log('Checking history:', Object.keys(hist), new Date());
 
   try {
     if (Object.keys(hist).length) {
