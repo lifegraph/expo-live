@@ -341,7 +341,6 @@ app.get('/ants/:id', function (req, res) {
 
 app.put('/ants/:id', function (req, res) {
   var ant = {
-    _id: String(req.params.id),
     $set: {}
   };
   if ('user' in req.body) {
@@ -387,10 +386,9 @@ app.get('/colonies/:id', function (req, res) {
 
 app.put('/colonies/:id', function (req, res) {
   var colony = {
-    _id: String(req.params.id),
     $set: {}
   };
-  if (req.body.location) {
+  if ('location' in req.body) {
     colony.$set.location = String(req.body.location);
   };
   cols.colonies.update({
