@@ -94,8 +94,8 @@ function Location (id, x, y, ac) {
   }.bind(this))
 
   setInterval(function () {
-    // TODO! This may make rooms not have presentations
-    if (Date.now() - this._activetime > 60*1000*5) {
+    // TODO! This may make rooms not look like they have presentations
+    if (Date.now() - this._activetime > 60*1000*1) {
       this.active(false);
     }
     this.size(Math.max(this._size - 0.1, this.baseSize))
@@ -137,7 +137,7 @@ Location.prototype.active = function (flag) {
 
 Location.prototype.bump = function (loc) {
   this.active(true);
-  this.size(this._size + (200 - (this._size - this.baseSize)) / 4);
+  this.size(this._size + (100 - (this._size - this.baseSize)) / 4);
 }
 
 
