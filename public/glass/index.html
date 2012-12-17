@@ -18,7 +18,8 @@ td { vertical-align: middle; padding-top: 200px; }
   -webkit-user-select: none;
   text-align: center;
   color: white;
-  text-shadow: black 0 2px 2px;
+  font-weight: bold;
+  text-shadow: black 0 5px 5px;
   width: 0;
   height: 0;
   -webkit-transition-property: height, width, border-radius, margin-left, margin-top, line-height, font-size, color;
@@ -86,7 +87,7 @@ function Location (id, x, y) {
     if (Date.now() - this._activetime > 60*1000*5) {
       this.active(false);
     }
-    this.size(Math.max(this._size - 0.01, 25))
+    this.size(Math.max(this._size - 0.1, 25))
   }.bind(this), 100)
 }
 
@@ -99,7 +100,7 @@ Location.prototype.size = function (size) {
     borderRadius: (size / 2) + 'px',
     marginLeft: -size/2 + 'px',
     marginTop: -size/2 + 'px',
-    fontSize: size / 5 + 'px'
+    fontSize: size / 3 + 'px'
   });
 }
 
