@@ -197,19 +197,16 @@ var api = olinexpo(function () {
   // all positions received by the client up until this point, and the third argument
   // is FALSE if the user has not been seen before (i.e. is a new user)
   api.listenAll(false, function (guess, guesses, isUpdate) {
-    guesses.forEach(function (guess) {
+    console.log(new Date());
+    console.log('Guess for location:', guess.location, 'user:', guess.user);
 
-      console.log(new Date());
-      console.log('Guess for location:', guess.location, 'user:', guess.user);
-
-      var location, user;
-      if (location = locations[guess.location]) {
-        if (user = api.getUserById(guess.user)) {
-          console.log("I think that", user.name, "is at", guess.location);
-          location.bump();
-        }
+    var location, user;
+    if (location = locations[guess.location]) {
+      if (user = api.getUserById(guess.user)) {
+        console.log("I think that", user.name, "is at", guess.location);
+        location.bump();
       }
-    });
+    }
   });
 });
 
