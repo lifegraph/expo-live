@@ -135,13 +135,17 @@ app.post('/binds', function (req, res) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
 
+  var pingstr = 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony;
+
   var bind = {
     ant: req.body.ant,
     colony: req.body.colony,
-    ping: 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony,
+    ping: pingstr,
     queen: req.body.queen,
     time: Date.now()
   };
+
+  colony.log(pingstr);
 
   cols.binds.findOne({
     ping: bind.ping
