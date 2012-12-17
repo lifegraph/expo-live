@@ -371,17 +371,17 @@ app.get('/ants/:id', function (req, res) {
 
 app.put('/ants/:id', function (req, res) {
   var ant = {
-    _id: String(req.params.id)
+    $set: {}
   };
   if ('user' in req.body) {
-    ant.user = req.body.user || null;
+    ant.$set.user = req.body.user || null;
   }
   cols.ants.update({
     _id: String(req.params.id)
   }, ant, {
     upsert: true
   }, function (err, docs) {
-    res.json({message: 'Succeeded in assigning ant.'});
+    res.json({message: 'Succeeded in assigning ant.', ant: ant});
   });
 });
 
@@ -416,17 +416,17 @@ app.get('/colonies/:id', function (req, res) {
 
 app.put('/colonies/:id', function (req, res) {
   var colony = {
-    _id: String(req.params.id)
+    $set: {}
   };
-  if (req.body.location) {
-    colony.location = String(req.body.location);
+  if ('location' in req.body) {
+    colony.$set.location = String(req.body.location);
   };
   cols.colonies.update({
     _id: String(req.params.id)
   }, colony, {
     upsert: true
   }, function (err, docs) {
-    res.json({message: 'Succeeded in assigning colony.'});
+    res.json({message: 'Succeeded in assigning colony.', colony: colony});
   });
 });
 
@@ -638,8 +638,9 @@ function setupMongo (next) {
             _id: guess.ant
           }, {
             _id: guess.ant,
-            guess: guess._id,
-            user: guess.user
+            $set: {
+              guess: guess._id
+            }
           }, {
             upsert: true
           }, function (err, docs) {
@@ -674,8 +675,8 @@ setupMongo(function () {
   /**
   * Insert the ants
   */
-  // var ant_base = require('./ant_base');
-  // ant_base(cols);
+  var ant_base = require('./ant_base');
+  ant_base(cols);
 
   setupPostgres(function () {
     setupServer(function() {

@@ -1,0 +1,53 @@
+<body>
+
+<h2>Ants <button id="new" class="btn btn-success">Create new</button></h2>
+<ul id="ants"></ul>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script src="/olinexpo.js"></script>
+<script>
+
+var api = olinexpo(function () {
+
+  api._getAnts(function (err, ants) {
+    ants = ants.sort(function (a, b) {
+      return a.id > b.id ? 1 : -1;
+    });
+
+    ants.forEach(function (ant) {
+      var $row = $('<li data-ant="' + ant.id + '">').append($('<span class="lead"><b>Ant id:</b></span> ').append(ant.id)).appendTo('#ants').append('<br><select class="users"><option>---</option></select>')
+      .on('change', 'select', function () {
+        var id = $row.find('select').val();
+        if (id) {
+          api._assignAnt(ant.id, id, function () {
+            // noop
+          });
+        }
+      });
+    })
+
+    api.users.sort(function (a, b) { 
+      return a.name > b.name ? 1 : -1;
+    }).forEach(function (user) {
+      $('#ants select').append($('<option value="' + user.id + '">').text(user.name));
+    })
+
+    ants.forEach(function (ant) {
+      $('li[data-ant="' + ant.id + '"] .users').val(ant.user);
+    })
+  });
+
+  $('#new').on('click', function () {
+    var id = prompt('Ant id:');
+    if (id) {
+      api._assignAnt(id, null, function () {
+        window.location.reload();
+      })
+    }
+  });
+});
+
+</script>
+</body>
