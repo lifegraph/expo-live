@@ -609,8 +609,8 @@ setupMongo(function () {
   /**
   * Insert the ants
   */
-  // var ant_base = require('./ant_base');
-  // ant_base(cols);
+  var ant_base = require('./ant_base');
+  ant_base(cols);
 
   setupPostgres(function () {
     setupServer(function() {
