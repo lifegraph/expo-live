@@ -275,7 +275,15 @@ function historySampler (cols) {
               user: ant && ant.user,
               location: colony && colony.location
             }, function (err, docs) {
-              // inserted history element
+
+              // Get last five history elements.
+              var HISTORY_THRESHOLD = 1;
+              cols.history.find({
+                user: ant.user,
+                location: colony.location
+              }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
+                console.log('HISTORY MATCHING', arr.length);
+              });
             });
           } else {
             console.error('History ==> Missing ant', antid, ant, 'or colony', colid, colony);
@@ -287,7 +295,7 @@ function historySampler (cols) {
     console.error(e);
   }
 
-  setTimeout(historySampler.bind(null, cols), 60*1000);
+  setTimeout(historySampler.bind(null, cols), 1000);
 }
 
 module.exports = sampler;
