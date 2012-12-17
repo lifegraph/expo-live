@@ -258,15 +258,23 @@ var sampler = require('./sampler');
 // minimum amount of time to be considered at a location
 var MIN_MS_GUESS = 20*(1000);
 
+// app.get('/test', function(req, res) {
+//   console.log("asdfsdf");
+// });
+
 app.get('/history/:uid', function (req, res) {
+  console.log("history/uid");
+
   var uid = req.params.uid;
   var history = [];
   var last_guess;
   var oldest_same_location_guess;
 
   cols.guesses.find({
-    user: parseInt(uid)
+    user: uid
   }).sort({time: 1}).each(function (err, guess) {
+    
+    console.log(guess);
     if (!guess) {
       return res.json(history);
     }
