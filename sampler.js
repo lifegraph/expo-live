@@ -249,6 +249,7 @@ function historySampler (cols) {
       var maxid, max = 0;
       Object.keys(hist[antid]).forEach(function (colid) {
         if (hist[antid][colid] > max) {
+          console.log(max, maxid);
           max = hist[antid][colid];
           maxid = colid;
         }
@@ -256,6 +257,7 @@ function historySampler (cols) {
 
       // Make new history bind.
       var colid = maxid;
+      console.log(colid);
       cols.colonies.findOne({
         _id: colid
       }, function (err, colony) {
@@ -276,7 +278,7 @@ function historySampler (cols) {
               // inserted history element
             });
           } else {
-            console.error('History ==> Missing ant', ant, 'or colony', colony);
+            console.error('History ==> Missing ant', antid, ant, 'or colony', colid, colony);
           }
         });
       });
