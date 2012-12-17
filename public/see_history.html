@@ -21,16 +21,73 @@
 
 </style>
 <script>
-var colonyIds = ["FF03", "FF04"]; // the colony IDs used for this display
+var colonyIds = ["AA02", "001F"]; // the colony IDs used for this display
 var resetDisplayTimeout = null;
 var lasttime = 0;
+var $newHistory = $('<ul id="history"></ul>');
+var persontext = 'Waiting for person';
+
+
+function getParameterByName(name)
+{
+  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+  var regexS = "[\\?&]" + name + "=([^&#]*)";
+  var regex = new RegExp(regexS);
+  var results = regex.exec(window.location.search);
+  if(results == null)
+    return "";
+  else
+    return decodeURIComponent(results[1].replace(/\+/g, " "));
+}
 
 function resetDisplay() {
-  $('#history').html('');
-  $('#person').text('Waiting for person.');
+  // $('#history').html('');
+  $('#person').text(persontext);
+  $('#history').replaceWith($newHistory);
+  console.log("Updated display");
+}
+
+var usertimes = {}
+function updateIdsAndGetBestId(userid, bindtime) {
+  if (usertimes[userid]) {
+    usertimes[userid].push(bindtime);
+  } else {
+    usertimes[userid] = [bindtime];
+  }
+  var t0 = Date.now();
+  var cutofftime = t0 - 20 * 1000;
+  var usercounts = {};
+  for(var uid in usertimes) {
+    if(usertimes.hasOwnProperty(uid)) {
+        var times = usertimes[uid];
+        for (var i = 0; i < times.length; i++) {
+          if (times[i] < cutofftime) {
+            times.splice(i,1);
+            i--;
+          } else {
+            if (usercounts[uid]) {
+              usercounts[uid]++;
+            } else {
+              usercounts[uid] = 1;
+            }
+          }
+        }
+      }
+  }
+  var bestcount = -1, bestuserid = null;
+  for(var uid in usercounts) {
+    if(usercounts.hasOwnProperty(uid)) {
+      if (usercounts[uid] > bestcount) {
+        bestcount = usercounts[uid];
+        bestuserid = uid;
+      }
+    }
+  }
+  return bestuserid;
 }
 
 console.log("hi"); 
+setInterval(resetDisplay, 10 * 1000);
 
 var api = olinexpo(function () {
   api._listenBinds(function (bind) {
@@ -41,8 +98,7 @@ var api = olinexpo(function () {
 
     if (colonyIds.indexOf(bind.colony) > -1) {
       console.log("YAY")
-      clearTimeout(resetDisplayTimeout);
-      resetDisplayTimeout = setTimeout(resetDisplay, 5000);
+      // clearTimeout(resetDisplayTimeout);
       if (bind.user) {
         console.log("Found a user!");
         var user = api.getUserById(bind.user);
@@ -50,19 +106,23 @@ var api = olinexpo(function () {
         var time = Date.now();
         console.log(time - lasttime);
         lasttime = time;
-        if (user.name) {
-          $('#person').text("Welcome " + user.name + "!");
-        } else {
-          console.log("No name!");
-        }
         if (user.id) {
+          var bestId = updateIdsAndGetBestId(user.id, bind.time);
+          var user = api.getUserById(bestId);
+          if (user.name) {
+            // $('#person').text("Welcome " + user.name + "!");
+            persontext = "Welcome " + user.name + "!";
+          } else {
+            console.log("No name!");
+          }
+
           $.getJSON('http://' + olinexpoHost + '/history/' + user.id, function (visits) {
-            var $newHistory = $('<ul id="history"></ul>');
+            $newHistory = $('<ul id="history"></ul>');
             visits.forEach(function(visit) {
               var location = visit.location, time = visit.started, duration = visit.length;
               if (time && location) {
                 console.log(time, location);
-                var presentation = api.getPresentationByLocationAndTime(location, time + 17.5 * 60 * 60 * 1000);
+                var presentation = api.getPresentationByLocationAndTime(location, time + 5 * 60 * 60 * 1000);
                 if (presentation) {
                   console.log(presentation)
                   $newHistory.append($('<li></li>').text( presentation.presentation_title + " : " + presentation.room + " : " + (new Date(time).getHours() + ":" + new Date(time).getMinutes()) + " - " + (new Date(time + duration).getHours() + ":" + new Date(time + duration).getMinutes()) ));
@@ -71,13 +131,17 @@ var api = olinexpo(function () {
             });
             console.log("done making new history");
             console.log($newHistory.html());
-            $('#history').replaceWith($newHistory);
+            // $('#history').replaceWith($newHistory);
+            // resetDisplayTimeout = setTimeout(resetDisplay, 10000);
           });
         }
           
       } else {
-        $('#person').text("Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?");
-        $('#history').html('');
+        // $('#person').text("Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?");
+        // $('#history').html('');
+        $newHistory = $('<ul id="history"></ul>');
+        // resetDisplayTimeout = setTimeout(resetDisplay, 10000);
+        persontext = "Hello there, ant user " + bind.ant +"! Why don't you go associate your account at the front desk?"
       }
     }
   })
