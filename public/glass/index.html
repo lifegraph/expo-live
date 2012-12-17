@@ -6,14 +6,17 @@
 <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.2/css/bootstrap-combined.min.css" rel="stylesheet">
     <style>
 
-html, body { margin: 0; padding: 0; background: #023; }
+html, body { margin: 0; padding: 0; background: #023; color: white; }
 body { padding-top: 200px; background: url(expolive.png) 60px 0 no-repeat; background-color: transparent; }
 
 html, body, table { height: 100%; width: 100%; margin: 0; padding: 0; border-collapse: collapse; }
 td { vertical-align: middle; padding-top: 200px; }
 
-#wrapper { width: 3000px; height: 1200px; background-image: url(ac1-white.png); overflow: auto; }
-#center { margin-top: 600px; margin-left: 1500px; position: relative; }
+#ac1 { background-image: url(ac1-white.png); margin-top: -400px; }
+#ac3 { background-image: url(ac3-white.png); }
+
+.building { width: 3000px; height: 1200px; overflow: auto; }
+.center { margin-top: 600px; margin-left: 1500px; position: relative; }
 .marker {
   -webkit-user-select: none;
   text-align: center;
@@ -30,9 +33,15 @@ td { vertical-align: middle; padding-top: 200px; }
   </head>
   <body>
     <table><tr><td>
-    <div id="wrapper">
-      <div id="center"></div>
+
+    <div id="ac3" class="building">
+      <div class="center"></div>
     </div>
+
+    <div id="ac1" class="building">
+      <div class="center"></div>
+    </div>
+
   </td></tr></table>
 
     <script src="http://code.jquery.com/jquery.js"></script>
@@ -62,11 +71,13 @@ fitScreen();
 var locations = {};
 
 function Location (id, x, y) {
+  this.baseSize = 50;
+
   this.id = id;
   this.x = x;
   this.y = y;
 
-  this.$el = $('<div class="marker">').appendTo('#center');
+  this.$el = $('<div class="marker">').appendTo('#ac1 .center');
   this.$el.text(id.replace(/^AC[0-9]D/, ''));
   this.$el.css({ position: 'absolute', background: 'red' });
   this.$el.tooltip({
@@ -74,7 +85,7 @@ function Location (id, x, y) {
   })
 
   this.position(x, y);
-  this.size(25);
+  this.size(this.baseSize);
   this.confidence(0.8);
   this.active(false);
 
@@ -87,7 +98,7 @@ function Location (id, x, y) {
     if (Date.now() - this._activetime > 60*1000*5) {
       this.active(false);
     }
-    this.size(Math.max(this._size - 0.1, 25))
+    this.size(Math.max(this._size - 0.1, this.baseSize))
   }.bind(this), 100)
 }
 
@@ -126,7 +137,7 @@ Location.prototype.active = function (flag) {
 
 Location.prototype.bump = function (loc) {
   this.active(true);
-  this.size(this._size + (200 - (this._size - 25)) / 4);
+  this.size(this._size + (200 - (this._size - this.baseSize)) / 4);
 }
 
 
@@ -134,16 +145,33 @@ function createLocation (id, x, y) {
   locations[id] = new Location(id, x, y);
 }
 
-createLocation("AC118", 500, -80);
-createLocation("AC1D1", 400, -100);
-createLocation("AC1D2", 250, -120);
-createLocation("AC1D3", 100, -130);
-createLocation("AC1D4", -50, -130);
-createLocation("AC1D5", -200, -105);
-createLocation("AC1D6", -350, -80);
-createLocation("AC1D7", -500, -30);
-createLocation("AC1D8", -650, 40);
+createLocation("AC118", -500, -80);
 
+createLocation("AC1D1", 920, 80);
+createLocation("AC1D2", 850, 30);
+createLocation("AC1D3", 770, -10);
+createLocation("AC1D4", 680, -40);
+createLocation("AC1D5", 590, -70);
+createLocation("AC1D6", 490, -100);
+createLocation("AC1D7", 398, -112);
+createLocation("AC1D8", -179, -96);
+createLocation("AC1D9", -264, -88);
+createLocation("AC1D10", -337, -71);
+createLocation("AC1D11", -414, -48);
+createLocation("AC1D12", -491, -25);
+createLocation("AC1D13", -567, -2);
+createLocation("AC1D14", -629, 34);
+createLocation("AC1D15", -692, 64);
+createLocation("AC1D16", -747, 94);
+createLocation("AC1D17", -798, 121);
+createLocation("AC1D18", -839, 148);
+createLocation("AC1D19", -874, 170);
+createLocation("AC1D20", -905, 191);
+
+createLocation("AC1D5", 590, -70);
+createLocation("AC1D6", 490, -100);
+createLocation("AC1D7", 398, -112);
+createLocation("AC1D8", 313, -120);
 
 var api = olinexpo(function () {
 
@@ -168,6 +196,12 @@ var api = olinexpo(function () {
     });
   });
 });
+
+$('.building').on('dblclick', function (e) {
+  var offset = $(this).offset();
+  console.log(e.offsetX - $(this)[0].offsetWidth/2, e.offsetY - $(this)[0].offsetHeight/2);
+  //document.body.innerHTML = '<h1>' + (e.offsetX - 1500) + 'x' + (e.offsetY - 600) + '</h1>'
+})
 
     </script>
   </body>
