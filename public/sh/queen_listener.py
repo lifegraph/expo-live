@@ -5,7 +5,7 @@ import os
 import subprocess
 from subprocess import Popen
 
-arduino = serial.Serial('/dev/cu.usbmodem1411', 57600) # serial port# and baud rate
+arduino = serial.Serial('/dev/ttyACM0', 57600) # serial port# and baud rate
 
 def chunks(l, n):
   return [l[i:i+n] for i in range(0, len(l), n)]
