@@ -273,7 +273,7 @@ function historySampler (cols) {
     });
   } catch (e) { }
 
-  setTimeout(historySampler, 1000);
+  setTimeout(historySampler.bind(cols), 1000);
 }
 
 module.exports = sampler;

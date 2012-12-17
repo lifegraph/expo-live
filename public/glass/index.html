@@ -9,7 +9,8 @@
 html, body { margin: 0; padding: 0; background: #023; color: white; }
 body { padding-top: 200px; background: url(expolive.png) 60px 0 no-repeat; background-color: transparent; }
 
-html, body, table { height: 100%; width: 100%; margin: 0; padding: 0; border-collapse: collapse; }
+html, body, table { height: 100%; margin: 0; padding: 0; border-collapse: collapse; }
+table { width: 3000px; }
 td { vertical-align: middle; padding-top: 200px; }
 
 #ac1 { background-image: url(ac1-white.png); margin-top: -400px; }
@@ -57,7 +58,7 @@ td { vertical-align: middle; padding-top: 200px; }
  */
 
 function fitScreen () {
-  $('body').css('zoom', $(window).width()/3000*100 + '%'); 
+  $('body').css('zoom', $(window).width()/4000*100 + '%'); 
 }
 $(window).on('resize', fitScreen);
 fitScreen();
