@@ -6,6 +6,7 @@ var async = require('async');
 var express = require('express');
 var mongo = require('mongodb'), ObjectID = mongo.ObjectID;
 var socketio = require('socket.io');
+var OpenGraph = require('facebook-open-graph');
 
 var pg = require('pg').native;
 
@@ -26,6 +27,7 @@ var port = process.env.PORT || 5000;
 var app = express();
 app.use(express.logger());
 app.use(express.bodyParser());
+app.set('views', __dirname + '/views');
 app.use(express.static(__dirname + '/public'));
 
 app.all('*', function(req, res, next) {
@@ -62,6 +64,22 @@ function bindJSON (bind) {
     queen: bind.queen,
     ping: bind.ping
   };
+}
+
+/*
+ * Open Graph
+ */
+
+// Opengraph APIs.
+var openGraph = new OpenGraph('olinexpo');
+
+// makes an open graph request for when the user visits the presentation
+function makeVisitedOpenGraphRequest(access_token, presentationId ) {
+  console.log("Open Graph Request for prezo:", presentationId );
+  var presentationUrl = 'http://olinexpo.com/presentation/' + presentationId;
+  elephantGraph.publish('me',access_token,'visit', 'presentation', presentationUrl, function(err,response){
+    console.log(response);
+  });
 }
 
 // GET /binds
@@ -290,11 +308,23 @@ app.get('/history/:uid', function (req, res) {
         elapsed_time > MIN_MS_GUESS ) {
 
         var starting_time = oldest_same_location_guess.time;
-        history.push({
+        var new_history_point = {
           started: starting_time, length: elapsed_time, 
           location: last_guess.location, ant: last_guess.ant, user: last_guess.user,
           colony: last_guess.colony
-        });
+        };
+        var latest_history = history.pop();
+        if (latest_history) {
+          if (latest_history.location == new_history_point.location 
+              && latest_history.ant == new_history_point.ant 
+              && latest_history.user == new_history_point.user) {
+            new_history_point.length = new_history_point.started + new_history_point.length - latest_history.started;
+            new_history_point.started = latest_history.started;
+          } else {
+            history.push(latest_history);
+          }
+        }
+        history.push(new_history_point);
       }
 
       // if the location stayed the same, don't update the oldest
@@ -481,7 +511,9 @@ app.get('/locations/:id', function (req, res) {
 });
 */
 
-// Presentations.
+/*
+ * Presentations
+ */
 
 function presentationJSON (presentation) {
   // TODO strip fields
@@ -514,6 +546,39 @@ app.get('/presentations/:id', function (req, res) {
   });
 });
 
+// This looks very similar to /presentations/:id but it is NOT the same
+// this is the open graph endpoint for facebook integration
+app.get('/presentation/:id', function(req, res) {
+  dbpg.query('SELECT * FROM projects WHERE id = $1 LIMIT 1', [
+    req.params.id
+  ], function (err, presentations) {
+    if (err) {
+      console.error(err);
+      res.json({message: err}, 500);
+    } else if (presentations.rows.length) {
+      // res.json(presentationJSON(presentations.rows[0]));
+      var presentation = presentationJSON(presentations.rows[0]);
+      var presentation_image = presentation.image;
+      if (presentation_image) {
+        presentation_image = 'https://s3.amazonaws.com/OlinExpo/uploads/project/image/' + presentation.id + '/' + presentation.image;
+      } else {
+        presentation_image = presentation.image1;
+        if (presentation_image) {
+          presentation_image = 'https://s3.amazonaws.com/OlinExpo/uploads/project/image1/' + presentation.id + '/' + presentation.image1;
+        } else {
+          presentation_image = 'http://olinexpo.com/assets/expolive-logo.png';
+        }
+      }
+      res.render('presentation.jade', {presentation_name: presentation.presentation_title, 
+                                        presentation_image: presentation_image,
+                                        presentation_description: presentation.project_description,
+                                        presentation_id: req.params.id});
+    } else {
+      res.json({message: 'No such user.'}, 404);
+    }
+  });
+  
+});
 
 /**
  * Sockets
