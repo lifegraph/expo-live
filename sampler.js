@@ -239,7 +239,12 @@ function historySampler (cols) {
   var hist = historyCache;
   historyCache = {};
 
+  console.log('hi', hist);
+
   try {
+    if (Object.keys(hist).length) {
+      console.log(hist);
+    }
     Object.keys(hist).forEach(function (antid) {
       var maxid, max = 0;
       Object.keys(hist[antid]).forEach(function (colid) {
@@ -270,6 +275,8 @@ function historySampler (cols) {
             }, function (err, docs) {
               // inserted history element
             });
+          } else {
+            console.error('History ==> Missing ant', ant, 'or colony', colony);
           }
         });
       });
