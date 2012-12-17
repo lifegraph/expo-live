@@ -83,7 +83,7 @@ function Location (id, x, y, ac) {
   this.$el.css({ position: 'absolute', background: 'red' });
   this.$el.tooltip({
     title: id
-  })
+  });
 
   this.position(x, y);
   this.size(this.baseSize);
@@ -136,10 +136,15 @@ Location.prototype.active = function (flag) {
   this.confidence(this._conf);
 }
 
-Location.prototype.bump = function (loc) {
+Location.prototype.bump = function () {
   this.active(true);
   this.size(this._size + (100 - (this._size - this.baseSize)) / 4);
 }
+
+Location.prototype.label = function (label) {
+  this.$el.attr('data-original-title', label);
+}
+
 
 
 function createLocation (id, x, y) {
@@ -198,6 +203,10 @@ var api = olinexpo(function () {
   // all positions received by the client up until this point, and the third argument
   // is FALSE if the user has not been seen before (i.e. is a new user)
   api.listenAll(false, function (guess, guesses, isUpdate) {
+    if (Date.now() - guess.time > 10*60*1000) {
+      return;
+    }
+
     console.log(new Date());
     console.log('Guess for location:', guess.location, 'user:', guess.user);
 
@@ -206,6 +215,7 @@ var api = olinexpo(function () {
       if (user = api.getUserById(guess.user)) {
         console.log("I think that", user.name, "is at", guess.location);
         location.bump();
+        location.label(user.name);
       }
     }
   });
