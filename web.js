@@ -699,10 +699,22 @@ function setupMongo (next) {
           });
         }
       });
+    }, function (userid, locid) {
+      var presid = getPresentationByLocation(new Date(), locid);
+      console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', presid);
     });
 
     next();
   });
+}
+
+var PRESCACHE = [];
+
+function getPresentationByLocation (date, locid) {
+  var hours = time.getHours() - 5;
+  return PRESCACHE.filter(function (row) {
+    return row.start_hour == hours && row.room == locid;
+  })[0];
 }
 
 var dbpg;
@@ -714,6 +726,15 @@ function setupPostgres (next) {
   }).on('end', function () {
     console.log('client ended connection');
   });
+
+  dbpg.query('SELECT * FROM projects', [], function (err, result) {
+    if (err) {
+      console.error(err);
+    } else {
+      PRESCACHE = result.rows;
+    }
+  });
+
   next();
 }
 

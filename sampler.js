@@ -90,14 +90,14 @@ var FARBY_BONUS = 0.5; // Bonus for 2 away
 var FRESHNESS_WEIGHT = 0; // How fresh the bind is
 var BEST_WEIGHT = 0.5; // How certain the colony is
 
-function sampler (cols, callback) {
+function sampler (cols, callback, opengraphPost) {
   // Query for the last GUESS_THRESHOLD of binds. 
   var guesses = {};
   var adequateness = {};
   var currenttime = Date.now();
   var querytime = currenttime - GUESS_THRESHOLD;
 
-  historySampler(cols);
+  historySampler(cols, opengraphPost);
 
   // Log some sod.
   console.log('\nGuessing location based on binds from', querytime, 'to', currenttime);
@@ -235,7 +235,10 @@ function sampler (cols, callback) {
   }
 }
 
-function historySampler (cols) {
+// dont repeat!
+var dontRepeatHistory = {};
+
+function historySampler (cols, opengraphPost) {
   var hist = historyCache;
   historyCache = {};
 
@@ -277,13 +280,19 @@ function historySampler (cols) {
             }, function (err, docs) {
 
               // Get last five history elements.
-              var HISTORY_THRESHOLD = 1;
-              cols.history.find({
-                user: ant.user,
-                location: colony.location
-              }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
-                console.log('HISTORY MATCHING', arr.length);
-              });
+              if (dontRepeatHistory[antid] != colid) {
+                var HISTORY_THRESHOLD = 1;
+                cols.history.find({
+                  user: ant.user,
+                  location: colony.location
+                }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
+                  if (arr.length == HISTORY_THRESHOLD) {
+                    console.log('BIG HISTORY threshold.');
+                    opengraphPost(ant.user, colony.location);
+                  }
+                });
+              }
+              dontRepeatHistory[antid] = colid;
             });
           } else {
             console.error('History ==> Missing ant', antid, ant, 'or colony', colid, colony);
@@ -295,7 +304,7 @@ function historySampler (cols) {
     console.error(e);
   }
 
-  setTimeout(historySampler.bind(null, cols), 1000);
+  setTimeout(historySampler.bind(null, cols, opengraphPost), 1*1000);
 }
 
 module.exports = sampler;
