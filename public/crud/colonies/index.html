@@ -1,0 +1,55 @@
+<body>
+
+<h2>Colonies <button id="new-colony" class="btn btn-success">Create new</button></h2>
+<ul id="colonies"></ul>
+
+<script src="http://code.jquery.com/jquery.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+    <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.2.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script src="/olinexpo.js"></script>
+<script>
+
+var api = olinexpo(function () {
+
+  api._getColonies(function (err, colonies) {
+    colonies = colonies.sort(function (a, b) {
+      return a.id > b.id ? 1 : -1;
+    });
+
+    colonies.forEach(function (colony) {
+      var $row = $('<li data-colony="' + colony.id + '">').append($('<span class="lead"><b>Colony id:</b></span> ').append(colony.id)).appendTo('#colonies').append('<br><select class="locations"><option>---</option></select> <button class="btn btn-success">Update</button>')
+      .on('click', '.btn-success', function () {
+        var locid = $row.find('.locations').val();
+        if (locid) {
+          api._assignColony(colony.id, locid, function () {
+            window.location.reload();
+          });
+        }
+      });
+
+      $('.select-colonies').append('<option value=' + JSON.stringify(colony.id) + '>' + colony.id + '</option>');
+    })
+
+    api.locations.sort(function (a, b) { 
+      return a.id > b.id ? 1 : -1;
+    }).forEach(function (loc) {
+      $('#colonies select').append($('<option value="' + loc.id + '">').text(loc.id));
+    })
+
+    colonies.forEach(function (colony) {
+      $('li[data-colony="' + colony.id + '"] .locations').val(colony.location);
+    })
+  });
+
+  $('#new-colony').on('click', function () {
+    var colonyid = prompt('Colony id:');
+    if (colonyid) {
+      api._assignColony(colonyid, null, function () {
+        window.location.reload();
+      })
+    }
+  });
+});
+
+</script>
+</body>
