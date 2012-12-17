@@ -238,6 +238,7 @@ function historySampler (cols) {
   historyCache = {};
 
   try {
+    console.log(hist);
     Object.keys(hist).forEach(function (antid) {
       var maxid, max = 0;
       Object.keys(hist[antid]).forEach(function (colid) {
