@@ -145,7 +145,7 @@ app.post('/binds', function (req, res) {
     time: Date.now()
   };
 
-  colony.log(pingstr);
+  console.log(pingstr);
 
   cols.binds.findOne({
     ping: bind.ping
