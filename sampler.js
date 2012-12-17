@@ -174,8 +174,8 @@ function sampler (cols, callback) {
           // Add guess to history cache.
           if (colony && colony.location && ant && ant.user) {
             (historyCache[antid] || (historyCache[antid] = {}));
-            historyCache[antid][colony.location] || (historyCache[antid][colony.location] = 0);
-            historyCache[antid][colony.location]++;
+            historyCache[antid][guess.location] || (historyCache[antid][guess.location] = 0);
+            historyCache[antid][guess.location]++;
           } else {
             console.log('Guess has no colony', colony, 'or ant', ant);
           }
