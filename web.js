@@ -80,8 +80,8 @@ function makeVisitedOpenGraphRequest(userId, presentationId ) {
   var access_token = getAccessTokenFromUserId(userId, function (access_token) {
     console.log("HEY", access_token);
     console.log(presentationUrl);
-    openGraph.publish('me',access_token,'visit', 'presentation', presentationUrl, function(err,response){
-      console.log(response);
+    openGraph.publish('me', access_token, 'visit', 'presentation', presentationUrl, {'access_token': access_token}, function(err,response){
+      console.log(response, err);
     });
   });
 }
@@ -704,7 +704,6 @@ setupMongo(function () {
   setupPostgres(function () {
     setupServer(function() {
       console.log("Listening on http://localhost:" + port);
-      makeVisitedOpenGraphRequest(3, 1 );
     })
   })
 });
