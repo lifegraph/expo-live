@@ -345,14 +345,14 @@ app.put('/ants/:id', function (req, res) {
     $set: {}
   };
   if ('user' in req.body) {
-    ant.user = req.body.user || null;
+    ant.$set.user = req.body.user || null;
   }
   cols.ants.update({
     _id: String(req.params.id)
   }, ant, {
     upsert: true
   }, function (err, docs) {
-    res.json({message: 'Succeeded in assigning ant.'});
+    res.json({message: 'Succeeded in assigning ant.', ant: ant});
   });
 });
 
@@ -391,14 +391,14 @@ app.put('/colonies/:id', function (req, res) {
     $set: {}
   };
   if (req.body.location) {
-    colony.location = String(req.body.location);
+    colony.$set.location = String(req.body.location);
   };
   cols.colonies.update({
     _id: String(req.params.id)
   }, colony, {
     upsert: true
   }, function (err, docs) {
-    res.json({message: 'Succeeded in assigning colony.'});
+    res.json({message: 'Succeeded in assigning colony.', colony: colony});
   });
 });
 
