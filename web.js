@@ -290,7 +290,7 @@ app.get('/guesses/:id', function (req, res) {
  * New History
  */
 
-app.get('/guesses', function (req, res) {
+app.get('/newhistory', function (req, res) {
   var filterCriteria = {}, sort = 'start';
 
   if (req.query.ant) {
