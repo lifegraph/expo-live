@@ -33,6 +33,10 @@ var api = olinexpo(function () {
     }).forEach(function (user) {
       $('#ants select').append($('<option value="' + user.id + '">').text(user.name));
     })
+
+    ants.forEach(function (ant) {
+      $('li[data-ant="' + ant.id + '"] .users').val(ant.user);
+    })
   });
 
   $('#new').on('click', function () {
