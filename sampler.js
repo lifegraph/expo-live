@@ -271,7 +271,9 @@ function historySampler (cols) {
         });
       });
     });
-  } catch (e) { }
+  } catch (e) {
+    console.error(e);
+  }
 
   setTimeout(historySampler.bind(cols), 1000);
 }
