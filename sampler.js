@@ -275,7 +275,7 @@ function historySampler (cols) {
     console.error(e);
   }
 
-  setTimeout(historySampler.bind(cols), 1000);
+  setTimeout(historySampler.bind(null, cols), 1000);
 }
 
 module.exports = sampler;
