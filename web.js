@@ -341,7 +341,8 @@ app.get('/ants/:id', function (req, res) {
 
 app.put('/ants/:id', function (req, res) {
   var ant = {
-    _id: String(req.params.id)
+    _id: String(req.params.id),
+    $set: {}
   };
   if ('user' in req.body) {
     ant.user = req.body.user || null;
@@ -386,7 +387,8 @@ app.get('/colonies/:id', function (req, res) {
 
 app.put('/colonies/:id', function (req, res) {
   var colony = {
-    _id: String(req.params.id)
+    _id: String(req.params.id),
+    $set: {}
   };
   if (req.body.location) {
     colony.location = String(req.body.location);
@@ -573,8 +575,9 @@ function setupMongo (next) {
             _id: guess.ant
           }, {
             _id: guess.ant,
-            guess: guess._id,
-            user: guess.user
+            $set: {
+              guess: guess._id
+            }
           }, {
             upsert: true
           }, function (err, docs) {
