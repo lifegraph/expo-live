@@ -556,6 +556,7 @@ function setupMongo (next) {
     cols.ants = new mongo.Collection(dbmongo, 'ants');
     cols.colonies = new mongo.Collection(dbmongo, 'colonies');
     cols.guesses = new mongo.Collection(dbmongo, 'guesses');
+    cols.history = new mongo.Collection(dbmongo, 'history');
 
     sampler(cols, function (json) {
       cols.guesses.insert(json, function (err, docs) {

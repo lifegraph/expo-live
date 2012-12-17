@@ -77,6 +77,8 @@ var COLONIES_SET = (function () {
 var INCORRECT_ANTS = {}, INCORRECT_COLS = {}, ANT_GUESSES = {};
 var CONFIDENCE_SUCCESSFUL = 0, CONFIDENCE_TOTAL = 0, CONFIDENCE_DROPPED = 0;
 
+var historyCache = {};
+
 // Variables.
 var GUESS_INTERVAL = process.env.GUESS_INTERVAL || 10*1000;
 var GUESS_THRESHOLD = process.env.GUESS_THRESHOLD || (1/6)*60*1000;
@@ -95,6 +97,8 @@ function sampler (cols, callback) {
   var currenttime = Date.now();
   var querytime = currenttime - GUESS_THRESHOLD;
 
+  historySampler(cols);
+
   // Log some sod.
   console.log('\nGuessing location based on binds from', querytime, 'to', currenttime);
   console.log('Incorrectest ants:', JSON.stringify(INCORRECT_ANTS));
@@ -109,24 +113,23 @@ function sampler (cols, callback) {
     }   
   }).sort({time: 1}).each(function (err, bind) {
     if (bind == null) {
-      // Fetched all binds. Process guess.
-      consumeBinds();
+      // Fetched all binds. Process guesses.
+      setTimeout(consumeBinds, 200);
 
       // Consume next binds.
-      //setTimeout(calculateGuesses.bind(null, currenttime + GUESS_INTERVAL), 0);
       setTimeout(sampler.bind(this, cols, callback), GUESS_INTERVAL);
     } else {
-      //if (bind.ant in CORRECT && COLONIES.indexOf(bind.colony) >= 0) {
+      try {
         consumeGuess(guesses, bind, querytime, currenttime);
         (adequateness[bind.ant] || (adequateness[bind.ant] = 0));
         adequateness[bind.ant]++;
-      //}
+      } catch (e) {}
     }
   });
 
   function consumeBinds () {
     // For each ant's bundle of binds, perform our algorithm.
-    if (Object.keys(guesses).map(function (antid) {
+    Object.keys(guesses).forEach(function (antid) {
       var guess = makeGuess(guesses[antid], antid);
       console.log(guess);
       if (!guess) {
@@ -178,21 +181,16 @@ function sampler (cols, callback) {
             ant: antid,
             user: ant && ant.user,
           });
+
+          // Add guess to history cache.
+          (history[antid] || (history[antid] = {}));
+          history[antid][colony.location] || (history[antid][colony.location] = 0);
+          history[antid][colony.location]++;
         });
       })
 
       return true;
-    }).indexOf(true) < 0) {
-      console.log('Start:', new Date(querytime))
-      console.log('End:', new Date(currenttime))
-      /*
-      ANTS.forEach(function (antid) {
-        console.log(antid, '(' + CORRECT[antid] + ')', '=>', ANT_GUESSES[antid])
-      });
-      console.log('Success rate:', CONFIDENCE_SUCCESSFUL, '/', CONFIDENCE_TOTAL, '(accepting ' + (CONFIDENCE_TOTAL/(CONFIDENCE_TOTAL+CONFIDENCE_DROPPED)) + '%) => ', (CONFIDENCE_SUCCESSFUL/CONFIDENCE_TOTAL) + '%')
-      process.exit(1);
-      */
-    }
+    });
   }
 
   function consumeGuess (guesses, bind, start, end) {
@@ -231,6 +229,48 @@ function sampler (cols, callback) {
       confidence: (1 - BEST_WEIGHT) + ((bestloc / total) * BEST_WEIGHT)
     };
   }
+}
+
+function historySampler (cols) {
+  var hist = historyCache;
+  historyCache = {};
+
+  try {
+    Object.keys(hist).forEach(function (antid) {
+      var maxid, max = 0;
+      Object.keys(hist[antid]).forEach(function (colid) {
+        if (hist[antid][colid] > max) {
+          max = hist[antid][colid];
+          maxid = colid;
+        }
+      });
+
+      // Make new history bind.
+      cols.colonies.findOne({
+        _id: colid
+      }, function (err, colony) {
+        cols.ants.findOne({
+          _id: antid
+        }, function (err, ant) {
+          if (ant && ant.user && colony && colony.location) {
+
+            // Create history element
+            cols.history.insert({
+              time: Date.now(),
+              ant: antid,
+              colony: colid,
+              user: ant && ant.user,
+              location: colony && colony.location
+            }, function (err, docs) {
+              // inserted history element
+            });
+          }
+        });
+      });
+    });
+  } catch (e) { }
+
+  setTimeout(historySampler, 1000);
 }
 
 module.exports = sampler;
