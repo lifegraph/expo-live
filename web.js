@@ -76,29 +76,34 @@ var openGraph = new OpenGraph('olinexpo');
 // makes an open graph request for when the user visits the presentation
 function makeVisitedOpenGraphRequest(userId, presentationId ) {
   console.log("Open Graph Request for prezo:", presentationId );
-  var presentationUrl = 'http://olinexpo.com/presentation/' + presentationId;
-  elephantGraph.publish('me',getAccessTokenFromUserId(userId),'visit', 'presentation', presentationUrl, function(err,response){
-    console.log(response);
+  var presentationUrl = 'http://api.olinexpo.com/presentation/' + presentationId;
+  var access_token = getAccessTokenFromUserId(userId, function (access_token) {
+    console.log("HEY", access_token);
+    console.log(presentationUrl);
+    openGraph.publish('me',access_token,'visit', 'presentation', presentationUrl, function(err,response){
+      console.log(response);
+    });
   });
 }
 
-// Returns the access token if there is one for the given user_id.
-// hides errors and returns null if error or no result
-function getAccessTokenFromUserId(user_id) {
+// Returns the access token if there is one for the given user id.
+// hides errors and uses null if error or no result
+// calls next(access_token)
+function getAccessTokenFromUserId(userId, next) {
   dbpg.query('SELECT * FROM authentications WHERE user_id = $1 LIMIT 1', 
-    [user_id], function (err, result) {
+    [userId], function (err, result) {
     if (err) {
       console.error(err);
-      return null;
+      next(null);
     } else {
       if (result.rows.length) {
-        return result.rows[0].token;
+        next(result.rows[0].token);
       } else {
-        return null;
+        next(null);
       }
     }
   });
-});
+}
 
 // GET /binds
 
@@ -699,6 +704,7 @@ setupMongo(function () {
   setupPostgres(function () {
     setupServer(function() {
       console.log("Listening on http://localhost:" + port);
+      makeVisitedOpenGraphRequest(3, 1 );
     })
   })
 });
