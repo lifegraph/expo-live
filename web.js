@@ -701,12 +701,14 @@ function setupMongo (next) {
       });
     }, function (userid, locid) {
       console.log('Making open graph posting...');
-      var presid = getPresentationByLocation(new Date(), locid).id;
-      console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', presid);
-      try {
-        makeVisitedOpenGraphRequest(userid, presid);
-      } catch (e) {
-        console.error('OPENGRAPH:', e);
+      var pres = getPresentationByLocation(new Date(), locid);
+      if (pres) {
+        console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', pres.id);
+        try {
+          makeVisitedOpenGraphRequest(userid, presid);
+        } catch (e) {
+          console.error('OPENGRAPH:', e);
+        }
       }
     });
 
@@ -717,7 +719,7 @@ function setupMongo (next) {
 var PRESCACHE = [];
 
 function getPresentationByLocation (date, locid) {
-  var hours = date.getHours() - 2;
+  var hours = date.getHours() - 5;
   console.log('LOOKING FOR PRESENTATION', 'hour', hours, 'room', locid);
   return PRESCACHE.filter(function (row) {
     return row.start_hour == hours && row.room == locid;

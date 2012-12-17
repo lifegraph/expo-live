@@ -281,7 +281,7 @@ function historySampler (cols, opengraphPost) {
 
               // Get last five history elements.
               if (dontRepeatHistory[antid] != colid) {
-                var HISTORY_THRESHOLD = 1;
+                var HISTORY_THRESHOLD = 5; // FIVE MINUTES
                 cols.history.find({
                   user: ant.user,
                   location: colony.location
@@ -310,7 +310,7 @@ function historySampler (cols, opengraphPost) {
     console.error(e);
   }
 
-  setTimeout(historySampler.bind(null, cols, opengraphPost), 1*1000);
+  setTimeout(historySampler.bind(null, cols, opengraphPost), 60*1000);
 }
 
 module.exports = sampler;
