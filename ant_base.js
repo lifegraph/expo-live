@@ -11,13 +11,8 @@ function ant_base(cols) {
   // Add ants.
   generateIds(ANT_COUNT).forEach( function (ant_id) {
     // console.log(ant_id)
-    cols.ants.update({
+    cols.ants.insert({
       _id: String(ant_id)
-    }, {
-      _id: String(ant_id),
-      $set: {}
-    }, {
-      upsert: true
     }, function (err, docs) {
       if (err) {
         console.error(err);

@@ -139,7 +139,7 @@ Location.prototype.active = function (flag) {
 
 Location.prototype.bump = function () {
   this.active(true);
-  this.size(this._size + (100 - (this._size - this.baseSize)) / 4);
+  this.size(this._size + (200 - (this._size - this.baseSize)) / 4);
 }
 
 Location.prototype.label = function (label) {
@@ -158,21 +158,21 @@ createLocation("AC3L", -1073, 200);
 createLocation("AC1D1", 920, 80);
 createLocation("AC1D2", 850, 30);
 createLocation("AC1D3", 770, -10);
-createLocation("AC1D4", 680, -40);
-createLocation("AC1D5", 590, -70);
-createLocation("AC1D6", 490, -100);
-createLocation("AC1D7", 398, -112);
-createLocation("AC1D8", -179, -96);
-createLocation("AC1D9", -264, -88);
-createLocation("AC1D10", -337, -71);
-createLocation("AC1D11", -414, -48);
-createLocation("AC1D12", -491, -25);
-createLocation("AC1D13", -567, -2);
-createLocation("AC1D14", -629, 34);
-createLocation("AC1D15", -692, 64);
-createLocation("AC1D16", -747, 94);
-createLocation("AC1D17", -798, 121);
-createLocation("AC1D18", -839, 148);
+createLocation("AC1D4", 690, -40);
+createLocation("AC1D5", 620, -60);
+createLocation("AC1D6", 540, -80);
+createLocation("AC1D7", 468, -102);
+createLocation("AC1D8", 394, -105);
+createLocation("AC1D9", 320, -110);
+createLocation("AC1D10", 240, -115);
+createLocation("AC1D11", -174, -100);
+createLocation("AC1D12", -271, -80);
+createLocation("AC1D13", -347, -50);
+createLocation("AC1D14", -409, -30);
+createLocation("AC1D15", -502, -10);
+createLocation("AC1D16", -617, 26);
+createLocation("AC1D17", -728, 70);
+createLocation("AC1D18", -819, 128);
 createLocation("AC1D19", -874, 170);
 createLocation("AC1D20", -905, 191);
 
@@ -196,6 +196,15 @@ createLocation("AC3D24", -65, -27);
 createLocation("AC3D23", -117, -16);
 createLocation("AC3D22", -168, 0);
 createLocation("AC3D21", -219, 8);
+
+createLocation("AC113", -50, -401); // FF01
+createLocation("AC126", 650, -300);
+createLocation("AC128", 1000, -200);
+
+createLocation("AC318", 400, -350);
+createLocation("AC328", 1100, -160);
+// FF02 
+// FF03
 
 var api = olinexpo(function () {
 

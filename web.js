@@ -135,13 +135,17 @@ app.post('/binds', function (req, res) {
     return res.json({message: 'Need ant and colony parameter.'}, 500);
   }
 
+  var pingstr = 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony;
+
   var bind = {
     ant: req.body.ant,
     colony: req.body.colony,
-    ping: 'ping:' + String(req.body.ping) + '-time:' + String(timeChunk) + '-ant:' + req.body.ant + '-colony:' + req.body.colony,
+    ping: pingstr,
     queen: req.body.queen,
     time: Date.now()
   };
+
+  console.log(pingstr);
 
   cols.binds.findOne({
     ping: bind.ping
@@ -423,9 +427,7 @@ app.put('/ants/:id', function (req, res) {
   var ant = {
     $set: {}
   };
-  if ('user' in req.body) {
-    ant.$set.user = req.body.user || null;
-  }
+  ant.$set.user = req.body.user == 'null' || req.body.user == '---' ? null : req.body.user || null;
   cols.ants.update({
     _id: String(req.params.id)
   }, ant, {
@@ -539,7 +541,9 @@ app.get('/locations', function (req, res) {
       console.log(result);
       res.json(result.rows.map(locationJSON).filter(function (loc) {
         return loc.id;
-      }));
+      }).concat(['AC318', 'AC328', 'AC3D40', 'AC3D39'].map(function (k) {
+        return {id: k}
+      })));
     }
   });
 });
@@ -705,7 +709,7 @@ function setupMongo (next) {
       if (pres) {
         console.log('OPENGRAPH: OPEN GRAPH POST FOR', userid, 'at', locid, 'pres', pres.id);
         try {
-          makeVisitedOpenGraphRequest(userid, presid);
+          makeVisitedOpenGraphRequest(userid, pres.id);
         } catch (e) {
           console.error('OPENGRAPH:', e);
         }

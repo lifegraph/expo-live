@@ -1,0 +1,101 @@
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355542879236, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf15fd062080200000002" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355542889298, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf169d062080200000003" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355542899377, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf173d062080200000004" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355542909447, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf17dd062080200000005" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355542919516, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf187d062080200000006" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542929576, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf191d062080200000008" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542939646, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf19bd062080200000009" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542949706, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1a5d06208020000000a" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542959767, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1afd06208020000000b" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542969826, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1b9d06208020000000c" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542979886, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1c3d06208020000000d" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542989937, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1cdd06208020000000e" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355542999996, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1d8d06208020000000f" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355543010066, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1e2d062080200000010" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355543020136, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1ecd062080200000011" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355543030196, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf1f6d062080200000012" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355543040256, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf200d062080200000013" } }
+{ "colony" : "D03", "confidence" : 0.25, "location" : null, "time" : 1355543050318, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf20ad062080200000014" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355543060388, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf214d062080200000015" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355543070451, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf21ed062080200000016" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355543080526, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf228d062080200000017" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355543090587, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf232d062080200000018" } }
+{ "colony" : "D03", "confidence" : 0.125, "location" : null, "time" : 1355543100656, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cbf23cd062080200000019" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544786745, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf8d2c7bb330200000002" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544796805, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf8dcc7bb330200000003" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544806865, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf8e6c7bb330200000004" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544816926, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf8f0c7bb330200000005" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544826986, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf8fbc7bb330200000006" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544837046, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf905c7bb330200000007" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544847106, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf90fc7bb330200000008" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544857166, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf919c7bb330200000009" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544867226, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf923c7bb33020000000a" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544877296, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf92dc7bb33020000000b" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544887356, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf937c7bb33020000000c" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544897416, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf941c7bb33020000000d" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544907476, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf94bc7bb33020000000e" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544917536, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf955c7bb33020000000f" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544927596, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf95fc7bb330200000010" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544937646, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf969c7bb330200000011" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544947706, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf973c7bb330200000012" } }
+{ "colony" : "D01", "confidence" : 0.125, "location" : null, "time" : 1355544957766, "ant" : "wellnow", "user" : null, "_id" : { "$oid" : "50cbf97dc7bb330200000013" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355593936770, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb8d01f79e20200000002" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355593946840, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb8da1f79e20200000003" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355593956890, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb8e41f79e20200000004" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355593966949, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb8ef1f79e20200000005" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355593976999, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb8f91f79e20200000006" } }
+{ "colony" : "78", "confidence" : 0.375, "location" : null, "time" : 1355593987068, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9031f79e20200000009" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355593997138, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb90d1f79e2020000000e" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594007207, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9171f79e20200000010" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594017277, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9211f79e20200000011" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594027337, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb92b1f79e20200000012" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594037406, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9351f79e20200000013" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594047465, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb93f1f79e20200000014" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594057525, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9491f79e20200000015" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594067574, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9531f79e20200000016" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594077624, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb95d1f79e20200000017" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594087683, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9671f79e20200000018" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594097742, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9711f79e20200000019" } }
+{ "colony" : "78", "confidence" : 1, "location" : null, "time" : 1355594107802, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb97b1f79e2020000001a" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355594117852, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9851f79e2020000001b" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355594127911, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb98f1f79e2020000001c" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355594137971, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb99a1f79e2020000001d" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355594148030, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9a41f79e2020000001e" } }
+{ "colony" : "78", "confidence" : 0.875, "location" : null, "time" : 1355594158089, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9ae1f79e2020000001f" } }
+{ "colony" : "78", "confidence" : 0.625, "location" : null, "time" : 1355594168149, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccb9b81f79e20200000020" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605646546, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce68e334e3f0200000002" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605656616, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce698334e3f0200000003" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605666686, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6a2334e3f0200000004" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605676746, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6ac334e3f0200000005" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605686810, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6b6334e3f0200000006" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605696876, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6c0334e3f0200000007" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605706966, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6cb334e3f0200000008" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605717036, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6d5334e3f0200000009" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605727096, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6df334e3f020000000a" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605737156, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6e9334e3f020000000b" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605747216, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6f3334e3f020000000c" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605757286, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce6fd334e3f020000000d" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605767356, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce707334e3f020000000e" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605777416, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce711334e3f020000000f" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605787476, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce71b334e3f0200000010" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605797536, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce725334e3f0200000011" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605807596, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce72f334e3f0200000012" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : null, "time" : 1355605817668, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cce739334e3f0200000013" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "---", "time" : 1355606612848, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea54334e3f0200000015" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606622929, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea5e334e3f0200000017" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606622929, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea5e334e3f0200000018" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606632999, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea69334e3f020000001d" } }
+{ "colony" : "78", "confidence" : 0.625, "location" : "AC328", "time" : 1355606632999, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea69334e3f020000001e" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606643069, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea73334e3f0200000023" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC328", "time" : 1355606643069, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea73334e3f0200000024" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC328", "time" : 1355606653139, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea7d334e3f0200000025" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606653139, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea7d334e3f0200000026" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606663219, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea87334e3f0200000027" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC328", "time" : 1355606663219, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea87334e3f0200000028" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC328", "time" : 1355606673277, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea91334e3f0200000029" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC328", "time" : 1355606673277, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea91334e3f020000002a" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC128", "time" : 1355606683349, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50ccea9b334e3f020000002b" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC128", "time" : 1355606683349, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50ccea9b334e3f020000002c" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC128", "time" : 1355606693409, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cceaa5334e3f020000002d" } }
+{ "colony" : "78", "confidence" : 1, "location" : "AC128", "time" : 1355606693409, "ant" : "Select Ant", "user" : null, "_id" : { "$oid" : "50cceaa5334e3f020000002e" } }
+{ "colony" : "78", "confidence" : 0.125, "location" : "AC128", "time" : 1355606703479, "ant" : "theant", "user" : null, "_id" : { "$oid" : "50cceaaf334e3f020000002f" } }

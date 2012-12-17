@@ -230,7 +230,7 @@ function sampler (cols, callback, opengraphPost) {
     })
 
     // If there is no location with binds, return null.
-    console.log('Guess data:', JSON.stringify(binds));
+    console.log('Guess data for ', antid, ': ', JSON.stringify(binds));
     return !(bestloc > 0) ? null : {
       location: bestlocid,
       confidence: (1 - BEST_WEIGHT) + ((bestloc / total) * BEST_WEIGHT)
@@ -287,7 +287,7 @@ function historySampler (cols, opengraphPost) {
 
               // Get last five history elements.
               if (dontRepeatHistory[antid] != colid) {
-                var HISTORY_THRESHOLD = 5; // FIVE MINUTES
+                var HISTORY_THRESHOLD = 2; // THESHOLD FOR POSTING
                 cols.history.find({
                   user: ant.user,
                   location: colony.location
