@@ -59,7 +59,7 @@ td { vertical-align: middle; padding-top: 200px; }
  */
 
 function fitScreen () {
-  $('body').css('zoom', $(window).width()/4000*100 + '%'); 
+  //$('body').css('zoom', $(window).width()/4000*100 + '%'); 
 }
 $(window).on('resize', fitScreen);
 fitScreen();
@@ -152,7 +152,8 @@ function createLocation (id, x, y) {
   locations[id] = new Location(id, x, y);
 }
 
-createLocation("AC118", -500, -80);
+//createLocation("AC118", -500, -80);
+createLocation("AC3L", -1073, -482);
 
 createLocation("AC1D1", 920, 80);
 createLocation("AC1D2", 850, 30);
@@ -175,26 +176,26 @@ createLocation("AC1D18", -839, 148);
 createLocation("AC1D19", -874, 170);
 createLocation("AC1D20", -905, 191);
 
-createLocation("AC3D40", 920, 80);
-createLocation("AC3D39", 850, 30);
-createLocation("AC3D38", 770, -10);
-createLocation("AC3D37", 680, -40);
-createLocation("AC3D36", 590, -70);
-createLocation("AC3D35", 490, -100);
-createLocation("AC3D34", 398, -112);
-createLocation("AC3D33", -179, -96);
-createLocation("AC3D32", -264, -88);
-createLocation("AC3D31", -337, -71);
-createLocation("AC3D30", -414, -48);
-createLocation("AC3D29", -491, -25);
-createLocation("AC3D28", -567, -2);
-createLocation("AC3D27", -629, 34);
-createLocation("AC3D26", -692, 64);
-createLocation("AC3D25", -747, 94);
-createLocation("AC3D24", -798, 121);
-createLocation("AC3D23", -839, 148);
-createLocation("AC3D22", -874, 170);
-createLocation("AC3D21", -905, 191);
+createLocation("AC3D40", 1135, 144);
+createLocation("AC3D39", 1100, 190);
+createLocation("AC3D38", 1050, 170);
+createLocation("AC3D37", 990, 150);
+createLocation("AC3D36", 520, -15);
+createLocation("AC3D35", 480, -23);
+createLocation("AC3D34", 440, -29);
+createLocation("AC3D33", 405, -35);
+createLocation("AC3D32", 360, -41);
+createLocation("AC3D31", 310, -47);
+createLocation("AC3D30", 260, -47);
+createLocation("AC3D29", 210, -47);
+createLocation("AC3D28", 155, -49);
+createLocation("AC3D27", 103, -43);
+createLocation("AC3D26", 45, -43);
+createLocation("AC3D25", -11, -34);
+createLocation("AC3D24", -65, -27);
+createLocation("AC3D23", -117, -16);
+createLocation("AC3D22", -168, 0);
+createLocation("AC3D21", -219, 8);
 
 var api = olinexpo(function () {
 
