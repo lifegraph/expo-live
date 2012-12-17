@@ -287,7 +287,7 @@ function historySampler (cols, opengraphPost) {
 
               // Get last five history elements.
               if (dontRepeatHistory[antid] != colid) {
-                var HISTORY_THRESHOLD = 5; // FIVE MINUTES
+                var HISTORY_THRESHOLD = 5; // THESHOLD FOR POSTING
                 cols.history.find({
                   user: ant.user,
                   location: colony.location
