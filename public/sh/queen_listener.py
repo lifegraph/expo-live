@@ -3,6 +3,7 @@
 import serial, json
 import os
 import subprocess
+from subprocess import Popen
 
 arduino = serial.Serial('/dev/ttyACM0', 57600) # serial port# and baud rate
 
@@ -10,7 +11,8 @@ def chunks(l, n):
   return [l[i:i+n] for i in range(0, len(l), n)]
 
 def post_to_server(queen_id, ant_id, ping_id, colony_id):
-  subprocess.call(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "-d", "ping=" + ping_id, "api.olinexpo.com/binds"])
+  # subprocess.call(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "-d", "ping=" + ping_id, "localhost:5000/binds"])
+  Popen(["curl", "-X", "POST", "-d", "colony=" + colony_id, "-d", "ant=" + ant_id, "-d", "ping=" + ping_id, "http://api.olinexpo.com/binds"])
 
 def append_to_file(filename, data):
   with open(filename, "a") as f: # open file in append mode
@@ -24,6 +26,7 @@ def grab_ant_ids():
     
 ant_ids = set()
 
+print 'time to fly'
 prefix = 'Got payload: '
 while 1:
   data = arduino.readline().strip()

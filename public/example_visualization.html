@@ -21,7 +21,7 @@
 
 </style>
 <script>
-var colonyId = "FF03";
+var colonyId = "AA02";
 var resetDisplayTimeout = null;
 var lasttime = 0;
 console.log("hi"); 
@@ -35,7 +35,7 @@ var api = olinexpo(function () {
     console.log("bind");
     console.log(bind);
     clearTimeout(resetDisplayTimeout);
-    resetDisplayTimeout = setTimeout(function(){ $('#people').text('')}, 3000);
+    resetDisplayTimeout = setTimeout(function(){ $('#people').text('')}, 2500);
     if (colonyId == bind.colony) {
       if (bind.user) {
         console.log("Found a user!");
