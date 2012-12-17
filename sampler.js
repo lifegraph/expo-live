@@ -287,10 +287,14 @@ function historySampler (cols, opengraphPost) {
                   location: colony.location
                 }).sort({time: -1}).limit(HISTORY_THRESHOLD).toArray(function (err, arr) {
                   if (arr.length == HISTORY_THRESHOLD) {
-                    console.log('BIG HISTORY threshold.');
-                    opengraphPost(ant.user, colony.location);
+                    try {
+                      console.log('BIG HISTORY threshold.');
+                      opengraphPost(ant.user, colony.location);
+                    } catch (e) { }
                   }
                 });
+              } else {
+                console.log('REPEATING HISTORY ');
               }
               dontRepeatHistory[antid] = colid;
             });

@@ -711,7 +711,9 @@ function setupMongo (next) {
 var PRESCACHE = [];
 
 function getPresentationByLocation (date, locid) {
-  var hours = date.getHours() - 3;
+  var hours = date.getHours() - 2;
+  console.log(PRESCACHE);
+  console.log('LOOKING FOR PRESENTATION', 'hour', hours, 'room', locid);
   return PRESCACHE.filter(function (row) {
     return row.start_hour == hours && row.room == locid;
   })[0];
