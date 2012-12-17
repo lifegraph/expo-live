@@ -427,7 +427,7 @@ app.put('/ants/:id', function (req, res) {
   var ant = {
     $set: {}
   };
-  ant.$set.user = req.body.user == 'null' ? null : req.body.user || null;
+  ant.$set.user = req.body.user == 'null' || req.body.user == '---' ? null : req.body.user || null;
   cols.ants.update({
     _id: String(req.params.id)
   }, ant, {
