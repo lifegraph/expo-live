@@ -250,6 +250,7 @@ function historySampler (cols) {
       });
 
       // Make new history bind.
+      var colid = maxid;
       cols.colonies.findOne({
         _id: colid
       }, function (err, colony) {
